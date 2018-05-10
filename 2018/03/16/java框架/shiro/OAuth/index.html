@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="shiro,OAuth," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="OAuth2 集成目前很多开放平台如新浪微博开放平台都在使用提供开放 API 接口供开发者使用，随之带 来了第三方应用要到开放平台进行授权的问题，OAuth 就是干这个的，OAuth2 是 OAuth 协议的下一个版本，相比 OAuth1，OAuth2 整个授权流程更简单安全了，但不兼容 OAuth1， 具 体 可以到 OAuth2 官 网 http://oauth.net/2/ 查看，OAuth">
+<meta name="keywords" content="shiro,OAuth">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OAuth">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java框架/shiro/OAuth/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="OAuth2 集成目前很多开放平台如新浪微博开放平台都在使用提供开放 API 接口供开发者使用，随之带 来了第三方应用要到开放平台进行授权的问题，OAuth 就是干这个的，OAuth2 是 OAuth 协议的下一个版本，相比 OAuth1，OAuth2 整个授权流程更简单安全了，但不兼容 OAuth1， 具 体 可以到 OAuth2 官 网 http://oauth.net/2/ 查看，OAuth">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://dl2.iteye.com/upload/attachment/0095/4801/3e97c6f9-41a7-398e-9cdb-b60afda794e9.png">
+<meta property="og:image" content="http://www.sinaimg.cn/blog/developer/wiki/oAuth2_02.gif">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.151Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OAuth">
+<meta name="twitter:description" content="OAuth2 集成目前很多开放平台如新浪微博开放平台都在使用提供开放 API 接口供开发者使用，随之带 来了第三方应用要到开放平台进行授权的问题，OAuth 就是干这个的，OAuth2 是 OAuth 协议的下一个版本，相比 OAuth1，OAuth2 整个授权流程更简单安全了，但不兼容 OAuth1， 具 体 可以到 OAuth2 官 网 http://oauth.net/2/ 查看，OAuth">
+<meta name="twitter:image" content="http://dl2.iteye.com/upload/attachment/0095/4801/3e97c6f9-41a7-398e-9cdb-b60afda794e9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java框架/shiro/OAuth/"/>
+
+
+
+
+
+  <title>OAuth | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java框架/shiro/OAuth/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OAuth</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/" itemprop="url" rel="index">
+                    <span itemprop="name">java框架</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/shiro/" itemprop="url" rel="index">
+                    <span itemprop="name">shiro</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java框架/shiro/OAuth/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java框架/shiro/OAuth/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="OAuth2-集成"><a href="#OAuth2-集成" class="headerlink" title="OAuth2 集成"></a>OAuth2 集成</h1><p>目前很多开放平台如新浪微博开放平台都在使用提供开放 API 接口供开发者使用，随之带 来了第三方应用要到开放平台进行授权的问题，OAuth 就是干这个的，OAuth2 是 OAuth 协议的下一个版本，相比 OAuth1，OAuth2 整个授权流程更简单安全了，但不兼容 OAuth1， 具 体 可以到 OAuth2 官 网 <a href="http://oauth.net/2/" target="_blank" rel="noopener">http://oauth.net/2/</a> 查看，OAuth2 协 议 规 范 可以参考 <a href="http://tools.ietf.org/html/rfc6749。目前有好多参考实现供选择，可以到其官网查看下载。" target="_blank" rel="noopener">http://tools.ietf.org/html/rfc6749。目前有好多参考实现供选择，可以到其官网查看下载。</a> </p>
+<h3 id="OAuth-角色"><a href="#OAuth-角色" class="headerlink" title="OAuth 角色"></a>OAuth 角色</h3><ul>
+<li>资源拥有者（resource owner）：能授权访问受保护资源的一个实体，可以是一个人，那我 们称之为最终用户；如新浪微博用户 zhangsan； </li>
+<li>资源服务器（resource server）：存储受保护资源，客户端通过 access token 请求资源，资源服务器响应受保护资源给客户端；存储着用户 zhangsan 的微博等信息。</li>
+<li>授权服务器（authorization server）：成功验证资源拥有者并获取授权之后，授权服务器 颁发授权令牌（Access Token）给客户端。 </li>
+<li>客户端（client）：如新浪微博客户端weico、微格等第三方应用，也可以是它自己的官方应用；其本身不存储资源，而是资源拥有者授权通过后，使用它的授权（授权令牌）访问受保护资源，然后客户端把相应的数据展示出来/提交到服务器。“客户端”术语不代表任 何特定实现（如应用运行在一台服务器、桌面、手机或其他设备）。 </li>
+</ul>
+<p><img src="http://dl2.iteye.com/upload/attachment/0095/4801/3e97c6f9-41a7-398e-9cdb-b60afda794e9.png" alt=""></p>
+<ol>
+<li>客户端从资源拥有者那请求授权。授权请求可以直接发给资源拥有者，或间接的通过授权服务器这种中介，后者更可取。 </li>
+<li>客户端收到一个授权许可，代表资源服务器提供的授权。 </li>
+<li>客户端使用它自己的私有证书及授权许可到授权服务器验证。 </li>
+<li>如果验证成功，则下发一个访问令牌。 </li>
+<li>客户端使用访问令牌向资源服务器请求受保护资源。 </li>
+<li>资源服务器会验证访问令牌的有效性，如果成功则下发受保护资源</li>
+</ol>
+<h3 id="授权码类型的开放授权"><a href="#授权码类型的开放授权" class="headerlink" title="授权码类型的开放授权"></a>授权码类型的开放授权</h3><p><img src="http://www.sinaimg.cn/blog/developer/wiki/oAuth2_02.gif" alt=""></p>
+<ol>
+<li>Client初始化协议的执行流程。首先通过HTTP 302来重定向RO用户代理到AS。Client在redirect_uri中应包含如下参数：client_id, scope (描述被访问的资源), redirect_uri (即Client的URI), state (用于抵制CSRF攻击). 此外，请求中还可以包含access_type和approval_prompt参数。当approval_prompt=force时，AS将提供交互页面，要求RO必须显式地批准（或拒绝）Client的此次请求。如果没有approval_prompt参数，则默认为RO批准此次请求。当access_type=offline时，AS将在颁发access_token时，同时还会颁发一个refresh_token。因为access_token的有效期较短（如3600秒），为了优化协议执行流程，offline方式将允许Client直接持refresh_token来换取一个新的access_token。</li>
+<li>AS认证RO身份，并提供页面供RO决定是否批准或拒绝Client的此次请求（当approval_prompt=force时）。</li>
+<li>若请求被批准，AS使用步骤(1)中Client提供的redirect_uri重定向RO用户代理到Client。redirect_uri须包含authorization_code，以及步骤1中Client提供的state。若请求被拒绝，AS将通过redirect_uri返回相应的错误信息。</li>
+<li>Client拿authorization_code去访问AS以交换所需的access_token。Client请求信息中应包含用于认证Client身份所需的认证数据，以及上一步请求authorization_code时所用的redirect_uri。</li>
+<li>AS在收到authorization_code时需要验证Client的身份，并验证收到的redirect_uri与第3步请求authorization_code时所使用的redirect_uri相匹配。如果验证通过，AS将返回access_token，以及refresh_token（若access_type=offline）。</li>
+</ol>
+<h2 id="服务器端"><a href="#服务器端" class="headerlink" title="服务器端"></a>服务器端</h2><h3 id="POM-依赖"><a href="#POM-依赖" class="headerlink" title="POM 依赖"></a>POM 依赖</h3><p>此处我们使用 apache oltu oauth2 服务端实现，需要引入 authzserver（授权服务器依赖）和 resourceserver（资源服务器依赖）</p>
+<pre><code>&lt;dependency&gt;                 
+    &lt;groupId&gt;org.apache.oltu.oauth2&lt;/groupId&gt;             
+    &lt;artifactId&gt;org.apache.oltu.oauth2.authzserver&lt;/artifactId&gt;    
+    &lt;version&gt;0.31&lt;/version&gt; 
+&lt;/dependency&gt; 
+&lt;dependency&gt;     
+    &lt;groupId&gt;org.apache.oltu.oauth2&lt;/groupId&gt;         &lt;artifactId&gt;org.apache.oltu.oauth2.resourceserver&lt;/artifactId&gt; 
+    &lt;version&gt;0.31&lt;/version&gt; 
+&lt;/dependency&gt;
+</code></pre><h3 id="实体类"><a href="#实体类" class="headerlink" title="实体类"></a>实体类</h3><h3 id="表和Sql"><a href="#表和Sql" class="headerlink" title="表和Sql"></a>表和Sql</h3><h3 id="DAO"><a href="#DAO" class="headerlink" title="DAO"></a>DAO</h3><h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><pre><code>public interface UserService {  
+    public User createUser(User user);// 创建用户  
+    public User updateUser(User user);// 更新用户  
+    public void deleteUser(Long userId);// 删除用户  
+    public void changePassword(Long userId, String newPassword); //修改密码  
+    User findOne(Long userId);// 根据id查找用户  
+    List&lt;User&gt; findAll();// 得到所有用户  
+    public User findByUsername(String username);// 根据用户名查找用户  
+}  
+
+public interface ClientService {  
+    public Client createClient(Client client);// 创建客户端  
+    public Client updateClient(Client client);// 更新客户端  
+    public void deleteClient(Long clientId);// 删除客户端  
+    Client findOne(Long clientId);// 根据id查找客户端  
+    List&lt;Client&gt; findAll();// 查找所有  
+    Client findByClientId(String clientId);// 根据客户端id查找客户端  
+    Client findByClientSecret(String clientSecret);//根据客户端安全KEY查找客户端  
+}  
+
+此处通过OAuthService实现进行auth code和access token的维护。
+
+public interface OAuthService {  
+   public void addAuthCode(String authCode, String username);// 添加 auth code  
+   public void addAccessToken(String accessToken, String username); // 添加 access token  
+   boolean checkAuthCode(String authCode); // 验证auth code是否有效  
+   boolean checkAccessToken(String accessToken); // 验证access token是否有效  
+   String getUsernameByAuthCode(String authCode);// 根据auth code获取用户名  
+   String getUsernameByAccessToken(String accessToken);// 根据access token获取用户名  
+   long getExpireIn();//auth code / access token 过期时间  
+   public boolean checkClientId(String clientId);// 检查客户端id是否存在  
+   public boolean checkClientSecret(String clientSecret);// 坚持客户端安全KEY是否存在  
+}   
+</code></pre><h3 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h3><h4 id="AuthorizeController"><a href="#AuthorizeController" class="headerlink" title="AuthorizeController"></a>AuthorizeController</h4><pre><code>@Controller
+public class AuthorizeController {
+  @Autowired
+  private OAuthService oAuthService;
+  @Autowired
+  private ClientService clientService;
+  @RequestMapping(&quot;/authorize&quot;)
+  public Object authorize(Model model,  HttpServletRequest request)
+        throws URISyntaxException, OAuthSystemException {
+    try {
+      //构建OAuth 授权请求
+      OAuthAuthzRequest oauthRequest = new OAuthAuthzRequest(request);
+      //检查传入的客户端id是否正确
+      if (!oAuthService.checkClientId(oauthRequest.getClientId())) {
+        OAuthResponse response = OAuthASResponse
+             .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
+             .setError(OAuthError.TokenResponse.INVALID_CLIENT)
+             .setErrorDescription(Constants.INVALID_CLIENT_DESCRIPTION)
+             .buildJSONMessage();
+        return new ResponseEntity(
+           response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
+      }
+
+      Subject subject = SecurityUtils.getSubject();
+      //如果用户没有登录，跳转到登陆页面
+      if(!subject.isAuthenticated()) {
+        if(!login(subject, request)) {//登录失败时跳转到登陆页面
+          model.addAttribute(&quot;client&quot;,    
+              clientService.findByClientId(oauthRequest.getClientId()));
+          return &quot;oauth2login&quot;;
+        }
+      }
+
+      String username = (String)subject.getPrincipal();
+      //生成授权码
+      String authorizationCode = null;
+      //responseType目前仅支持CODE，另外还有TOKEN
+      String responseType = oauthRequest.getParam(OAuth.OAUTH_RESPONSE_TYPE);
+      if (responseType.equals(ResponseType.CODE.toString())) {
+        OAuthIssuerImpl oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
+        authorizationCode = oauthIssuerImpl.authorizationCode();
+        oAuthService.addAuthCode(authorizationCode, username);
+      }
+      //进行OAuth响应构建
+      OAuthASResponse.OAuthAuthorizationResponseBuilder builder =
+        OAuthASResponse.authorizationResponse(request, 
+                                           HttpServletResponse.SC_FOUND);
+      //设置授权码
+      builder.setCode(authorizationCode);
+      //得到到客户端重定向地址
+      String redirectURI = oauthRequest.getParam(OAuth.OAUTH_REDIRECT_URI);
+
+      //构建响应
+      final OAuthResponse response = builder.location(redirectURI).buildQueryMessage();
+      //根据OAuthResponse返回ResponseEntity响应
+      HttpHeaders headers = new HttpHeaders();
+      headers.setLocation(new URI(response.getLocationUri()));
+      return new ResponseEntity(headers, HttpStatus.valueOf(response.getResponseStatus()));
+    } catch (OAuthProblemException e) {
+      //出错处理
+      String redirectUri = e.getRedirectUri();
+      if (OAuthUtils.isEmpty(redirectUri)) {
+        //告诉客户端没有传入redirectUri直接报错
+        return new ResponseEntity(
+          &quot;OAuth callback url needs to be provided by client!!!&quot;, HttpStatus.NOT_FOUND);
+      }
+      //返回错误消息（如?error=）
+      final OAuthResponse response =
+              OAuthASResponse.errorResponse(HttpServletResponse.SC_FOUND)
+                      .error(e).location(redirectUri).buildQueryMessage();
+      HttpHeaders headers = new HttpHeaders();
+      headers.setLocation(new URI(response.getLocationUri()));
+      return new ResponseEntity(headers, HttpStatus.valueOf(response.getResponseStatus()));
+    }
+  }
+
+  private boolean login(Subject subject, HttpServletRequest request) {
+    if(&quot;get&quot;.equalsIgnoreCase(request.getMethod())) {
+      return false;
+    }
+    String username = request.getParameter(&quot;username&quot;);
+    String password = request.getParameter(&quot;password&quot;);
+
+    if(StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+      return false;
+    }
+
+    UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+    try {
+      subject.login(token);
+      return true;
+    } catch (Exception e) {
+      request.setAttribute(&quot;error&quot;, &quot;登录失败:&quot; + e.getClass().getName());
+      return false;
+    }
+  }
+};
+</code></pre><ol>
+<li>首先通过如<a href="http://localhost:8080/chapter17-server/authorize" target="_blank" rel="noopener">http://localhost:8080/chapter17-server/authorize</a><br>?client_id=c1ebe466-1cdc-4bd3-ab69-77c3561b9dee&amp;response_type=code&amp;redirect_uri=<a href="http://localhost:9080/chapter17-client/oauth2-login访问授权页面；" target="_blank" rel="noopener">http://localhost:9080/chapter17-client/oauth2-login访问授权页面；</a></li>
+<li>该控制器首先检查clientId是否正确；如果错误将返回相应的错误信息；</li>
+<li>然后判断用户是否登录了，如果没有登录首先到登录页面登录；</li>
+<li>登录成功后生成相应的auth code即授权码，然后重定向到客户端地址，如<a href="http://localhost:9080/chapter17-client/oauth2-login?code=52b1832f5dff68122f4f00ae995da0ed；在重定向到的地址中会带上code参数（授权码），接着客户端可以根据授权码去换取access" target="_blank" rel="noopener">http://localhost:9080/chapter17-client/oauth2-login?code=52b1832f5dff68122f4f00ae995da0ed；在重定向到的地址中会带上code参数（授权码），接着客户端可以根据授权码去换取access</a> token。    </li>
+</ol>
+<h4 id="AccessTokenController"><a href="#AccessTokenController" class="headerlink" title="AccessTokenController"></a>AccessTokenController</h4><pre><code>@RestController
+public class AccessTokenController {
+  @Autowired
+  private OAuthService oAuthService;
+  @Autowired
+  private UserService userService;
+  @RequestMapping(&quot;/accessToken&quot;)
+  public HttpEntity token(HttpServletRequest request)
+          throws URISyntaxException, OAuthSystemException {
+    try {
+      //构建OAuth请求
+      OAuthTokenRequest oauthRequest = new OAuthTokenRequest(request);
+
+      //检查提交的客户端id是否正确
+      if (!oAuthService.checkClientId(oauthRequest.getClientId())) {
+        OAuthResponse response = OAuthASResponse
+                .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
+                .setError(OAuthError.TokenResponse.INVALID_CLIENT)
+                .setErrorDescription(Constants.INVALID_CLIENT_DESCRIPTION)
+                .buildJSONMessage();
+       return new ResponseEntity(
+         response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
+      }
+
+    // 检查客户端安全KEY是否正确
+      if (!oAuthService.checkClientSecret(oauthRequest.getClientSecret())) {
+        OAuthResponse response = OAuthASResponse
+              .errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
+              .setError(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)
+              .setErrorDescription(Constants.INVALID_CLIENT_DESCRIPTION)
+              .buildJSONMessage();
+      return new ResponseEntity(
+          response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
+      }
+
+      String authCode = oauthRequest.getParam(OAuth.OAUTH_CODE);
+      // 检查验证类型，此处只检查AUTHORIZATION_CODE类型，其他的还有PASSWORD或REFRESH_TOKEN
+      if (oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(
+         GrantType.AUTHORIZATION_CODE.toString())) {
+         if (!oAuthService.checkAuthCode(authCode)) {
+            OAuthResponse response = OAuthASResponse
+                .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
+                .setError(OAuthError.TokenResponse.INVALID_GRANT)
+                .setErrorDescription(&quot;错误的授权码&quot;)
+              .buildJSONMessage();
+           return new ResponseEntity(
+             response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
+         }
+      }
+
+      //生成Access Token
+      OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
+      final String accessToken = oauthIssuerImpl.accessToken();
+      oAuthService.addAccessToken(accessToken,
+          oAuthService.getUsernameByAuthCode(authCode));
+
+      //生成OAuth响应
+      OAuthResponse response = OAuthASResponse
+              .tokenResponse(HttpServletResponse.SC_OK)
+              .setAccessToken(accessToken)
+              .setExpiresIn(String.valueOf(oAuthService.getExpireIn()))
+              .buildJSONMessage();
+
+      //根据OAuthResponse生成ResponseEntity
+      return new ResponseEntity(
+          response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
+    } catch (OAuthProblemException e) {
+      //构建错误响应
+      OAuthResponse res = OAuthASResponse
+              .errorResponse(HttpServletResponse.SC_BAD_REQUEST).error(e)
+              .buildJSONMessage();
+     return new ResponseEntity(res.getBody(), HttpStatus.valueOf(res.getResponseStatus()));
+   }
+ }
+}
+</code></pre><ol>
+<li>首先通过如<a href="http://localhost:8080/chapter17-server/accessToken，POST提交如下数据：client_id=" target="_blank" rel="noopener">http://localhost:8080/chapter17-server/accessToken，POST提交如下数据：client_id=</a> c1ebe466-1cdc-4bd3-ab69-77c3561b9dee&amp; client_secret= d8346ea2-6017-43ed-ad68-19c0f971738b&amp;grant_type=authorization_code&amp;code=828beda907066d058584f37bcfd597b6&amp;redirect_uri=<a href="http://localhost:9080/chapter17-client/oauth2-login访问；" target="_blank" rel="noopener">http://localhost:9080/chapter17-client/oauth2-login访问；</a></li>
+<li>该控制器会验证client_id、client_secret、auth code的正确性，如果错误会返回相应的错误；</li>
+<li>如果验证通过会生成并返回相应的访问令牌access token。</li>
+</ol>
+<h4 id="资源控制器"><a href="#资源控制器" class="headerlink" title="资源控制器"></a>资源控制器</h4><p>@RestController<br>    public class UserInfoController {<br>      @Autowired<br>      private OAuthService oAuthService;</p>
+<pre><code>  @RequestMapping(&quot;/userInfo&quot;)
+  public HttpEntity userInfo(HttpServletRequest request) throws OAuthSystemException {
+    try {
+      //构建OAuth资源请求
+      OAuthAccessResourceRequest oauthRequest = 
+            new OAuthAccessResourceRequest(request, ParameterStyle.QUERY);
+      //获取Access Token
+      String accessToken = oauthRequest.getAccessToken();
+
+      //验证Access Token
+      if (!oAuthService.checkAccessToken(accessToken)) {
+        // 如果不存在/过期了，返回未验证错误，需重新验证
+      OAuthResponse oauthResponse = OAuthRSResponse
+              .errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
+              .setRealm(Constants.RESOURCE_SERVER_NAME)
+              .setError(OAuthError.ResourceResponse.INVALID_TOKEN)
+              .buildHeaderMessage();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(OAuth.HeaderType.WWW_AUTHENTICATE, 
+          oauthResponse.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
+      return new ResponseEntity(headers, HttpStatus.UNAUTHORIZED);
+      }
+      //返回用户名
+      String username = oAuthService.getUsernameByAccessToken(accessToken);
+      return new ResponseEntity(username, HttpStatus.OK);
+    } catch (OAuthProblemException e) {
+      //检查是否设置了错误码
+      String errorCode = e.getError();
+      if (OAuthUtils.isEmpty(errorCode)) {
+        OAuthResponse oauthResponse = OAuthRSResponse
+               .errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
+               .setRealm(Constants.RESOURCE_SERVER_NAME)
+               .buildHeaderMessage();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(OAuth.HeaderType.WWW_AUTHENTICATE, 
+          oauthResponse.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
+        return new ResponseEntity(headers, HttpStatus.UNAUTHORIZED);
+      }
+
+      OAuthResponse oauthResponse = OAuthRSResponse
+               .errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
+               .setRealm(Constants.RESOURCE_SERVER_NAME)
+               .setError(e.getError())
+               .setErrorDescription(e.getDescription())
+               .setErrorUri(e.getUri())
+               .buildHeaderMessage();
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.add(OAuth.HeaderType.WWW_AUTHENTICATE, 、
+        oauthResponse.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
+      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+  }
+};
+</code></pre><ol>
+<li>首先通过如<a href="http://localhost:8080/chapter17-server/userInfo" target="_blank" rel="noopener">http://localhost:8080/chapter17-server/userInfo</a>? access_token=828beda907066d058584f37bcfd597b6进行访问；</li>
+<li>该控制器会验证access token的有效性；如果无效了将返回相应的错误，客户端再重新进行授权；</li>
+<li>如果有效，则返回当前登录用户的用户名。</li>
+</ol>
+<h3 id="Spring配置文件"><a href="#Spring配置文件" class="headerlink" title="Spring配置文件"></a>Spring配置文件</h3><p>只列举spring-config-shiro.xml中的shiroFilter的filterChainDefinitions属性：  </p>
+<pre><code>&lt;property name=&quot;filterChainDefinitions&quot;&gt;
+    &lt;value&gt;
+      / = anon
+      /login = authc
+      /logout = logout
+
+      /authorize=anon
+      /accessToken=anon
+      /userInfo=anon
+
+      /** = user
+    &lt;/value&gt;
+&lt;/property&gt;
+</code></pre><p>对于oauth2的几个地址/authorize、/accessToken、/userInfo都是匿名可访问的</p>
+<h3 id="服务器维护"><a href="#服务器维护" class="headerlink" title="服务器维护"></a>服务器维护</h3><p>客户端管理就是进行客户端的注册，如新浪微博的第三方应用就需要到新浪微博开发平台进行注册；用户管理就是进行如新浪微博用户的管理。</p>
+<p>对于授权服务和资源服务的实现可以参考新浪微博开发平台的实现：<br><a href="http://open.weibo.com/wiki/授权机制说明" target="_blank" rel="noopener">http://open.weibo.com/wiki/授权机制说明</a><br><a href="http://open.weibo.com/wiki/微博API" target="_blank" rel="noopener">http://open.weibo.com/wiki/微博API</a> </p>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>客户端流程：如果需要登录首先跳到oauth2服务端进行登录授权，成功后服务端返回auth code，然后客户端使用auth code去服务器端换取access token，最好根据access token获取用户信息进行客户端的登录绑定。这个可以参照如很多网站的新浪微博登录功能，或其他的第三方帐号登录功能。</p>
+<h3 id="POM依賴"><a href="#POM依賴" class="headerlink" title="POM依賴"></a>POM依賴</h3><dependency><br>  <groupid>org.apache.oltu.oauth2</groupid><br>  <artifactid>org.apache.oltu.oauth2.client</artifactid><br>  <version>0.31</version><br></dependency>
+
+<h3 id="OAuth2Token"><a href="#OAuth2Token" class="headerlink" title="OAuth2Token"></a>OAuth2Token</h3><p>类似于UsernamePasswordToken和CasToken；用于存储oauth2服务端返回的auth code。  </p>
+<pre><code>public class OAuth2Token implements AuthenticationToken {  
+    private String authCode;  
+    private String principal;  
+    public OAuth2Token(String authCode) {  
+        this.authCode = authCode;  
+    }  
+    //省略getter/setter  
+}   
+</code></pre><h3 id="OAuth2AuthenticationFilter"><a href="#OAuth2AuthenticationFilter" class="headerlink" title="OAuth2AuthenticationFilter"></a>OAuth2AuthenticationFilter</h3><p>用于oauth2客户端的身份验证控制；如果当前用户还没有身份验证，首先会判断url中是否有code（服务端返回的auth code），如果没有则重定向到服务端进行登录并授权，然后返回auth code；接着OAuth2AuthenticationFilter会用auth code创建OAuth2Token，然后提交给Subject.login进行登录；接着OAuth2Realm会根据OAuth2Token进行相应的登录逻辑。  </p>
+<pre><code>public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
+    //oauth2 authc code参数名
+    private String authcCodeParam = &quot;code&quot;;
+    //客户端id
+    private String clientId;
+    //服务器端登录成功/失败后重定向到的客户端地址
+    private String redirectUrl;
+    //oauth2服务器响应类型
+    private String responseType = &quot;code&quot;;
+    private String failureUrl;
+    //省略setter
+    protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String code = httpRequest.getParameter(authcCodeParam);
+        return new OAuth2Token(code);
+    }
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+        return false;
+    }
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        String error = request.getParameter(&quot;error&quot;);
+        String errorDescription = request.getParameter(&quot;error_description&quot;);
+        if(!StringUtils.isEmpty(error)) {//如果服务端返回了错误
+            WebUtils.issueRedirect(request, response, failureUrl + &quot;?error=&quot; + error + &quot;error_description=&quot; + errorDescription);
+            return false;
+        }
+        Subject subject = getSubject(request, response);
+        if(!subject.isAuthenticated()) {
+            if(StringUtils.isEmpty(request.getParameter(authcCodeParam))) {
+                //如果用户没有身份验证，且没有auth code，则重定向到服务端授权
+                saveRequestAndRedirectToLogin(request, response);
+                return false;
+            }
+        }
+        //执行父类里的登录逻辑，调用Subject.login登录
+        return executeLogin(request, response);
+    }
+
+    //登录成功后的回调方法 重定向到成功页面
+    protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,  ServletResponse response) throws Exception {
+        issueSuccessRedirect(request, response);
+        return false;
+    }
+
+    //登录失败后的回调 
+    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException ae, ServletRequest request,
+                                     ServletResponse response) {
+        Subject subject = getSubject(request, response);
+        if (subject.isAuthenticated() || subject.isRemembered()) {
+            try { //如果身份验证成功了 则也重定向到成功页面
+                issueSuccessRedirect(request, response);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try { //登录失败时重定向到失败页面
+                WebUtils.issueRedirect(request, response, failureUrl);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+}
+</code></pre><p>该拦截器的作用：</p>
+<ol>
+<li>首先判断有没有服务端返回的error参数，如果有则直接重定向到失败页面；</li>
+<li>接着如果用户还没有身份验证，判断是否有auth code参数（即是不是服务端授权之后返回的），如果没有则重定向到服务端进行授权；</li>
+<li>否则调用executeLogin进行登录，通过auth code创建OAuth2Token提交给Subject进行登录；</li>
+<li>登录成功将回调onLoginSuccess方法重定向到成功页面；</li>
+<li>登录失败则回调onLoginFailure重定向到失败页面。</li>
+</ol>
+<h3 id="OAuth2Realm"><a href="#OAuth2Realm" class="headerlink" title="OAuth2Realm"></a>OAuth2Realm</h3><pre><code>public class OAuth2Realm extends AuthorizingRealm {
+    private String clientId;
+    private String clientSecret;
+    private String accessTokenUrl;
+    private String userInfoUrl;
+    private String redirectUrl;
+    //省略setter
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof OAuth2Token; //表示此Realm只支持OAuth2Token类型
+    }
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        return authorizationInfo;
+    }
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        OAuth2Token oAuth2Token = (OAuth2Token) token;
+        String code = oAuth2Token.getAuthCode(); //获取 auth code
+        String username = extractUsername(code); // 提取用户名
+        SimpleAuthenticationInfo authenticationInfo =
+                new SimpleAuthenticationInfo(username, code, getName());
+        return authenticationInfo;
+    }
+    private String extractUsername(String code) {
+        try {
+            OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+            OAuthClientRequest accessTokenRequest = OAuthClientRequest
+                    .tokenLocation(accessTokenUrl)
+                    .setGrantType(GrantType.AUTHORIZATION_CODE)
+                    .setClientId(clientId).setClientSecret(clientSecret)
+                    .setCode(code).setRedirectURI(redirectUrl)
+                    .buildQueryMessage();
+            //获取access token
+            OAuthAccessTokenResponse oAuthResponse = 
+                oAuthClient.accessToken(accessTokenRequest, OAuth.HttpMethod.POST);
+            String accessToken = oAuthResponse.getAccessToken();
+            Long expiresIn = oAuthResponse.getExpiresIn();
+            //获取user info
+            OAuthClientRequest userInfoRequest = 
+                new OAuthBearerClientRequest(userInfoUrl)
+                    .setAccessToken(accessToken).buildQueryMessage();
+            OAuthResourceResponse resourceResponse = oAuthClient.resource(
+                userInfoRequest, OAuth.HttpMethod.GET, OAuthResourceResponse.class);
+            String username = resourceResponse.getBody();
+            return username;
+        } catch (Exception e) {
+            throw new OAuth2AuthenticationException(e);
+        }
+    }
+}
+</code></pre><p>此Realm首先只支持OAuth2Token类型的Token；然后通过传入的auth code去换取access token；再根据access token去获取用户信息（用户名），然后根据此信息创建AuthenticationInfo；如果需要AuthorizationInfo信息，可以根据此处获取的用户名再根据自己的业务规则去获取。</p>
+<h3 id="Spring-shiro配置（spring-config-shiro-xml）"><a href="#Spring-shiro配置（spring-config-shiro-xml）" class="headerlink" title="Spring shiro配置（spring-config-shiro.xml）"></a>Spring shiro配置（spring-config-shiro.xml）</h3><pre><code>&lt;bean id=&quot;oAuth2Realm&quot; 
+    class=&quot;com.github.zhangkaitao.shiro.chapter18.oauth2.OAuth2Realm&quot;&gt;
+  &lt;property name=&quot;cachingEnabled&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;authenticationCachingEnabled&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;authenticationCacheName&quot; value=&quot;authenticationCache&quot;/&gt;
+  &lt;property name=&quot;authorizationCachingEnabled&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;authorizationCacheName&quot; value=&quot;authorizationCache&quot;/&gt;
+  &lt;property name=&quot;clientId&quot; value=&quot;c1ebe466-1cdc-4bd3-ab69-77c3561b9dee&quot;/&gt;
+  &lt;property name=&quot;clientSecret&quot; value=&quot;d8346ea2-6017-43ed-ad68-19c0f971738b&quot;/&gt;
+  &lt;property name=&quot;accessTokenUrl&quot; 
+     value=&quot;http://localhost:8080/chapter17-server/accessToken&quot;/&gt;
+  &lt;property name=&quot;userInfoUrl&quot; value=&quot;http://localhost:8080/chapter17-server/userInfo&quot;/&gt;
+  &lt;property name=&quot;redirectUrl&quot; value=&quot;http://localhost:9080/chapter17-client/oauth2-login&quot;/&gt;
+&lt;/bean&gt;;
+</code></pre><p>此OAuth2Realm需要配置在服务端申请的clientId和clientSecret；及用于根据auth code换取access token的accessTokenUrl地址；及用于根据access token换取用户信息（受保护资源）的userInfoUrl地址。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/shiro/" rel="tag"># shiro</a>
+          
+            <a href="/tags/OAuth/" rel="tag"># OAuth</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/java框架/shiro/RemableMe-单点登录-/" rel="next" title="shiro RemableMe-单点登录">
+                <i class="fa fa-chevron-left"></i> shiro RemableMe-单点登录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/python基础/python基础/" rel="prev" title="python基础">
+                python基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#OAuth2-集成"><span class="nav-number">1.</span> <span class="nav-text">OAuth2 集成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OAuth-角色"><span class="nav-number">1.0.1.</span> <span class="nav-text">OAuth 角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#授权码类型的开放授权"><span class="nav-number">1.0.2.</span> <span class="nav-text">授权码类型的开放授权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器端"><span class="nav-number">1.1.</span> <span class="nav-text">服务器端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#POM-依赖"><span class="nav-number">1.1.1.</span> <span class="nav-text">POM 依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实体类"><span class="nav-number">1.1.2.</span> <span class="nav-text">实体类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表和Sql"><span class="nav-number">1.1.3.</span> <span class="nav-text">表和Sql</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DAO"><span class="nav-number">1.1.4.</span> <span class="nav-text">DAO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service"><span class="nav-number">1.1.5.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#控制器"><span class="nav-number">1.1.6.</span> <span class="nav-text">控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AuthorizeController"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">AuthorizeController</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AccessTokenController"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">AccessTokenController</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#资源控制器"><span class="nav-number">1.1.6.3.</span> <span class="nav-text">资源控制器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring配置文件"><span class="nav-number">1.1.7.</span> <span class="nav-text">Spring配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器维护"><span class="nav-number">1.1.8.</span> <span class="nav-text">服务器维护</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端"><span class="nav-number">1.2.</span> <span class="nav-text">客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#POM依賴"><span class="nav-number">1.2.1.</span> <span class="nav-text">POM依賴</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OAuth2Token"><span class="nav-number">1.2.2.</span> <span class="nav-text">OAuth2Token</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OAuth2AuthenticationFilter"><span class="nav-number">1.2.3.</span> <span class="nav-text">OAuth2AuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OAuth2Realm"><span class="nav-number">1.2.4.</span> <span class="nav-text">OAuth2Realm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring-shiro配置（spring-config-shiro-xml）"><span class="nav-number">1.2.5.</span> <span class="nav-text">Spring shiro配置（spring-config-shiro.xml）</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

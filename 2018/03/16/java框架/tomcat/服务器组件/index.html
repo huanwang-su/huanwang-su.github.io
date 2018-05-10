@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="14 服务器组件和服务组件14.1 服务器组件org.capache.catalina.Server接口实例表示Catalina的整个servlet引擎，囊括了所有的组件。使用一种优雅的方法启动/关闭整个系统。 Server元素表示整个Catalina servlet容器。 它的属性代表了整个servlet容器的特性。 一个服务器可能包含一个或多个服务，以及顶层的一组命名资源。 通常，此接口的实现">
+<meta name="keywords" content="tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tomcat 服务器组件和服务组件">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java框架/tomcat/服务器组件/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="14 服务器组件和服务组件14.1 服务器组件org.capache.catalina.Server接口实例表示Catalina的整个servlet引擎，囊括了所有的组件。使用一种优雅的方法启动/关闭整个系统。 Server元素表示整个Catalina servlet容器。 它的属性代表了整个servlet容器的特性。 一个服务器可能包含一个或多个服务，以及顶层的一组命名资源。 通常，此接口的实现">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20160717184554588">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.168Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tomcat 服务器组件和服务组件">
+<meta name="twitter:description" content="14 服务器组件和服务组件14.1 服务器组件org.capache.catalina.Server接口实例表示Catalina的整个servlet引擎，囊括了所有的组件。使用一种优雅的方法启动/关闭整个系统。 Server元素表示整个Catalina servlet容器。 它的属性代表了整个servlet容器的特性。 一个服务器可能包含一个或多个服务，以及顶层的一组命名资源。 通常，此接口的实现">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160717184554588">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java框架/tomcat/服务器组件/"/>
+
+
+
+
+
+  <title>tomcat 服务器组件和服务组件 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java框架/tomcat/服务器组件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tomcat 服务器组件和服务组件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/" itemprop="url" rel="index">
+                    <span itemprop="name">java框架</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java框架/tomcat/服务器组件/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java框架/tomcat/服务器组件/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="14-服务器组件和服务组件"><a href="#14-服务器组件和服务组件" class="headerlink" title="14 服务器组件和服务组件"></a>14 服务器组件和服务组件</h1><h2 id="14-1-服务器组件"><a href="#14-1-服务器组件" class="headerlink" title="14.1 服务器组件"></a>14.1 服务器组件</h2><p>org.capache.catalina.Server接口实例表示Catalina的整个servlet引擎，囊括了所有的组件。使用一种优雅的方法启动/关闭整个系统。</p>
+<p>Server元素表示整个Catalina servlet容器。 它的属性代表了整个servlet容器的特性。 一个服务器可能包含一个或多个服务，以及顶层的一组命名资源。</p>
+<p>通常，此接口的实现也将实现生命周期，以便在调用start（）和stop（）方法时，所有已定义的服务也将启动或停止。</p>
+<p>在这之间，实现必须在由port属性指定的端口号上打开服务器套接字。 当连接被接受时，第一行被读取并与指定的关闭命令进行比较。 如果命令匹配，则关闭</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Server</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ------------------------------------------------------------- Properties</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> NamingResourcesImpl <span class="title">getGlobalNamingResources</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> setGlobalNamingResources</span><br><span class="line">        (NamingResourcesImpl globalNamingResources);</span><br><span class="line">    <span class="keyword">public</span> javax.naming.<span class="function">Context <span class="title">getGlobalNamingContext</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPort</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Set the port number we listen to for shutdown commands.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPort</span><span class="params">(<span class="keyword">int</span> port)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the address on which we listen to for shutdown commands.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAddress</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAddress</span><span class="params">(String address)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the shutdown command we are waiting for.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getShutdown</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setShutdown</span><span class="params">(String shutdown)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParentClassLoader</span><span class="params">(ClassLoader parent)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the outer Catalina startup/shutdown component</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Catalina <span class="title">getCatalina</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCatalina</span><span class="params">(Catalina catalina)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the configured base (instance) directory. 为空返回getCatalinaHome</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> File <span class="title">getCatalinaBase</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCatalinaBase</span><span class="params">(File catalinaBase)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> File <span class="title">getCatalinaHome</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCatalinaHome</span><span class="params">(File catalinaHome)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// --------------------------------------------------------- Public Methods</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Add a new Service to the set of defined Services.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addService</span><span class="params">(Service service)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> Service <span class="title">findService</span><span class="params">(String name)</span></span>;</span><br><span class="line">	<span class="keyword">public</span> Service[] findServices();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeService</span><span class="params">(Service service)</span></span>;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 等待shutdown command</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">await</span><span class="params">()</span></span>; </span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the token necessary for operations on the associated JNDI naming</span></span><br><span class="line"><span class="comment">     * context.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getNamingToken</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="14-2-StandardServer类"><a href="#14-2-StandardServer类" class="headerlink" title="14.2 StandardServer类"></a>14.2 StandardServer类</h2><p>服务器接口的标准实现</p>
+<ul>
+<li><p>属性为接口状态属性</p>
+</li>
+<li><p>stopAwait 关闭socketServer和停主线程</p>
+<p>注意这里只是关闭了socketServer和停止线程，没有指明之后的操作，如stop()</p>
+</li>
+<li><p>XXXInternal略</p>
+</li>
+<li><p>await 等到收到正确的关机命令，然后返回。 这使主线程保持活动，监听http连接的线程池是守护进程线程。</p>
+<p>注意这里只是等待接受shutdown命令，匹配成功关闭socketServer和break循环，没有指明之后的操作，如stop()，与stopAwait 区别在于stopAwait 是由其他线程终止调用await 方法的线程</p>
+<ol>
+<li>port==-2 负值 , 不要等待端口 - 嵌入式tomcat或者我们不喜欢用端口</li>
+<li>port==-1 通过死循环观察stopAwait变量</li>
+<li>开启socketServer，while(!stopAwait)不停接受连接，读取请求，与shutdown字符串匹配，相等则break</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">StandardServer</span> <span class="keyword">extends</span> <span class="title">LifecycleMBeanBase</span> <span class="keyword">implements</span> <span class="title">Server</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ----------------------------------------------------- Instance Variables</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> javax.naming.Context globalNamingContext = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> NamingResourcesImpl globalNamingResources = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> NamingContextListener namingContextListener;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The port number on which we wait for shutdown commands.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> port = <span class="number">8005</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The address on which we wait for shutdown commands.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String address = <span class="string">"localhost"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Service services[] = <span class="keyword">new</span> Service[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The shutdown command string we are looking for.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String shutdown = <span class="string">"SHUTDOWN"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> stopAwait = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Catalina catalina = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ClassLoader parentClassLoader = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> Thread awaitThread = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Server socket that is used to wait for the shutdown command.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> ServerSocket awaitSocket = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> File catalinaHome = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> File catalinaBase = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object namingToken = <span class="keyword">new</span> Object();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ------------------------------------------------------------- Properties</span></span><br><span class="line">	<span class="comment">//getter and setter</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// --------------------------------------------------------- Server Methods</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stopAwait</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stopAwait=<span class="keyword">true</span>;</span><br><span class="line">        Thread t = awaitThread;</span><br><span class="line">        <span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ServerSocket s = awaitSocket;</span><br><span class="line">            <span class="keyword">if</span> (s != <span class="keyword">null</span>) &#123;</span><br><span class="line">                awaitSocket = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    s.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    <span class="comment">// Ignored</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            t.interrupt();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                t.join(<span class="number">1000</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                <span class="comment">// Ignored</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Wait until a proper shutdown command is received, then return.</span></span><br><span class="line"><span class="comment">     * This keeps the main thread alive </span></span><br><span class="line"><span class="comment">	 * the thread pool listening for http connections is daemon threads.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">await</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Negative values - don't wait on port - tomcat is embedded or we just don't like ports</span></span><br><span class="line">        <span class="keyword">if</span>( port == -<span class="number">2</span> ) &#123;</span><br><span class="line">            <span class="comment">// undocumented yet - for embedding apps that are around, alive.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>( port==-<span class="number">1</span> ) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                awaitThread = Thread.currentThread();</span><br><span class="line">                <span class="keyword">while</span>(!stopAwait) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.sleep( <span class="number">10000</span> );</span><br><span class="line">                    &#125; <span class="keyword">catch</span>( InterruptedException ex ) &#123;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                awaitThread = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Set up a server socket to wait on</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            awaitSocket = <span class="keyword">new</span> ServerSocket(port, <span class="number">1</span>,</span><br><span class="line">                    InetAddress.getByName(address));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            log.error(<span class="string">"StandardServer.await: create["</span> + address</span><br><span class="line">                               + <span class="string">":"</span> + port</span><br><span class="line">                               + <span class="string">"]: "</span>, e);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            awaitThread = Thread.currentThread();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Loop waiting for a connection and a valid command</span></span><br><span class="line">            <span class="keyword">while</span> (!stopAwait) &#123;</span><br><span class="line">                ServerSocket serverSocket = awaitSocket;</span><br><span class="line">                <span class="keyword">if</span> (serverSocket == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// Wait for the next connection</span></span><br><span class="line">                Socket socket = <span class="keyword">null</span>;</span><br><span class="line">                StringBuilder command = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    InputStream stream;</span><br><span class="line">                     <span class="keyword">try</span> &#123;</span><br><span class="line">                        socket = serverSocket.accept();</span><br><span class="line">                        stream = socket.getInputStream();</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (SocketTimeoutException ste) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// Read a set of characters from the socket</span></span><br><span class="line">                    <span class="keyword">int</span> expected = <span class="number">1024</span>; <span class="comment">// Cut off to avoid DoS attack</span></span><br><span class="line">                    <span class="keyword">while</span> (expected &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                        <span class="keyword">int</span> ch = -<span class="number">1</span>;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            ch = stream.read();</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                            ch = -<span class="number">1</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="comment">// Control character or EOF (-1) terminates loop</span></span><br><span class="line">                        <span class="keyword">if</span> (ch &lt; <span class="number">32</span> || ch == <span class="number">127</span>) &#123;</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        command.append((<span class="keyword">char</span>) ch);</span><br><span class="line">                        expected--;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    <span class="comment">// Close the socket now that we are done with it</span></span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (socket != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            socket.close();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;&#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Match against our command string</span></span><br><span class="line">                <span class="keyword">boolean</span> match = command.toString().equals(shutdown);</span><br><span class="line">                <span class="keyword">if</span> (match) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            ServerSocket serverSocket = awaitSocket;</span><br><span class="line">            awaitThread = <span class="keyword">null</span>;</span><br><span class="line">            awaitSocket = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Close the server socket and return</span></span><br><span class="line">            <span class="keyword">if</span> (serverSocket != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    serverSocket.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    <span class="comment">// Ignore</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// --------------------------------------------------------- Public Methods</span></span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        fireLifecycleEvent(CONFIGURE_START_EVENT, <span class="keyword">null</span>);</span><br><span class="line">        setState(LifecycleState.STARTING);</span><br><span class="line"></span><br><span class="line">        globalNamingResources.start();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Start our defined Services</span></span><br><span class="line">        <span class="keyword">synchronized</span> (servicesLock) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; services.length; i++) &#123;</span><br><span class="line">                services[i].start();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">stopInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        setState(LifecycleState.STOPPING);</span><br><span class="line">        fireLifecycleEvent(CONFIGURE_STOP_EVENT, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Stop our defined Services</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; services.length; i++) &#123;</span><br><span class="line">            services[i].stop();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        globalNamingResources.stop();</span><br><span class="line"></span><br><span class="line">        stopAwait();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">super</span>.initInternal();</span><br><span class="line"></span><br><span class="line">        onameStringCache = register(<span class="keyword">new</span> StringCache(), <span class="string">"type=StringCache"</span>);</span><br><span class="line">        <span class="comment">// Register the MBeanFactory</span></span><br><span class="line">        MBeanFactory factory = <span class="keyword">new</span> MBeanFactory();</span><br><span class="line">        factory.setContainer(<span class="keyword">this</span>);</span><br><span class="line">        onameMBeanFactory = register(factory, <span class="string">"type=MBeanFactory"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register the naming resources</span></span><br><span class="line">        globalNamingResources.init();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Populate the extension validator with JARs from common and shared</span></span><br><span class="line">        <span class="comment">// class loaders</span></span><br><span class="line">        <span class="keyword">if</span> (getCatalina() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ClassLoader cl = getCatalina().getParentClassLoader();</span><br><span class="line">            <span class="keyword">while</span> (cl != <span class="keyword">null</span> &amp;&amp; cl != ClassLoader.getSystemClassLoader()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (cl <span class="keyword">instanceof</span> URLClassLoader) &#123;</span><br><span class="line">                    URL[] urls = ((URLClassLoader) cl).getURLs();</span><br><span class="line">                    <span class="keyword">for</span> (URL url : urls) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (url.getProtocol().equals(<span class="string">"file"</span>)) &#123;</span><br><span class="line">                            <span class="keyword">try</span> &#123;</span><br><span class="line">                                File f = <span class="keyword">new</span> File (url.toURI());</span><br><span class="line">                                <span class="keyword">if</span> (f.isFile() &amp;&amp;</span><br><span class="line">                                        f.getName().endsWith(<span class="string">".jar"</span>)) &#123;</span><br><span class="line">                                    ExtensionValidator.addSystemResource(f);</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125; <span class="keyword">catch</span> (URISyntaxException e) &#123;</span><br><span class="line">                                <span class="comment">// Ignore</span></span><br><span class="line">                            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                                <span class="comment">// Ignore</span></span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                cl = cl.getParent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Initialize our defined Services</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; services.length; i++) &#123;</span><br><span class="line">            services[i].init();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">destroyInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        <span class="comment">// Destroy our defined Services</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; services.length; i++) &#123;</span><br><span class="line">            services[i].destroy();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        globalNamingResources.destroy();</span><br><span class="line"></span><br><span class="line">        unregister(onameMBeanFactory);</span><br><span class="line"></span><br><span class="line">        unregister(onameStringCache);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">super</span>.destroyInternal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="14-3-Service接口"><a href="#14-3-Service接口" class="headerlink" title="14.3 Service接口"></a>14.3 Service接口</h2><p>Service是包含一个Container或多个连接器，这些连接器共享一个Container来处理它们的传入请求。 例如，这种安排允许非SSL和SSL连接器共享相同的网络应用程序。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Service</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ------------------------------------------------------------- Properties</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Engine <span class="title">getContainer</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContainer</span><span class="params">(Engine engine)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Server <span class="title">getServer</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServer</span><span class="params">(Server server)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ClassLoader <span class="title">getParentClassLoader</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParentClassLoader</span><span class="params">(ClassLoader parent)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getDomain</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">// --------------------------------------------------------- Public Methods</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addConnector</span><span class="params">(Connector connector)</span></span>;</span><br><span class="line">    <span class="keyword">public</span> Connector[] findConnectors();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeConnector</span><span class="params">(Connector connector)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addExecutor</span><span class="params">(Executor ex)</span></span>;</span><br><span class="line">    <span class="keyword">public</span> Executor[] findExecutors();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Executor <span class="title">getExecutor</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeExecutor</span><span class="params">(Executor ex)</span></span>;</span><br><span class="line">    <span class="function">Mapper <span class="title">getMapper</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="14-4-StandardService"><a href="#14-4-StandardService" class="headerlink" title="14.4 StandardService"></a>14.4 StandardService</h2><p>Service的标准实现</p>
+<h3 id="14-4-1-Container和Connector"><a href="#14-4-1-Container和Connector" class="headerlink" title="14.4.1 Container和Connector"></a>14.4.1 Container和Connector</h3><p>Container只能有一个，Connector有多个，保证了一个Container能处理多种请求，如http，https这些</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Connector connectors[] = <span class="keyword">new</span> Connector[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">private</span> Engine engine = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="14-4-1-1-add-set-操作"><a href="#14-4-1-1-add-set-操作" class="headerlink" title="14.4.1.1 add  set 操作"></a>14.4.1.1 add  set 操作</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 添加并启动connector</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addConnector</span><span class="params">(Connector connector)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">synchronized</span> (connectorsLock) &#123;</span><br><span class="line">    connector.setService(<span class="keyword">this</span>);</span><br><span class="line">    Connector results[] = <span class="keyword">new</span> Connector[connectors.length + <span class="number">1</span>];</span><br><span class="line">    System.arraycopy(connectors, <span class="number">0</span>, results, <span class="number">0</span>, connectors.length);</span><br><span class="line">    results[connectors.length] = connector;</span><br><span class="line">    connectors = results;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getState().isAvailable()) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        connector.start();</span><br><span class="line">      &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">        log.error(sm.getString(<span class="string">"standardService.connector.startFailed"</span>,connector), e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Report this property change to interested listeners</span></span><br><span class="line">    support.firePropertyChange(<span class="string">"connector"</span>, <span class="keyword">null</span>, connector);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 设置新的Engine</span></span><br><span class="line"><span class="comment"> * 启动Engine</span></span><br><span class="line"><span class="comment"> * 刷新mapperListener</span></span><br><span class="line"><span class="comment"> * 关闭旧的Engine</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContainer</span><span class="params">(Engine engine)</span> </span>&#123;</span><br><span class="line">  Engine oldEngine = <span class="keyword">this</span>.engine;</span><br><span class="line">  <span class="keyword">if</span> (oldEngine != <span class="keyword">null</span>) &#123;</span><br><span class="line">    oldEngine.setService(<span class="keyword">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.engine = engine;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.engine != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.engine.setService(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (getState().isAvailable()) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.engine != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.engine.start();</span><br><span class="line">      &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">        log.warn(sm.getString(<span class="string">"standardService.engine.startFailed"</span>), e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Restart MapperListener to pick up new engine.</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      mapperListener.stop();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">      log.warn(sm.getString(<span class="string">"standardService.mapperListener.stopFailed"</span>), e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      mapperListener.start();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">      log.warn(sm.getString(<span class="string">"standardService.mapperListener.startFailed"</span>), e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (oldEngine != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        oldEngine.stop();</span><br><span class="line">      &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">        log.warn(sm.getString(<span class="string">"standardService.engine.stopFailed"</span>), e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// Report this property change to interested listeners</span></span><br><span class="line">  support.firePropertyChange(<span class="string">"container"</span>, oldEngine, <span class="keyword">this</span>.engine);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="14-4-1-2-周期方法"><a href="#14-4-1-2-周期方法" class="headerlink" title="14.4.1.2 周期方法"></a>14.4.1.2 周期方法</h4><p>stop，init，destory，start调用子组件的stop，init，destory，start方法，源码略，子组件有：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Connector connectors[] = <span class="keyword">new</span> Connector[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> ArrayList&lt;Executor&gt; executors = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">private</span> Engine engine = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> MapperListener mapperListener = <span class="keyword">new</span> MapperListener(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="14-4-1-3-Mapper"><a href="#14-4-1-3-Mapper" class="headerlink" title="14.4.1.3 Mapper"></a>14.4.1.3 Mapper</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StandardService</span></span>&#123;</span><br><span class="line">	<span class="keyword">protected</span> <span class="keyword">final</span> Mapper mapper = <span class="keyword">new</span> Mapper();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Mapper，实现servlet API映射规则。映射规则保存在service中实现而不是在Container中</p>
+<p>Mapper组件的核心功能是提供请求路径的路由映射，根据某个请求路径通过计算得到相应的Servlet（Wrapper）。</p>
+<p><img src="http://img.blog.csdn.net/20160717184554588" alt="这里写图片描述"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Mapper</span> </span>&#123;</span><br><span class="line">	<span class="keyword">volatile</span> MappedHost[] hosts = <span class="keyword">new</span> MappedHost[<span class="number">0</span>];</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 支持分布式请求映射</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;Context, ContextVersion&gt; contextObjectToContextVersionMap =</span><br><span class="line">            <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">  </span><br><span class="line"><span class="comment">//---------------------------------------------inner class type</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MappedHost</span> <span class="keyword">extends</span> <span class="title">MapElement</span>&lt;<span class="title">Host</span>&gt; </span>&#123;</span><br><span class="line">    	<span class="keyword">public</span> <span class="keyword">volatile</span> ContextList contextList; </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ContextList</span> </span>&#123;</span><br><span class="line">      	<span class="keyword">public</span> <span class="keyword">final</span> MappedContext[] contexts;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MappedContext</span> <span class="keyword">extends</span> <span class="title">MapElement</span>&lt;<span class="title">Void</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">volatile</span> ContextVersion[] versions;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ContextVersion</span> <span class="keyword">extends</span> <span class="title">MapElement</span>&lt;<span class="title">Context</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">final</span> String path;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">final</span> WebResourceRoot resources;</span><br><span class="line">        <span class="keyword">public</span> String[] welcomeResources; <span class="comment">//wellcome资源</span></span><br><span class="line">        <span class="keyword">public</span> MappedWrapper defaultWrapper = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">public</span> MappedWrapper[] exactWrappers = <span class="keyword">new</span> MappedWrapper[<span class="number">0</span>]; <span class="comment">//精确匹配</span></span><br><span class="line">        <span class="keyword">public</span> MappedWrapper[] wildcardWrappers = <span class="keyword">new</span> MappedWrapper[<span class="number">0</span>]; <span class="comment">//表达式匹配</span></span><br><span class="line">        <span class="keyword">public</span> MappedWrapper[] extensionWrappers = <span class="keyword">new</span> MappedWrapper[<span class="number">0</span>]; <span class="comment">//扩展匹配</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MappedWrapper</span> <span class="keyword">extends</span> <span class="title">MapElement</span>&lt;<span class="title">Wrapper</span>&gt; </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Mapper只要包含一个Host数组即可完成所有组件关系的映射。在tomcat启动时将所有Host容器和它的名字组成Host映射模型添加到Mapper对象中，每个Host下的Context容器和它的名字组成Context映射模型添加到对应的Host下，每个Context下的Wrapper容器和它的名字组成的Wrapper映射模型添加到对应的Context下。Mapper组件提供了对Host映射、Context映射、Wrapper映射的添加和移除的方法，在tomcat容器中添加或移除相应的容器时都要调用相应的方法维护这些映射关系。Mapper组件为了提高查找速度和效率，使用了二分搜索法查找，所以在添加时应按照字典序把Host、Context、Wrapper等映射排好序。</p>
+<h4 id="14-4-1-4-路由映射的建立"><a href="#14-4-1-4-路由映射的建立" class="headerlink" title="14.4.1.4 路由映射的建立"></a>14.4.1.4 路由映射的建立</h4><p>MapperListener负责建立映射关系，实现了ContainerListener接口，支持动态刷新.StandardService中有个MapperListener，在容器更新时更新Mapper</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StandardService</span></span>&#123;</span><br><span class="line">	<span class="keyword">protected</span> <span class="keyword">final</span> MapperListener mapperListener = <span class="keyword">new</span> MapperListener(<span class="keyword">this</span>);</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">      <span class="comment">// start engine</span></span><br><span class="line">      <span class="comment">// start any Executors</span></span><br><span class="line">      <span class="comment">// start mapper listener</span></span><br><span class="line">      mapperListener.start();</span><br><span class="line">      <span class="comment">// start our defined Connectors</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContainer</span><span class="params">(Engine engine)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// set engine</span></span><br><span class="line">      <span class="comment">// start engine </span></span><br><span class="line">      <span class="comment">// Restart MapperListener to pick up new engine.</span></span><br><span class="line">          mapperListener.stop();</span><br><span class="line">          mapperListener.start();</span><br><span class="line">      <span class="comment">// stop old engine </span></span><br><span class="line">      <span class="comment">// Report this property change to interested listeners</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>MapperListener实现</p>
+<ul>
+<li>startInternal会初始化Mapper并添加监听</li>
+<li>stopInternal只是删除监听</li>
+<li>containerEvent和lifecycleEvent根据监听的容器的变化更新Mapper的状态</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapperListener</span> <span class="keyword">extends</span> <span class="title">LifecycleMBeanBase</span></span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">ContainerListener</span>, <span class="title">LifecycleListener</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Mapper mapper;  <span class="comment">//service的mapper，用于对请求进行路由  </span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Service service;  <span class="comment">//所属的service对象  </span></span><br><span class="line">     </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MapperListener</span><span class="params">(Service service)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.service = service;</span><br><span class="line">        <span class="keyword">this</span>.mapper = service.getMapper();</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 启动，mapper中加入engine，host，context，Wrapper</span></span><br><span class="line"><span class="comment">	 * 向中engine，host，context，Wrapper注册监听</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        setState(LifecycleState.STARTING);</span><br><span class="line">        Engine engine = service.getContainer();</span><br><span class="line">        <span class="keyword">if</span> (engine == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        findDefaultHost(); <span class="comment">//mapper添加默认host</span></span><br><span class="line">        addListeners(engine); <span class="comment">//engine及子（host，context，Wrapper）递归添加监听</span></span><br><span class="line">        Container[] conHosts = engine.findChildren();</span><br><span class="line">        <span class="keyword">for</span> (Container conHost : conHosts) &#123;</span><br><span class="line">            Host host = (Host) conHost;</span><br><span class="line">            <span class="keyword">if</span> (!LifecycleState.NEW.equals(host.getState())) &#123;</span><br><span class="line">                registerHost(host); <span class="comment">//mapper中加入host，context，Wrapper</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * stop，</span></span><br><span class="line"><span class="comment">	 * 向中engine，host，context，Wrapper监听</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stopInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        setState(LifecycleState.STOPPING);</span><br><span class="line"></span><br><span class="line">        Engine engine = service.getContainer();</span><br><span class="line">        <span class="keyword">if</span> (engine == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        removeListeners(engine);</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 监听容器的lifecycleEvent</span></span><br><span class="line"><span class="comment">	 * 实时更新Mapper</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lifecycleEvent</span><span class="params">(LifecycleEvent event)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (event.getType().equals(Lifecycle.AFTER_START_EVENT)) &#123;</span><br><span class="line">            Object obj = event.getSource();</span><br><span class="line">            <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Wrapper) &#123;</span><br><span class="line">                Wrapper w = (Wrapper) obj;</span><br><span class="line">                <span class="comment">// Only if the Context has started. If it has not, then it will</span></span><br><span class="line">                <span class="comment">// have its own "after_start" event later.</span></span><br><span class="line">                <span class="keyword">if</span> (w.getParent().getState().isAvailable()) &#123;</span><br><span class="line">                    registerWrapper(w);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Context) &#123;</span><br><span class="line">                Context c = (Context) obj;</span><br><span class="line">                <span class="comment">// Only if the Host has started. If it has not, then it will</span></span><br><span class="line">                <span class="comment">// have its own "after_start" event later.</span></span><br><span class="line">                <span class="keyword">if</span> (c.getParent().getState().isAvailable()) &#123;</span><br><span class="line">                    registerContext(c);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Host) &#123;</span><br><span class="line">                registerHost((Host) obj);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.BEFORE_STOP_EVENT)) &#123;</span><br><span class="line">            Object obj = event.getSource();</span><br><span class="line">            <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Wrapper) &#123;</span><br><span class="line">                unregisterWrapper((Wrapper) obj);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Context) &#123;</span><br><span class="line">                unregisterContext((Context) obj);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Host) &#123;</span><br><span class="line">                unregisterHost((Host) obj);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 监听容器的ContainerEvent</span></span><br><span class="line"><span class="comment">	 * 实时更新Mapper</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">containerEvent</span><span class="params">(ContainerEvent event)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (Container.ADD_CHILD_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            Container child = (Container) event.getData();</span><br><span class="line">            addListeners(child);</span><br><span class="line">            <span class="comment">// If child is started then it is too late for life-cycle listener</span></span><br><span class="line">            <span class="comment">// to register the child so register it here</span></span><br><span class="line">            <span class="keyword">if</span> (child.getState().isAvailable()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (child <span class="keyword">instanceof</span> Host) &#123;</span><br><span class="line">                    registerHost((Host) child);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (child <span class="keyword">instanceof</span> Context) &#123;</span><br><span class="line">                    registerContext((Context) child);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (child <span class="keyword">instanceof</span> Wrapper) &#123;</span><br><span class="line">                    <span class="comment">// Only if the Context has started. If it has not, then it</span></span><br><span class="line">                    <span class="comment">// will have its own "after_start" life-cycle event later.</span></span><br><span class="line">                    <span class="keyword">if</span> (child.getParent().getState().isAvailable()) &#123;</span><br><span class="line">                        registerWrapper((Wrapper) child);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Container.REMOVE_CHILD_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            Container child = (Container) event.getData();</span><br><span class="line">            removeListeners(child);</span><br><span class="line">            <span class="comment">// No need to unregister - life-cycle listener will handle this when</span></span><br><span class="line">            <span class="comment">// the child stops</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Host.ADD_ALIAS_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically adding host aliases</span></span><br><span class="line">            mapper.addHostAlias(((Host) event.getSource()).getName(),</span><br><span class="line">                    event.getData().toString());</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Host.REMOVE_ALIAS_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically removing host aliases</span></span><br><span class="line">            mapper.removeHostAlias(event.getData().toString());</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Wrapper.ADD_MAPPING_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically adding wrappers</span></span><br><span class="line">            Wrapper wrapper = (Wrapper) event.getSource();</span><br><span class="line">            Context context = (Context) wrapper.getParent();</span><br><span class="line">            String contextPath = context.getPath();</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"/"</span>.equals(contextPath)) &#123;</span><br><span class="line">                contextPath = <span class="string">""</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String version = context.getWebappVersion();</span><br><span class="line">            String hostName = context.getParent().getName();</span><br><span class="line">            String wrapperName = wrapper.getName();</span><br><span class="line">            String mapping = (String) event.getData();</span><br><span class="line">            <span class="keyword">boolean</span> jspWildCard = (<span class="string">"jsp"</span>.equals(wrapperName)</span><br><span class="line">                    &amp;&amp; mapping.endsWith(<span class="string">"/*"</span>));</span><br><span class="line">            mapper.addWrapper(hostName, contextPath, version, mapping, wrapper,</span><br><span class="line">                    jspWildCard, context.isResourceOnlyServlet(wrapperName));</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Wrapper.REMOVE_MAPPING_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically removing wrappers</span></span><br><span class="line">            Wrapper wrapper = (Wrapper) event.getSource();</span><br><span class="line"></span><br><span class="line">            Context context = (Context) wrapper.getParent();</span><br><span class="line">            String contextPath = context.getPath();</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"/"</span>.equals(contextPath)) &#123;</span><br><span class="line">                contextPath = <span class="string">""</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String version = context.getWebappVersion();</span><br><span class="line">            String hostName = context.getParent().getName();</span><br><span class="line"></span><br><span class="line">            String mapping = (String) event.getData();</span><br><span class="line"></span><br><span class="line">            mapper.removeWrapper(hostName, contextPath, version, mapping);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Context.ADD_WELCOME_FILE_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically adding welcome files</span></span><br><span class="line">            Context context = (Context) event.getSource();</span><br><span class="line"></span><br><span class="line">            String hostName = context.getParent().getName();</span><br><span class="line"></span><br><span class="line">            String contextPath = context.getPath();</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"/"</span>.equals(contextPath)) &#123;</span><br><span class="line">                contextPath = <span class="string">""</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String welcomeFile = (String) event.getData();</span><br><span class="line"></span><br><span class="line">            mapper.addWelcomeFile(hostName, contextPath,</span><br><span class="line">                    context.getWebappVersion(), welcomeFile);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Context.REMOVE_WELCOME_FILE_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically removing welcome files</span></span><br><span class="line">            Context context = (Context) event.getSource();</span><br><span class="line"></span><br><span class="line">            String hostName = context.getParent().getName();</span><br><span class="line"></span><br><span class="line">            String contextPath = context.getPath();</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"/"</span>.equals(contextPath)) &#123;</span><br><span class="line">                contextPath = <span class="string">""</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String welcomeFile = (String) event.getData();</span><br><span class="line"></span><br><span class="line">            mapper.removeWelcomeFile(hostName, contextPath,</span><br><span class="line">                    context.getWebappVersion(), welcomeFile);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Context.CLEAR_WELCOME_FILES_EVENT.equals(event.getType())) &#123;</span><br><span class="line">            <span class="comment">// Handle dynamically clearing welcome files</span></span><br><span class="line">            Context context = (Context) event.getSource();</span><br><span class="line"></span><br><span class="line">            String hostName = context.getParent().getName();</span><br><span class="line"></span><br><span class="line">            String contextPath = context.getPath();</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"/"</span>.equals(contextPath)) &#123;</span><br><span class="line">                contextPath = <span class="string">""</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            mapper.clearWelcomeFiles(hostName, contextPath,</span><br><span class="line">                    context.getWebappVersion());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tomcat/" rel="tag"># tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/大数据/zookeeper/简介/" rel="next" title="zookeeper简介">
+                <i class="fa fa-chevron-left"></i> zookeeper简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/java框架/tomcat/Session/" rel="prev" title="tomcat session">
+                tomcat session <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#14-服务器组件和服务组件"><span class="nav-number">1.</span> <span class="nav-text">14 服务器组件和服务组件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#14-1-服务器组件"><span class="nav-number">1.1.</span> <span class="nav-text">14.1 服务器组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-2-StandardServer类"><span class="nav-number">1.2.</span> <span class="nav-text">14.2 StandardServer类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-3-Service接口"><span class="nav-number">1.3.</span> <span class="nav-text">14.3 Service接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-4-StandardService"><span class="nav-number">1.4.</span> <span class="nav-text">14.4 StandardService</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#14-4-1-Container和Connector"><span class="nav-number">1.4.1.</span> <span class="nav-text">14.4.1 Container和Connector</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#14-4-1-1-add-set-操作"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">14.4.1.1 add  set 操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#14-4-1-2-周期方法"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">14.4.1.2 周期方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#14-4-1-3-Mapper"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">14.4.1.3 Mapper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#14-4-1-4-路由映射的建立"><span class="nav-number">1.4.1.4.</span> <span class="nav-text">14.4.1.4 路由映射的建立</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

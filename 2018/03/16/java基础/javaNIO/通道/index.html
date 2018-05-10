@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="nio," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="通道Channel用于在字节缓冲区和位于通道另一侧的实体（通常是一个文件或套接字）之间有效地传输数据。 通道是一种途径，借助该途径，可以用最小的总开销来访问操作系统本身的I/O服务。缓冲区则是通道内部用来发送和接收数据的端点。  channel类层次结构  通道基础public interface Channel {      public boolean isOpen( );      publ">
+<meta name="keywords" content="nio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java nio 通道">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java基础/javaNIO/通道/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="通道Channel用于在字节缓冲区和位于通道另一侧的实体（通常是一个文件或套接字）之间有效地传输数据。 通道是一种途径，借助该途径，可以用最小的总开销来访问操作系统本身的I/O服务。缓冲区则是通道内部用来发送和接收数据的端点。  channel类层次结构  通道基础public interface Channel {      public boolean isOpen( );      publ">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/DZPDJB8.jpg">
+<meta property="og:image" content="http://www.molotang.com/wp-content/uploads/2013/09/Channel%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.jpg">
+<meta property="og:image" content="http://my.csdn.net/uploads/201205/31/1338442967_8295.jpg">
+<meta property="og:image" content="http://i.imgur.com/rXCPEqJ.jpg">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.127Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java nio 通道">
+<meta name="twitter:description" content="通道Channel用于在字节缓冲区和位于通道另一侧的实体（通常是一个文件或套接字）之间有效地传输数据。 通道是一种途径，借助该途径，可以用最小的总开销来访问操作系统本身的I/O服务。缓冲区则是通道内部用来发送和接收数据的端点。  channel类层次结构  通道基础public interface Channel {      public boolean isOpen( );      publ">
+<meta name="twitter:image" content="http://i.imgur.com/DZPDJB8.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java基础/javaNIO/通道/"/>
+
+
+
+
+
+  <title>java nio 通道 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/javaNIO/通道/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java nio 通道</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">java基础</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/javaNIO/" itemprop="url" rel="index">
+                    <span itemprop="name">javaNIO</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java基础/javaNIO/通道/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java基础/javaNIO/通道/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="通道"><a href="#通道" class="headerlink" title="通道"></a>通道</h3><p>Channel用于在字节缓冲区和位于通道另一侧的实体（通常是一个文件或套接字）之间有效地传输数据。</p>
+<p>通道是一种途径，借助该途径，可以用最小的总开销来访问操作系统本身的I/O服务。缓冲区则是通道内部用来发送和接收数据的端点。</p>
+<p><img src="http://i.imgur.com/DZPDJB8.jpg" alt=""></p>
+<p>channel类层次结构</p>
+<p><img src="http://www.molotang.com/wp-content/uploads/2013/09/Channel%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.jpg" alt=""></p>
+<h2 id="通道基础"><a href="#通道基础" class="headerlink" title="通道基础"></a>通道基础</h2><pre><code>public interface Channel { 
+    public boolean isOpen( ); 
+    public void close( ) throws IOException; 
+}
+</code></pre><p>通道实现经常使用操作系统的本地代码。通道接口允许您以一种受控且可移植的方式来访问底层的I/O服务。</p>
+<p>InterruptibleChannel是一个标记接口，当被通道使用时可以标示该通道是可以中断的（Interruptible）。如果连接可中断通道的线程被中断，那么该通道会以特别的方式工作，关于这一点我们会在3.1.3节中进行讨论。大多数但非全部的通道都是可以中断的。</p>
+<h3 id="打开通道"><a href="#打开通道" class="headerlink" title="打开通道"></a>打开通道</h3><p>通道可以以多种方式创建。Socket通道有可以直接创建新socket通道的工厂方法。但是一个FileChannel对象却只能通过在一个打开的RandomAccessFile、FileInputStream或FileOutputStream对象上调用getChannel( )方法来获取。您不能直接创建一个FileChannel对象。</p>
+<pre><code>SocketChannel sc = SocketChannel.open( ); 
+sc.connect (new InetSocketAddress (&quot;somehost&quot;, someport)); 
+ServerSocketChannel ssc = ServerSocketChannel.open( ); 
+ssc.socket( ).bind (new InetSocketAddress (somelocalport));
+
+DatagramChannel dc = DatagramChannel.open( ); 
+RandomAccessFile raf = new RandomAccessFile (&quot;somefile&quot;, &quot;r&quot;); 
+FileChannel fc = raf.getChannel( );
+</code></pre><h3 id="使用通道"><a href="#使用通道" class="headerlink" title="使用通道"></a>使用通道</h3><p>通道将数据传输给ByteBuffer对象或者从ByteBuffer对象获取数据进行传输。</p>
+<p>ByteChannel接口引申出了ReadableByteChannel 和WritableByteChannel两个接口。ByteChannel接口本身并不定义新的API方法，它是一种用来聚集它自己以一个新名称继承的多个接口的便捷接口。从FileInputStream对象的getChannel( )方法获取的FileChannel对象是只读的</p>
+<p>ByteChannel的read( ) 和write( )方法使用ByteBuffer对象作为参数。两种方法均返回已传输的字节数，可能比缓冲区的字节数少甚至可能为零。缓冲区的位置也会发生与已传输字节相同数量的前移。如果只进行了部分传输，缓冲区可以被重新提交给通道并从上次中断的地方继续传输。该过程重复进行直到缓冲区的hasRemaining( )方法返回false值</p>
+<pre><code>private static void channelCopy1 (ReadableByteChannel src, WritableByteChannel dest) throws IOException { 
+    ByteBuffer buffer = ByteBuffer.allocateDirect (16 * 1024);
+    while (src.read (buffer) != -1) {
+        buffer.flip( ); 
+        // Write to the channel; may block 
+        dest.write (buffer);
+        buffer.compact( ); 
+    }// EOF will leave buffer in fill state 
+    buffer.flip( ); // Make sure that the buffer is fully drained 
+    while (buffer.hasRemaining( )) {
+        dest.write (buffer); 
+    } 
+}
+</code></pre><p>通道可以以阻塞（blocking）或非阻塞（nonblocking）模式运行。只有面向流的（stream-oriented）的通道，如sockets和pipes才能使用非阻塞模式。</p>
+<h3 id="关闭通道"><a href="#关闭通道" class="headerlink" title="关闭通道"></a>关闭通道</h3><p>与缓冲区不同，通道不能被重复使用。一个打开的通道即代表与一个特定I/O服务的特定连接并封装该连接的状态。当通道关闭时，那个连接会丢失，然后通道将不再连接任何东西。</p>
+<p>调用通道的close( )方法时，可能会导致在通道关闭底层I/O服务的过程中线程暂时阻塞7，哪怕该通道处于非阻塞模式。通道关闭时的阻塞行为（如果有的话）是高度取决于操作系统或者文件系统的。</p>
+<p>通道引入了一些与关闭和中断有关的新行为。如果一个通道实现InterruptibleChannel接口，它的行为以下述语义为准：如果一个线程在一个通道上被阻塞并且同时被中断，那么该通道将被关闭，该被阻塞线程也会产生一个ClosedByInterruptException异常。</p>
+<h2 id="Scatter-Gather"><a href="#Scatter-Gather" class="headerlink" title="Scatter/Gather"></a>Scatter/Gather</h2><p>1.Scatter  从一个Channel读取的信息分散到N个缓冲区中(Buufer).<br>2.Gather  将N个Buffer里面内容按照顺序发送到一个Channel. </p>
+<p><img src="http://my.csdn.net/uploads/201205/31/1338442967_8295.jpg" alt=""></p>
+<p>例子:</p>
+<pre><code>ByteBuffer header = ByteBuffer.allocateDirect (10); 
+ByteBuffer body = ByteBuffer.allocateDirect (80); 
+ByteBuffer [] buffers = { header, body }; 
+int bytesRead = channel.read (buffers);
+</code></pre><p>我们可以用一个gather操作将多个缓冲区的数据组合并发送出去。使用相同的缓冲区，我们可以像下面这样汇总数据并在一个socket通道上发送包</p>
+<pre><code>body.clear( ); 
+body.put(&quot;FOO&quot;.getBytes()).flip( ); // &quot;FOO&quot; as bytes 
+header.clear( ); 
+header.putShort (TYPE_FILE).putLong (body.limit()).flip( ); 
+long bytesWritten = channel.write (buffers);
+</code></pre><h2 id="文件通道"><a href="#文件通道" class="headerlink" title="文件通道"></a>文件通道</h2><p>文件通道总是阻塞式的，因此不能被置于非阻塞模式。面向流的I/O的非阻塞范例对于面向文件的操作并无多大意义，这是由文件I/O本质上的不同性质造成的。对于文件I/O，最强大之处在于异步I/O（asynchronous I/O），它允许一个进程可以从操作系统请求一个或多个I/O操作而不必等待这些操作的完成。发起请求的进程之后会收到它请求的I/O操作已完成的通知。</p>
+<p>FileChannel对象不能直接创建。一个FileChannel实例只能通过在一个打开的file对象（RandomAccessFile、FileInputStream或FileOutputStream）上调用getChannel( )方法获取</p>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><pre><code>package java.nio.channels;
+
+public abstract class FileChannel extends AbstractChannel implements ByteChannel, GatheringByteChannel, ScatteringByteChannel {
+    // This is a partial API listing
+    // All methods listed here can throw java.io.IOException
+
+    public abstract int read(ByteBuffer dst, long position);
+    public abstract int write(ByteBuffer src, long position);
+    public abstract long size();
+    // 返回当前文件的 position 值。返回值是一个长整型（long），表示文件中的当前字节位置。
+    public abstract long position();
+    // 将通道的 position 设置为指定值。负值，将异常伺候；值可以超过文件尾，这会导致文件空洞。
+    public abstract void position(long newPosition);
+    public abstract void truncate(long size);
+    public abstract void force(boolean metaData);
+    public final FileLock lock();
+    public abstract FileLock lock(long position, long size, boolean shared);
+    public final FileLock tryLock();
+    public abstract FileLock tryLock(long position, long size, boolean shared);
+    public abstract MappedByteBuffer map(MapMode mode, long position, long size);
+
+    public abstract long transferTo(long position, long count, WritableByteChannel target);
+    public abstract long transferFrom(ReadableByteChannel src, long position, long count);
+
+    public static class MapMode {
+        public static final MapMode READ_ONLY;
+        public static final MapMode READ_WRITE;
+        public static final MapMode PRIVATE;
+    }
+}
+</code></pre><p>FileChannel都会尝试使用本地I/O服务。FileChannel类本身是抽象的，您从getChannel( )方法获取的实际对象是一个具体子类（subclass）的一个实例（instance），该子类可能使用本地代码来实现以上API方法中的一些或全部。</p>
+<h3 id="访问文件"><a href="#访问文件" class="headerlink" title="访问文件"></a>访问文件</h3><pre><code>public abstract long position( ) 
+public abstract void position (long newPosition) 
+public abstract int read (ByteBuffer dst) 
+public abstract int read (ByteBuffer dst, long position) 
+public abstract int write (ByteBuffer src) 
+public abstract int write (ByteBuffer src, long position) 
+public abstract long size( ) 
+public abstract void truncate (long size) 
+public abstract void force (boolean metaData)
+</code></pre><p>当磁盘上一个文件的分配空间小于它的文件大小时会出现“文件空洞” , 当需要减少一个文件的size时，truncate( )方法会砍掉您所指定的新size值之外的所有数据。</p>
+<h3 id="文件锁定"><a href="#文件锁定" class="headerlink" title="文件锁定"></a>文件锁定</h3><p>锁（lock）可以是共享的（shared）或独占的（exclusive）。本节中描述的文件锁定特性在很大程度上依赖本地的操作系统实现。锁最终是由操作系统或文件系统来判优的并且几乎总是在进程级而非线程级上判优。锁都是与一个文件关联的，而不是与单个的文件句柄或通道关联。</p>
+<p>锁是在文件内部区域上获得的。调用带参数的Lock( )方法会指定文件内部锁定区域的开始position以及锁定区域的size。第三个参数shared表示您想获取的锁是共享的（参数值为true）还是独占的（参数值为false）。要获得一个共享锁，您必须先以只读权限打开文件，而请求独占锁时则需要写权限。</p>
+<p>lock( )方法是一种在整个文件上请求独占锁</p>
+<p>tryLock( )的方法，它们是lock( )方法的非阻塞变体。这两个tryLock( )和lock( )方法起相同的作用，不过如果请求的锁不能立即获取到则会返回一个null。</p>
+<pre><code>public abstract class FileLock
+{
+    public final FileChannel channel( ) 
+    public final long position( ) 
+    public final long size( )   
+    public final boolean isShared( )   //是否共享
+    public final boolean overlaps (long position, long size) 
+    public abstract boolean isValid( );   //是否有效
+    public abstract void release( ) throws IOException; 
+}
+</code></pre><p>FileLock类封装一个锁定的文件区域。FileLock对象由FileChannel创建并且总是关联到那个特定的通道实例</p>
+<p>一个FileLock对象创建之后即有效，直到它的release( )方法被调用或它所关联的通道被关闭或Java虚拟机关闭时才会失效。</p>
+<pre><code>FileLock lock = fileChannel.lock( ) 
+try { 
+    &lt;perform read/write/whatever on channel&gt; 
+} catch (IOException) {
+    &lt;handle unexpected exception&gt;
+} finally { 
+    lock.release( ) 
+}
+</code></pre><h2 id="内存映射文件"><a href="#内存映射文件" class="headerlink" title="内存映射文件"></a>内存映射文件</h2><p>新的FileChannel类提供了一个名为map( )的方法，该方法可以在一个打开的文件和一个特殊类型的ByteBuffer之间建立一个虚拟内存映射</p>
+<pre><code>public abstract MappedByteBuffer map (MapMode mode, long position,long size)
+</code></pre><p>映射文件的范围不应超过文件的实际大小。如果您请求一个超出文件大小的映射，文件会被增大以匹配映射的大小。</p>
+<h3 id="Channel-to-Channel传输"><a href="#Channel-to-Channel传输" class="headerlink" title="Channel-to-Channel传输"></a>Channel-to-Channel传输</h3><pre><code>public abstract long transferTo (long position, long count, WritableByteChannel target) 
+public abstract long transferFrom (ReadableByteChannel src,long position, long count)
+</code></pre><p>transferTo( )和transferFrom( )方法允许将一个通道交叉连接到另一个通道，而不需要通过一个中间缓冲区来传递数据。只有FileChannel类有这两个方法，因此channel-to-channel传输中通道之一必须是FileChannel。</p>
+<h2 id="Socket通道"><a href="#Socket通道" class="headerlink" title="Socket通道"></a>Socket通道</h2><p>看选择器</p>
+<p>全部socket通道类（DatagramChannel、SocketChannel和ServerSocketChannel）都是由位于java.nio.channels.spi包中的AbstractSelectableChannel引申而来。这意味着我们可以用一个Selector对象来执行socket通道的有条件的选择（readiness selection）。</p>
+<p>DatagramChannel和SocketChannel实现定义读和写功能的接口而ServerSocketChannel不实现。ServerSocketChannel负责监听传入的连接和创建新的SocketChannel对象，它本身从不传输数据。</p>
+<h3 id="非阻塞模式"><a href="#非阻塞模式" class="headerlink" title="非阻塞模式"></a>非阻塞模式</h3><p>要把一个socket通道置于非阻塞模式，我们要依靠所有socket通道类的公有超级类：SelectableChannel。</p>
+<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>管道就是一个用来在两个实体之间单向传输数据的导管</p>
+<pre><code>public abstract class Pipe { 
+    public static Pipe open( ) throws IOException 
+    public abstract SourceChannel source( ); 
+    public abstract SinkChannel sink( );
+    public static abstract class SourceChannel extends AbstractSelectableChannel     implements ReadableByteChannel, ScatteringByteChannel 
+    public static abstract class SinkChannel extends AbstractSelectableChannel     implements WritableByteChannel, GatheringByteChannel 
+}
+</code></pre><p><img src="http://i.imgur.com/rXCPEqJ.jpg" alt=""></p>
+<p>Pipe实例是通过调用不带参数的Pipe.open( )工厂方法来创建的。Pipe类定义了两个嵌套的通道类来实现管路。这两个类是Pipe.SourceChannel（管道负责读的一端）和Pipe.SinkChannel（管道负责写的一端）。这两个通道实例是在Pipe对象创建的同时被创建的，可以通过在Pipe对象上分别调用source( )和sink( )方法来取回。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nio/" rel="tag"># nio</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/java基础/java基础/String/" rel="next" title="java String">
+                <i class="fa fa-chevron-left"></i> java String
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/java基础/javaNIO/选择器/" rel="prev" title="java nio 选择器">
+                java nio 选择器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#通道"><span class="nav-number">1.</span> <span class="nav-text">通道</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通道基础"><span class="nav-number"></span> <span class="nav-text">通道基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#打开通道"><span class="nav-number">1.</span> <span class="nav-text">打开通道</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用通道"><span class="nav-number">2.</span> <span class="nav-text">使用通道</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭通道"><span class="nav-number">3.</span> <span class="nav-text">关闭通道</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scatter-Gather"><span class="nav-number"></span> <span class="nav-text">Scatter/Gather</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件通道"><span class="nav-number"></span> <span class="nav-text">文件通道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#API"><span class="nav-number">1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问文件"><span class="nav-number">2.</span> <span class="nav-text">访问文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件锁定"><span class="nav-number">3.</span> <span class="nav-text">文件锁定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存映射文件"><span class="nav-number"></span> <span class="nav-text">内存映射文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel-to-Channel传输"><span class="nav-number">1.</span> <span class="nav-text">Channel-to-Channel传输</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socket通道"><span class="nav-number"></span> <span class="nav-text">Socket通道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#非阻塞模式"><span class="nav-number">1.</span> <span class="nav-text">非阻塞模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管道"><span class="nav-number"></span> <span class="nav-text">管道</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

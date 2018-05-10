@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="多线程," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="线程池API 大多数并发应用程序是围绕执行任务（Task）进行管理的。把一个应用程序的工作（work）分离到任务中，可以简化程序的管理；这种分离还在不同事物间划分了自然的分界线，可以方便程序在出现错误时进行恢复；同时这种分离还可以为并行工作提供一个自然的结构，有利于提高程序的并发性。 所谓的任务拆分就是确定每一个执行任务（工作单元）的边界。理想情况下独立的工作单元有最大的吞吐量，这些工作单元不依赖">
+<meta name="keywords" content="多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java线程池">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java基础/java并发/线程池/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="线程池API 大多数并发应用程序是围绕执行任务（Task）进行管理的。把一个应用程序的工作（work）分离到任务中，可以简化程序的管理；这种分离还在不同事物间划分了自然的分界线，可以方便程序在出现错误时进行恢复；同时这种分离还可以为并行工作提供一个自然的结构，有利于提高程序的并发性。 所谓的任务拆分就是确定每一个执行任务（工作单元）的边界。理想情况下独立的工作单元有最大的吞吐量，这些工作单元不依赖">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-part-1-_8E6F/ThreadPool2_2.png">
+<meta property="og:image" content="http://i.imgur.com/SbARTVo.png">
+<meta property="og:image" content="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-part-3-Executor-_12486/Executor-Lifecycle_4.png">
+<meta property="og:image" content="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-part-3-Executor-_12486/ExecutorService-LifeCycle_2.png">
+<meta property="og:image" content="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-32--part-5-_72AF/ThreadPoolExecutor_2.png">
+<meta property="og:image" content="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-32--part-5-_72AF/ThreadPoolExecutor-Worker_2.png">
+<meta property="og:image" content="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-35--part-8--2_BFEA/ThreadPoolExecutor-Future_2.png">
+<meta property="og:image" content="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-35--part-8--2_BFEA/ThreadPoolExecutor-FutureTask-state_2.png">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.142Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java线程池">
+<meta name="twitter:description" content="线程池API 大多数并发应用程序是围绕执行任务（Task）进行管理的。把一个应用程序的工作（work）分离到任务中，可以简化程序的管理；这种分离还在不同事物间划分了自然的分界线，可以方便程序在出现错误时进行恢复；同时这种分离还可以为并行工作提供一个自然的结构，有利于提高程序的并发性。 所谓的任务拆分就是确定每一个执行任务（工作单元）的边界。理想情况下独立的工作单元有最大的吞吐量，这些工作单元不依赖">
+<meta name="twitter:image" content="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-part-1-_8E6F/ThreadPool2_2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java基础/java并发/线程池/"/>
+
+
+
+
+
+  <title>java线程池 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java并发/线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java线程池</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">java基础</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java基础/java并发/线程池/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java基础/java并发/线程池/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><p><img src="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-part-1-_8E6F/ThreadPool2_2.png" alt=""></p>
+<p>大多数并发应用程序是围绕执行任务（Task）进行管理的。把一个应用程序的工作（work）分离到任务中，可以简化程序的管理；这种分离还在不同事物间划分了自然的分界线，可以方便程序在出现错误时进行恢复；同时这种分离还可以为并行工作提供一个自然的结构，有利于提高程序的并发性。</p>
+<p>所谓的任务拆分就是确定每一个执行任务（工作单元）的边界。理想情况下独立的工作单元有最大的吞吐量，这些工作单元不依赖于其它工作单元的状态、结果或者其他资源等。因此将任务尽可能的拆分成一个个独立的工作单元有利于提高程序的并发性。</p>
+<p>任务的执行策略包括4W3H 部分：</p>
+<ul>
+<li>任务在什么（What）线程中执行</li>
+<li>任务以什么（What）顺序执行（FIFO/LIFO/优先级等）</li>
+<li>同时有多少个（How Many）任务并发执行</li>
+<li>允许有多少个（How Many）个任务进入执行队列</li>
+<li>系统过载时选择放弃哪一个（Which）任务，如何（How）通知应用程序这个动作</li>
+<li>任务执行的开始、结束应该做什么（What）处理</li>
+</ul>
+<p>如何满足上面的条件</p>
+<ol>
+<li>首先明确一定是在Java 里面可以供使用者调用的启动线程类是Thread。因此Runnable 或者Timer/TimerTask 等都是要依赖Thread 来启动的，因此在ThreadPool 里面同样也是靠Thread 来启动多线程的。</li>
+<li>默认情况下Runnable 接口执行完毕后是不能拿到执行结果的，因此在ThreadPool里就定义了一个Callable 接口来处理执行结果。</li>
+<li>为了异步阻塞的获取结果，Future 可以帮助调用线程获取执行结果。</li>
+<li>Executor 解决了向线程池提交任务的入口问题，同时ScheduledExecutorService 解决了如何进行重复调用任务的问题。</li>
+<li>CompletionService 解决了如何按照执行完毕的顺序获取结果的问题，这在某些情况下可以提高任务执行的并发，调用线程不必在长时间任务上等待过多时间。</li>
+<li>显然线程的数量是有限的，而且也不宜过多，因此合适的任务队列是必不可少的，BlockingQueue 的容量正好可以解决此问题。</li>
+<li>固定任务容量就意味着在容量满了以后需要一定的策略来处理过多的任务（新任务），RejectedExecutionHandler 正好解决此问题。</li>
+<li>一定时间内阻塞就意味着有超时，因此TimeoutException 就是为了描述这种现象。TimeUnit 是为了描述超时时间方便的一个时间单元枚举类。</li>
+<li>有上述问题就意味了配置一个合适的线程池是很复杂的，因此Executors 默认的一些线程池配置可以减少这个操作。</li>
+</ol>
+<h2 id="线程池的类体系结构"><a href="#线程池的类体系结构" class="headerlink" title="线程池的类体系结构"></a>线程池的类体系结构</h2><p><img src="http://i.imgur.com/SbARTVo.png" alt=""></p>
+<p>Executor 的execute 方法只是执行一个Runnable 的任务</p>
+<p>ExecutorService 在Executor 的基础上增加了一些方法，其中有两个核心的方法：</p>
+<ul>
+<li>Future&lt;?&gt; submit(Runnable task)</li>
+<li><t> Future<t> submit(Callable<t> task)</t></t></t></li>
+</ul>
+<p>这两个方法都是向线程池中提交任务，它们的区别在于Runnable 在执行完毕后没有结果，Callable 执行完毕后有一个结果。这在多个线程中传递状态和结果是非常有用的。另外他们的相同点在于都返回一个Future 对象。Future 对象可以阻塞线程直到运行完毕（获取结果，如果有的话），也可以取消任务执行，当然也能够检测任务是否被取消或者是否执行完毕。</p>
+<p>ScheduledExecutorService 描述的功能和Timer/TimerTask 类似，解决那些需要任务重复执行<br>的问题。这包括延迟时间一次性执行、延迟时间周期性执行以及固定延迟时间周期性执行等。当然了继承ExecutorService 的ScheduledExecutorService 拥有ExecutorService 的全部特性。</p>
+<p>ScheduledThreadPoolExecutor 是继承ThreadPoolExecutor 的ScheduledExecutorService 接口实现，周期性任务调度的类实现</p>
+<p>CompletionService 接口，它是用于描述顺序获取执行结果的一个线程池包装器</p>
+<p>Executors 类里面提供了一些静态工厂，生成一些常用的线程池</p>
+<ul>
+<li>newSingleThreadExecutonewSingleThreadExecutor：创建一个单线程的线程池。这个线程池只有一个线程在工作，也就是相当于单线程串行执行所有任务。如果这个唯一的线程因为异常结束，那<br>么会有一个新的线程来替代它。此线程池保证所有任务的执行顺序按照任务的提交顺序执行。</li>
+<li>newFixedThreadPool：创建固定大小的线程池。每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小。线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程。</li>
+<li>newCachedThreadPool：创建一个可缓存的线程池。如果线程池的大小超过了处理任务所需要的线程，那么就会回收部分空闲（60秒不执行任务）的线程，当任务数增加时，此线程池又可以智能的添加新线程来处理任务。此线程池不会对线程池大小做限制，线程池大小完全依赖于操作系统（或者说JVM）能够创建的最大线程大小。</li>
+<li>newScheduledThreadPool：创建一个大小无限的线程池。此线程池支持定时以及周期性执行任务的需求。</li>
+<li>newSingleThreadScheduledExecutor：创建一个单线程的线程池。此线程池支持定时以及周期性执行任务的需求。</li>
+</ul>
+<h3 id="退出"><a href="#退出" class="headerlink" title="退出"></a>退出</h3><p>线程是有多种执行状态的，同样管理线程的线程池也有多种状态。JVM 会在所有线程（非后台daemon 线程）全部终止后才退出，为了节省资源和有效释放资源关闭一个线程池就显得很重要。有时候无法正确的关闭线程池，将会阻止JVM 的结束。</p>
+<p>线程池Executor 是异步的执行任务，因此任何时刻不能够直接获取提交的任务的状态。这些任务有可能已经完成，也有可能正在执行或者还在排队等待执行。因此关闭线程池可能出现一下几种情况：</p>
+<ul>
+<li>平缓关闭：已经启动的任务全部执行完毕，同时不再接受新的任务</li>
+<li>立即关闭：取消所有正在执行和未执行的任务</li>
+</ul>
+<p>线程池的四种状态:</p>
+<ul>
+<li>线程池在构造前（new 操作）是初始状态，一旦构造完成线程池就进入了执行状态RUNNING</li>
+<li>线程池运行中可以通过shutdown()和shutdownNow()来改变运行状态</li>
+<li>一旦shutdown()或者shutdownNow()执行完毕，线程池就进入TERMINATED 状态，此时线程池就结束了。</li>
+<li>isTerminating()描述的是SHUTDOWN 和STOP 两种状态。</li>
+<li>isShutdown()描述的是非RUNNING 状态，也就是SHUTDOWN/STOP/TERMINATED三种状态。</li>
+<li><img src="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-part-3-Executor-_12486/Executor-Lifecycle_4.png" alt=""></li>
+</ul>
+<h3 id="线程池API"><a href="#线程池API" class="headerlink" title="线程池API"></a>线程池API</h3><p><img src="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-part-3-Executor-_12486/ExecutorService-LifeCycle_2.png" alt=""> </p>
+<p>shutdownNow()会返回那些已经进入了队列但是还没有执行的任务列表<br>awaitTermination 描述的是等待线程池关闭的时间，如果等待时间线程池还没有关闭将会抛出一个超时异常。</p>
+<ul>
+<li>平缓关闭线程池使用shutdown()</li>
+<li>立即关闭线程池使用shutdownNow()，同时得到未执行的任务列表</li>
+<li>检测线程池是否正处于关闭中，使用isShutdown()</li>
+<li>检测线程池是否已经关闭使用isTerminated()</li>
+<li>定时或者永久等待线程池关闭结束使用awaitTermination()操作</li>
+</ul>
+<h2 id="线程池数据结构与线程构造方法"><a href="#线程池数据结构与线程构造方法" class="headerlink" title="线程池数据结构与线程构造方法"></a>线程池数据结构与线程构造方法</h2><p><img src="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-32--part-5-_72AF/ThreadPoolExecutor_2.png" alt=""></p>
+<ul>
+<li>线程池需要支持多个线程并发执行，因此有一个线程集合Collection<thread>来执行线程任务；</thread></li>
+<li>涉及任务的异步执行，因此需要有一个集合来缓存任务队列Collection<runnable>；</runnable></li>
+<li>很显然在多个线程之间协调多个任务，那么就需要一个线程安全的任务集合，同时还需要支持阻塞、超时操作，那么BlockingQueue 是必不可少的；</li>
+<li>既然是线程池，出发点就是提高系统性能同时降低资源消耗，那么线程池的大小就有限制，因此需要有一个核心线程池大小（线程个数）和一个最大线程池大小（线程个数），有一个计数用来描述当前线程池大小；</li>
+<li>如果是有限的线程池大小，那么长时间不使用的线程资源就应该销毁掉，这样就需要一个线程空闲时间的计数来描述线程何时被销毁；</li>
+<li>前面描述过线程池也是有生命周期的，因此需要有一个状态来描述线程池当前的运行状态；</li>
+<li>线程池的任务队列如果有边界，那么就需要有一个任务拒绝策略来处理过多的任务，同时在线程池的销毁阶段也需要有一个任务拒绝策略来处理新加入的任务；</li>
+<li>上面种的线程池大小、线程空闲实际那、线程池运行状态等等状态改变都不是线程安全的，因此需要有一个全局的锁（mainLock）来协调这些竞争资源；</li>
+<li>除了以上数据结构以外，ThreadPoolExecutor 还有一些状态用来描述线程池的运行计数，例如线程池运行的任务数、曾经达到的最大线程数<h3 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h3>  public interface ThreadFactory {<pre><code>Thread newThread(Runnable r);
+</code></pre>  }<br>  static class DefaultThreadFactory implements ThreadFactory {<pre><code>static final AtomicInteger poolNumber = new AtomicInteger(1);
+final ThreadGroup group;
+final AtomicInteger threadNumber = new AtomicInteger(1);
+final String namePrefix;
+DefaultThreadFactory() {
+    SecurityManager s = System.getSecurityManager();
+    group = (s != null)? s.getThreadGroup() :
+    Thread.currentThread().getThreadGroup();
+    namePrefix = &quot;pool-&quot; +
+    poolNumber.getAndIncrement() +
+    &quot;-thread-&quot;;
+}
+public Thread newThread(Runnable r) {
+    Thread t = new Thread(group, r,
+        namePrefix + threadNumber.getAndIncrement(),
+        0);
+    if (t.isDaemon())
+        t.setDaemon(false);
+    if (t.getPriority() != Thread.NORM_PRIORITY)
+        t.setPriority(Thread.NORM_PRIORITY);
+    return t;
+}
+</code></pre>  }<br>同一个线程池的所有线程属于同一个线程组，也就是创建线程池的那个线程组</li>
+</ul>
+<p>另外对于线程池中的所有线程默认都转换为非后台线程，这样主线程退出时不会直接退出JVM，而是等待线程池结束。还有一点就是默认将线程池中的所有线程都调为同一个级别，这样在操作系统角度来看所有系统都是公平的，不会导致竞争堆积。</p>
+<h2 id="线程池中线程生命周期"><a href="#线程池中线程生命周期" class="headerlink" title="线程池中线程生命周期"></a>线程池中线程生命周期</h2><p>一个线程Worker 被构造出来以后就开始处于运行状态。</p>
+<pre><code>private final class Worker implements Runnable {
+    private final ReentrantLock runLock = new ReentrantLock();
+    private Runnable firstTask;
+    Thread thread;
+    Worker(Runnable firstTask) {
+        this.firstTask = firstTask;
+    }
+    private void runTask(Runnable task) {
+        final ReentrantLock runLock = this.runLock;
+        runLock.lock();
+        try {
+            task.run();
+        } finally {
+            runLock.unlock();
+        }
+    }
+    public void run() {
+        try {
+            Runnable task = firstTask;
+            firstTask = null;
+            while (task != null || (task = getTask()) != null) {
+                runTask(task);
+                task = null;
+            }
+        } finally {
+            workerDone(this);
+        }
+    }
+}
+</code></pre><p><img src="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-32--part-5-_72AF/ThreadPoolExecutor-Worker_2.png" alt=""></p>
+<p>当提交一个任务时，如果需要创建一个线程（何时需要在下一节中探讨）时，就调用线程工厂创建一个线程，同时将线程绑定到Worker 工作队列中。需要说明的是，Worker 队列构造的时候带着一个任务Runnable</p>
+<p>一旦线程池启动线程后（调用线程run()）方法，那么线程工作队列Worker 就从第1个任务开始执行（这时候发现构造Worker 时传递一个任务的好处了），一旦第1个任务执行完毕，就从线程池的任务队列中取出下一个任务进行执行。循环如此，直到线程池被关闭或者任务抛出了一个RuntimeException。</p>
+<h2 id="线程池任务执行流程"><a href="#线程池任务执行流程" class="headerlink" title="线程池任务执行流程"></a>线程池任务执行流程</h2><ul>
+<li>任务可能在将来某个时刻被执行，有可能不是立即执行。</li>
+<li>任务可能在一个新的线程中执行或者线程池中存在的一个线程中执行。</li>
+<li>任务无法被提交执行有以下两个原因：线程池已经关闭或者线程池已经达到了容量限制。</li>
+<li><p>所有失败的任务都将被“当前”的任务拒绝策略RejectedExecutionHandler 处理。</p>
+<pre><code>public void execute(Runnable command) {
+    //1
+    if (command == null)
+        throw new NullPointerException();
+    //2,3
+    if (poolSize &gt;= corePoolSize || !addIfUnderCorePoolSize(command)) {
+    //4
+        if (runState == RUNNING &amp;&amp; workQueue.offer(command)) {
+    //5
+        if (runState != RUNNING || poolSize == 0)
+    //6
+                ensureQueuedTaskHandled(command);
+        }
+    //7
+        else if (!addIfUnderMaximumPoolSize(command))
+            reject(command); // is shutdown or saturated
+    }
+}
+</code></pre></li>
+</ul>
+<p>上述过程:</p>
+<ol>
+<li>如果任务command 为空，则抛出空指针异常，返回。否则进行2。</li>
+<li>如果当前线程池大小大于或等于核心线程池大小，进行4。否则进行3。</li>
+<li>创建一个新工作队列（线程，参考上一节），成功直接返回，失败进行4。</li>
+<li>如果线程池正在运行并且任务加入线程池队列成功，进行5，否则进行7。</li>
+<li>如果线程池已经关闭或者线程池大小为0，进行6，否则直接返回。</li>
+<li>如果线程池已经关闭则执行拒绝策略返回，否则启动一个新线程来进行执行任务，返回。</li>
+<li>如果线程池大小不大于最大线程池数量，则启动新线程来进行执行，否则进行拒绝策略，结束。</li>
+</ol>
+<p>何时任务立即执行</p>
+<pre><code>runState == RUNNING &amp;&amp; ( poolSize &lt; corePoolSize || poolSize &lt; maxnumPoolSize &amp;&amp; workQueue.isFull())
+</code></pre><h3 id="submit"><a href="#submit" class="headerlink" title="submit"></a>submit</h3><pre><code>public Future&lt;?&gt; submit(Runnable task) {
+    if (task == null) throw new NullPointerException();
+    RunnableFuture&lt;Object&gt; ftask = newTaskFor(task, null);
+    execute(ftask);
+    return ftask;
+}
+public &lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result) {
+    if (task == null) throw new NullPointerException();
+    RunnableFuture&lt;T&gt; ftask = newTaskFor(task, result);
+    execute(ftask);
+    return ftask;
+}
+public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) {
+    if (task == null) throw new NullPointerException();
+    RunnableFuture&lt;T&gt; ftask = newTaskFor(task);
+    execute(ftask);
+    return ftask;
+}
+</code></pre><h2 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h2><p><img src="http://images.blogjava.net/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-35--part-8--2_BFEA/ThreadPoolExecutor-Future_2.png" alt=""></p>
+<p>在Future 接口中提供了5个方法。</p>
+<ul>
+<li>V get() throws InterruptedException, ExecutionException： 等待计算完成，然后获取其结果。</li>
+<li>V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException,TimeoutException。最多等待为使计算完成所给定的时间之后，获取其结果（如果结果可用）。</li>
+<li>boolean cancel(boolean mayInterruptIfRunning)：试图取消对此任务的执行。</li>
+<li>boolean isCancelled()：如果在任务正常完成前将其取消，则返回true。</li>
+<li>boolean isDone()：如果任务已完成，则返回true。可能由于正常终止、异常或取消而完成，在所有这些情况中，此方法都将返回true。</li>
+</ul>
+<p><img src="http://www.blogjava.net/images/blogjava_net/xylz/Windows-Live-Writer/-Java-Concurrency-35--part-8--2_BFEA/ThreadPoolExecutor-FutureTask-state_2.png" alt=""></p>
+<h3 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h3><p>初始情况下任务状态state=0，任务执行(innerRun)后状态变为运行状态RUNNING(state=1)，执行完毕后变成运行结束状态RAN(state=2)。任务在初始状态或者执行状态被取消后就变为状态CANCELLED(state=4)</p>
+<pre><code>void innerRun() {
+    if (!compareAndSetState(0, RUNNING))
+        return;
+    try {
+        runner = Thread.currentThread();
+        if (getState() == RUNNING) // recheck after setting thread
+            innerSet(callable.call());
+        else
+            releaseShared(0); // cancel
+    } catch (Throwable ex) {
+        innerSetException(ex);
+    }
+}
+</code></pre><p>执行一个任务有四步：设置运行状态、设置当前线程（AQS 需要）、执行任务(Runnable#run或者Callable#call）、设置执行结果。这里也可以看到，一个任务只能执行一次，因为执行完毕后它的状态不在为初始值0，要么为CANCELLED，要么为RAN。</p>
+<h3 id="取消任务"><a href="#取消任务" class="headerlink" title="取消任务"></a>取消任务</h3><pre><code>boolean innerCancel(boolean mayInterruptIfRunning) {
+    for (;;) {
+        int s = getState();
+        if (ranOrCancelled(s))
+            return false;
+        if (compareAndSetState(s, CANCELLED))
+            break;
+    }
+    if (mayInterruptIfRunning) {
+        Thread r = runner;
+        if (r != null)
+            r.interrupt();
+    }
+    releaseShared(0);
+    done();
+    return true;
+}
+</code></pre><h3 id="获取结果"><a href="#获取结果" class="headerlink" title="获取结果"></a>获取结果</h3><pre><code>V innerGet() throws InterruptedException, ExecutionException {
+    acquireSharedInterruptibly(0);
+    if (getState() == CANCELLED)
+        throw new CancellationException();
+    if (exception != null)
+        throw new ExecutionException(exception);
+    return result;
+}
+//AQS#acquireSharedInterruptibly
+public final void acquireSharedInterruptibly(int arg) throws InterruptedException {
+    if (Thread.interrupted())
+        throw new InterruptedException();
+    if (tryAcquireShared(arg) &lt; 0)
+        doAcquireSharedInterruptibly(arg); //park current Thread for result
+}
+protected int tryAcquireShared(int ignore) {
+    return innerIsDone()? 1 : -1;
+}
+boolean innerIsDone() {
+    return ranOrCancelled(getState()) &amp;&amp; runner == null;
+}
+</code></pre><p>当调用Future#get()的时候尝试去获取一个共享变量。这就涉及到AQS 的使用方式了。这里获取一个共享变量的状态是任务是否结束(innerIsDone())，也就是任务是否执行完毕或者被取消。如果不满足条件，那么在AQS 中就会doAcquireSharedInterruptibly(arg)挂起当前线程，直到满足条件</p>
+<h2 id="延迟、周期性任务调度的实现"><a href="#延迟、周期性任务调度的实现" class="headerlink" title="延迟、周期性任务调度的实现"></a>延迟、周期性任务调度的实现</h2><p>ScheduledThreadPoolExecutor 和ThreadPoolExecutor 的唯一区别在于任务是有序（按照执行时间顺序）的，并且需要到达时间点（临界点）才能执行，并不是任务队列中有任务就需要执行的。也就是说唯一不同的就是任务队列BlockingQueue<runnable>workQueue 不一样。ScheduledThreadPoolExecutor 的任务队列是java.util.concurrent.ScheduledThreadPoolExecutor.DelayedWorkQueue ， 它是基于<br>java.util.concurrent.DelayQueue<runnablescheduledfuture>队列的实现。</runnablescheduledfuture></runnable></p>
+<p>由于DelayQueue 在获取元素时需要检测元素是否“可用”，也就是任务是否达到“临界点”（指定时间点），因此加入元素和移除元素会有一些额外的操作。</p>
+<p>移除元素（出队列）的过程是这样的：</p>
+<ul>
+<li>总是检测队列的头元素（顺序最小元素，也是最先达到临界点的元素）</li>
+<li>检测头元素与当前时间的差，如果大于0，表示还未到底临界点，因此等待响应时间（使用条件变量available)</li>
+<li>如果小于或者等于0，说明已经到底临界点或者已经过了临界点，那么就移除头元素，并且唤醒其它等待任务队列的线程。</li>
+</ul>
+<p>同样加入元素也会有相应的条件变量操作。当前仅当队列为空或者要加入的元素比队列中的头元素还小的时候才需要唤醒“等待线程”去检测元素。因为头元素都没有唤醒那么比头元素更延迟的元素就更加不会唤醒。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/java基础/jvm/ClassLoader/" rel="next" title="ClassLoader">
+                <i class="fa fa-chevron-left"></i> ClassLoader
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/java基础/java并发/原子操作/" rel="prev" title="java多线程原子操作">
+                java多线程原子操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#线程池"><span class="nav-number">1.</span> <span class="nav-text">线程池</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#API"><span class="nav-number">1.1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池的类体系结构"><span class="nav-number">1.2.</span> <span class="nav-text">线程池的类体系结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#退出"><span class="nav-number">1.2.1.</span> <span class="nav-text">退出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池API"><span class="nav-number">1.2.2.</span> <span class="nav-text">线程池API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池数据结构与线程构造方法"><span class="nav-number">1.3.</span> <span class="nav-text">线程池数据结构与线程构造方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建线程"><span class="nav-number">1.3.1.</span> <span class="nav-text">创建线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池中线程生命周期"><span class="nav-number">1.4.</span> <span class="nav-text">线程池中线程生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池任务执行流程"><span class="nav-number">1.5.</span> <span class="nav-text">线程池任务执行流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#submit"><span class="nav-number">1.5.1.</span> <span class="nav-text">submit</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Future"><span class="nav-number">1.6.</span> <span class="nav-text">Future</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行"><span class="nav-number">1.6.1.</span> <span class="nav-text">执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取消任务"><span class="nav-number">1.6.2.</span> <span class="nav-text">取消任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取结果"><span class="nav-number">1.6.3.</span> <span class="nav-text">获取结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延迟、周期性任务调度的实现"><span class="nav-number">1.7.</span> <span class="nav-text">延迟、周期性任务调度的实现</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

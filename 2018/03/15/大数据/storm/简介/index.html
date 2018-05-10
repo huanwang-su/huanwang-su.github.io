@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="storm," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1. 简介Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架  什么是Apache Storm？Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架，具有最高的摄取率。虽然Storm是无状态的，它通过Apache ZooKeeper管理分布式">
+<meta name="keywords" content="storm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="storm介绍">
+<meta property="og:url" content="http://hvan.wang/2018/03/15/大数据/storm/简介/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="1. 简介Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架  什么是Apache Storm？Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架，具有最高的摄取率。虽然Storm是无状态的，它通过Apache ZooKeeper管理分布式">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/core_concept.jpg">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/shuffle_grouping.jpg">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/field_grouping.jpg">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/global_grouping.jpg">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/all_grouping.jpg">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/zookeeper_framework.jpg">
+<meta property="og:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/messaging_system.jpg">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.191Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="storm介绍">
+<meta name="twitter:description" content="1. 简介Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架  什么是Apache Storm？Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架，具有最高的摄取率。虽然Storm是无状态的，它通过Apache ZooKeeper管理分布式">
+<meta name="twitter:image" content="https://www.w3cschool.cn/attachments/tuploads/apache_storm/core_concept.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/15/大数据/storm/简介/"/>
+
+
+
+
+
+  <title>storm介绍 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/15/大数据/storm/简介/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">storm介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T20:46:25+08:00">
+                2018-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/storm/" itemprop="url" rel="index">
+                    <span itemprop="name">storm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/15/大数据/storm/简介/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/15/大数据/storm/简介/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h1><p>Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架 </p>
+<h3 id="什么是Apache-Storm？"><a href="#什么是Apache-Storm？" class="headerlink" title="什么是Apache Storm？"></a>什么是Apache Storm？</h3><p>Apache Storm是一个分布式实时大数据处理系统。Storm设计用于在容错和水平可扩展方法中处理大量数据。它是一个流数据框架，具有最高的摄取率。虽然Storm是无状态的，它通过Apache ZooKeeper管理分布式环境和集群状态。它很简单，您可以并行地对实时数据执行各种操作。</p>
+<p>Apache Storm继续成为实时数据分析的领导者。Storm易于设置和操作，并且它保证每个消息将通过拓扑至少处理一次。</p>
+<h3 id="Apache-Storm-vs-Hadoop"><a href="#Apache-Storm-vs-Hadoop" class="headerlink" title="Apache Storm vs Hadoop"></a>Apache Storm vs Hadoop</h3><p>基本上Hadoop和Storm框架用于分析大数据。两者互补，在某些方面有所不同。Apache Storm执行除持久性之外的所有操作，而Hadoop在所有方面都很好，但滞后于实时计算。下表比较了Storm和Hadoop的属性。</p>
+<table>
+<thead>
+<tr>
+<th>Storm</th>
+<th>Hadoop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实时流处理</td>
+<td>批量处理</td>
+</tr>
+<tr>
+<td>无状态</td>
+<td>有状态</td>
+</tr>
+<tr>
+<td>主/从架构与基于<strong>ZooKeeper</strong>的协调。主节点称为nimbus，从属节点是<strong>主管</strong>。</td>
+<td>具有/不具有基于ZooKeeper的协调的主 - 从结构。主节点是<strong>作业跟踪器</strong>，从节点是<strong>任务跟踪器</strong>。</td>
+</tr>
+<tr>
+<td>Storm流过程在集群上每秒可以访问数万条消息。</td>
+<td>Hadoop分布式文件系统（HDFS）使用MapReduce框架来处理大量的数据，需要几分钟或几小时。</td>
+</tr>
+<tr>
+<td>Storm拓扑运行直到用户关闭或意外的不可恢复故障。</td>
+<td>MapReduce作业按顺序执行并最终完成。</td>
+</tr>
+<tr>
+<td><strong>两者都是分布式和容错的</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>如果nimbus / supervisor死机，重新启动使它从它停止的地方继续，因此没有什么受到影响。</td>
+<td>如果JobTracker死机，所有正在运行的作业都会丢失。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Apache-Storm优势"><a href="#Apache-Storm优势" class="headerlink" title="Apache Storm优势"></a>Apache Storm优势</h3><p>下面是Apache Storm提供的好处列表：</p>
+<ul>
+<li>Storm是开源的，强大的，用户友好的。它可以用于小公司和大公司。</li>
+<li>Storm是容错的，灵活的，可靠的，并且支持任何编程语言。</li>
+<li>允许实时流处理。</li>
+<li>Storm是令人难以置信的快，因为它具有巨大的处理数据的力量。</li>
+<li>Storm可以通过线性增加资源来保持性能，即使在负载增加的情况下。它是高度可扩展的。</li>
+<li>Storm在几秒钟或几分钟内执行数据刷新和端到端传送响应取决于问题。它具有非常低的延迟。</li>
+<li>Storm有操作智能。</li>
+<li>Storm提供保证的数据处理，即使群集中的任何连接的节点死或消息丢失。</li>
+</ul>
+<h1 id="2-Apache-Storm核心概念"><a href="#2-Apache-Storm核心概念" class="headerlink" title="2. Apache Storm核心概念"></a>2. Apache Storm核心概念</h1><p>Apache Storm从一端读取实时数据的原始流，并将其传递通过一系列小处理单元，并在另一端输出处理/有用的信息。</p>
+<p>下图描述了Apache Storm的核心概念。</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/core_concept.jpg" alt="核心理念"></p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>Tuple是Storm中的主要数据结构。它是有序元素的列表。默认情况下，Tuple支持所有数据类型。通常，它被建模为一组逗号分隔的值，并传递到Storm集群。</td>
+</tr>
+<tr>
+<td>Stream</td>
+<td>流是元组的无序序列。</td>
+</tr>
+<tr>
+<td>Spouts</td>
+<td>流的源。通常，Storm从原始数据源（如Twitter Streaming API，Apache Kafka队列，Kestrel队列等）接受输入数据。否则，您可以编写spouts以从数据源读取数据。“ISpout”是实现spouts的核心接口，一些特定的接口是IRichSpout，BaseRichSpout，KafkaSpout等。</td>
+</tr>
+<tr>
+<td>Bolts</td>
+<td>Bolts是逻辑处理单元。Spouts将数据传递到Bolts和Bolts过程，并产生新的输出流。Bolts可以执行过滤，聚合，加入，与数据源和数据库交互的操作。Bolts接收数据并发射到一个或多个Bolts。 “IBolt”是实现Bolts的核心接口。一些常见的接口是IRichBolt，IBasicBolt等。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="拓扑"><a href="#拓扑" class="headerlink" title="拓扑"></a>拓扑</h3><p>Spouts和Bolts连接在一起，形成拓扑结构。实时应用程序逻辑在Storm拓扑中指定。简单地说，拓扑是有向图，其中顶点是计算，边缘是数据流。</p>
+<p>简单拓扑从spouts开始。Spouts将数据发射到一个或多个Bolts。Bolt表示拓扑中具有最小处理逻辑的节点，并且Bolts的输出可以发射到另一个Bolts作为输入。</p>
+<p>Storm保持拓扑始终运行，直到您终止拓扑。Apache Storm的主要工作是运行拓扑，并在给定时间运行任意数量的拓扑。</p>
+<h3 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h3><p>现在你有一个关于Spouts和Bolts的基本想法。它们是拓扑的最小逻辑单元，并且使用单个Spout和Bolt阵列构建拓扑。应以特定顺序正确执行它们，以使拓扑成功运行。Storm执行的每个Spout和Bolt称为“任务”。简单来说，任务是Spouts或Bolts的执行。在给定时间，每个Spout和Bolt可以具有在多个单独的螺纹中运行的多个实例。</p>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>拓扑在多个工作节点上以分布式方式运行。Storm将所有工作节点上的任务均匀分布。工作节点的角色是监听作业，并在新作业到达时启动或停止进程。</p>
+<h3 id="流分组"><a href="#流分组" class="headerlink" title="流分组"></a>流分组</h3><p>数据流从Spouts流到Bolts，或从一个Bolts流到另一个Bolts。流分组控制元组在拓扑中的路由方式，并帮助我们了解拓扑中的元组流。有四个内置分组，如下所述。</p>
+<h4 id="随机分组"><a href="#随机分组" class="headerlink" title="随机分组"></a>随机分组</h4><p>在随机分组中，相等数量的元组随机分布在执行Bolts的所有工人中。下图描述了结构。</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/shuffle_grouping.jpg" alt="随机分组"></p>
+<h4 id="字段分组"><a href="#字段分组" class="headerlink" title="字段分组"></a>字段分组</h4><p>元组中具有相同值的字段组合在一起，其余的元组保存在外部。然后，具有相同字段值的元组被向前发送到执行Bolts的同一进程。例如，如果流由字段“字”分组，则具有相同字符串“Hello”的元组将移动到相同的工作者。下图显示了字段分组的工作原理。</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/field_grouping.jpg" alt="现场分组"></p>
+<h4 id="全局分组"><a href="#全局分组" class="headerlink" title="全局分组"></a>全局分组</h4><p>所有流可以分组并向前到一个Bolts。此分组将源的所有实例生成的元组发送到单个目标实例（具体来说，选择具有最低ID的工作程序）。</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/global_grouping.jpg" alt="全球分组"></p>
+<h4 id="所有分组"><a href="#所有分组" class="headerlink" title="所有分组"></a>所有分组</h4><p>所有分组将每个元组的单个副本发送到接收Bolts的所有实例。这种分组用于向Bolts发送信号。所有分组对于连接操作都很有用。</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/all_grouping.jpg" alt="所有分组"></p>
+<h1 id="3-Apache-Storm集群架构"><a href="#3-Apache-Storm集群架构" class="headerlink" title="3. Apache Storm集群架构"></a>3. Apache Storm集群架构</h1><p>Apache Storm的主要亮点是，它是一个容错，快速，没有“单点故障”（SPOF）分布式应用程序。我们可以根据需要在多个系统中安装Apache Storm，以增加应用程序的容量。</p>
+<p>让我们看看Apache Storm集群如何设计和其内部架构。下图描述了集群设计。</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/zookeeper_framework.jpg" alt="动物园管理员框架"></p>
+<p>Apache Storm有两种类型的节点，Nimbus（主节点）和Supervisor（工作节点）。Nimbus是Apache Storm的核心组件。Nimbus的主要工作是运行Storm拓扑。Nimbus分析拓扑并收集要执行的任务。然后，它将任务分配给可用的supervisor。</p>
+<p>Supervisor将有一个或多个工作进程。Supervisor将任务委派给工作进程。工作进程将根据需要产生尽可能多的执行器并运行任务。Apache Storm使用内部分布式消息传递系统来进行Nimbus和管理程序之间的通信。</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nimbus（主节点）</td>
+<td>Nimbus是Storm集群的主节点。集群中的所有其他节点称为工作节点。主节点负责在所有工作节点之间分发数据，向工作节点分配任务和监视故障。</td>
+</tr>
+<tr>
+<td>Supervisor（工作节点）</td>
+<td>遵循指令的节点被称为<strong>Supervisors</strong>。Supervisor有多个工作进程，它管理工作进程以完成由nimbus分配的任务。</td>
+</tr>
+<tr>
+<td>Worker process（工作进程）</td>
+<td>工作进程将执行与特定拓扑相关的任务。工作进程不会自己运行任务，而是创建执行器并要求他们执行特定的任务。工作进程将有多个执行器。</td>
+</tr>
+<tr>
+<td>Executor（执行者）</td>
+<td>执行器只是工作进程产生的单个线程。执行器运行一个或多个任务，但仅用于特定的spout或bolt。</td>
+</tr>
+<tr>
+<td>Task（任务）</td>
+<td>任务执行实际的数据处理。所以，它是一个spout或bolt。</td>
+</tr>
+<tr>
+<td>ZooKeeper framework（ZooKeeper框架）</td>
+<td>Apache的ZooKeeper的是使用群集（节点组）自己和维护具有强大的同步技术共享数据之间进行协调的服务。Nimbus是无状态的，所以它依赖于ZooKeeper来监视工作节点的状态。ZooKeeper的帮助supervisor与nimbus交互。它负责维持nimbus，supervisor的状态。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="4-Apache-Storm工作流程"><a href="#4-Apache-Storm工作流程" class="headerlink" title="4. Apache Storm工作流程"></a>4. Apache Storm工作流程</h1><p>一个工作的Storm集群应该有一个Nimbus和一个或多个supervisors。另一个重要的节点是Apache ZooKeeper，它将用于nimbus和supervisors之间的协调。</p>
+<p>现在让我们仔细看看Apache Storm的工作流程 −</p>
+<ul>
+<li>最初，nimbus将等待“Storm拓扑”提交给它。</li>
+<li>一旦提交拓扑，它将处理拓扑并收集要执行的所有任务和任务将被执行的顺序。</li>
+<li>然后，nimbus将任务均匀分配给所有可用的supervisors。</li>
+<li>在特定的时间间隔，所有supervisor将向nimbus发送心跳以通知它们仍然运行着。</li>
+<li>当supervisor终止并且不向心跳发送心跳时，则nimbus将任务分配给另一个supervisor。</li>
+<li>当nimbus本身终止时，supervisor将在没有任何问题的情况下对已经分配的任务进行工作。</li>
+<li>一旦所有的任务都完成后，supervisor将等待新的任务进去。</li>
+<li>同时，终止nimbus将由服务监控工具自动重新启动。</li>
+<li>重新启动的网络将从停止的地方继续。同样，终止supervisor也可以自动重新启动。由于网络管理程序和supervisor都可以自动重新启动，并且两者将像以前一样继续，因此Storm保证至少处理所有任务一次。</li>
+<li>一旦处理了所有拓扑，则网络管理器等待新的拓扑到达，并且类似地，管理器等待新的任务。</li>
+</ul>
+<p>默认情况下，Storm集群中有两种模式：</p>
+<ul>
+<li><strong>本地模式</strong> -此模式用于开发，测试和调试，因为它是查看所有拓扑组件协同工作的最简单方法。在这种模式下，我们可以调整参数，使我们能够看到我们的拓扑如何在不同的Storm配置环境中运行。在本地模式下，storm拓扑在本地机器上在单个JVM中运行。</li>
+<li><strong>生产模式</strong> -在这种模式下，我们将拓扑提交到工作Storm集群，该集群由许多进程组成，通常运行在不同的机器上。如在storm的工作流中所讨论的，工作集群将无限地运行，直到它被关闭。</li>
+</ul>
+<h1 id="5-Apache-Storm分布式消息系统"><a href="#5-Apache-Storm分布式消息系统" class="headerlink" title="5. Apache Storm分布式消息系统"></a>5. Apache Storm分布式消息系统</h1><p>Apache Storm处理实时数据，并且输入通常来自消息排队系统。外部分布式消息系统将提供实时计算所需的输入。Spout将从消息系统读取数据，并将其转换为元组并输入到Apache Storm中。有趣的是，Apache Storm在内部使用其自己的分布式消息传递系统，用于其nimbus和主管之间的通信。</p>
+<h3 id="什么是分布式消息系统？"><a href="#什么是分布式消息系统？" class="headerlink" title="什么是分布式消息系统？"></a>什么是分布式消息系统？</h3><p>分布式消息传递基于可靠消息队列的概念。消息在客户端应用程序和消息系统之间异步排队。分布式消息传递系统提供可靠性，可扩展性和持久性的好处。</p>
+<p>大多数消息模式遵循<strong>发布 - 订阅模型</strong>（简称<strong>发布 - 订阅</strong>）,一旦消息已经被发送者发布，订阅者可以在过滤选项的帮助下接收所选择的消息。通常我们有两种类型的过滤，一种是<strong>基于主题的过滤</strong>，另一种是<strong>基于内容的过滤</strong>。</p>
+<p>pub-sub模型只能通过消息进行通信。它是一个非常松散耦合的架构</p>
+<p><img src="https://www.w3cschool.cn/attachments/tuploads/apache_storm/messaging_system.jpg" alt="消息系统"></p>
+<table>
+<thead>
+<tr>
+<th>分布式消息系统</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Apache Kafka</td>
+<td>Kafka是在LinkedIn公司开发的，后来它成为Apache的一个子项目。 Apache Kafka基于brokerenabled的，持久的，分布式的发布订阅模型。 Kafka是快速，可扩展和高效的。</td>
+</tr>
+<tr>
+<td>RabbitMQ</td>
+<td>RabbitMQ是一个开源的分布式鲁棒消息应用程序。它易于使用并在所有平台上运行。</td>
+</tr>
+<tr>
+<td>JMS(Java Message Service)</td>
+<td>JMS是一个开源API，支持创建，读取和从一个应用程序向另一个应用程序发送消息。它提供有保证的消息传递并遵循发布 - 订阅模型。</td>
+</tr>
+<tr>
+<td>ActiveMQ</td>
+<td>ActiveMQ消息系统是JMS的开源API。</td>
+</tr>
+<tr>
+<td>ZeroMQ</td>
+<td>ZeroMQ是无代理的对等体消息处理。它提供推拉，路由器 - 经销商消息模式。</td>
+</tr>
+<tr>
+<td>Kestrel</td>
+<td>Kestrel是一个快速，可靠，简单的分布式消息队列。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Thrift协议"><a href="#Thrift协议" class="headerlink" title="Thrift协议"></a>Thrift协议</h3><p>Thrift在Facebook上构建，用于跨语言服务开发和远程过程调用（RPC）。Apache Thrift是一种<strong>接口定义语言</strong>，允许以容易的方式在定义的数据类型之上定义新的数据类型和服务实现。Storm广泛使用Thrift协议进行内部通信和数据定义。Storm拓扑只是<strong>Thrift Structs</strong>。在Apache Storm中运行拓扑的Storm Nimbus是一个<strong>Thrift服务</strong>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/storm/" rel="tag"># storm</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/15/大数据/云计算/云计算的三种服务模式：IaaS，PaaS和SaaS/" rel="next" title="云计算的三种服务模式">
+                <i class="fa fa-chevron-left"></i> 云计算的三种服务模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/15/大数据/hive/mapreduce转换原理/" rel="prev" title="HIVE运行过程">
+                HIVE运行过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-简介"><span class="nav-number">1.</span> <span class="nav-text">1. 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是Apache-Storm？"><span class="nav-number">1.0.1.</span> <span class="nav-text">什么是Apache Storm？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Apache-Storm-vs-Hadoop"><span class="nav-number">1.0.2.</span> <span class="nav-text">Apache Storm vs Hadoop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Apache-Storm优势"><span class="nav-number">1.0.3.</span> <span class="nav-text">Apache Storm优势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Apache-Storm核心概念"><span class="nav-number">2.</span> <span class="nav-text">2. Apache Storm核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#拓扑"><span class="nav-number">2.0.1.</span> <span class="nav-text">拓扑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务"><span class="nav-number">2.0.2.</span> <span class="nav-text">任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程"><span class="nav-number">2.0.3.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流分组"><span class="nav-number">2.0.4.</span> <span class="nav-text">流分组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#随机分组"><span class="nav-number">2.0.4.1.</span> <span class="nav-text">随机分组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字段分组"><span class="nav-number">2.0.4.2.</span> <span class="nav-text">字段分组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#全局分组"><span class="nav-number">2.0.4.3.</span> <span class="nav-text">全局分组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#所有分组"><span class="nav-number">2.0.4.4.</span> <span class="nav-text">所有分组</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Apache-Storm集群架构"><span class="nav-number">3.</span> <span class="nav-text">3. Apache Storm集群架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Apache-Storm工作流程"><span class="nav-number">4.</span> <span class="nav-text">4. Apache Storm工作流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Apache-Storm分布式消息系统"><span class="nav-number">5.</span> <span class="nav-text">5. Apache Storm分布式消息系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是分布式消息系统？"><span class="nav-number">5.0.1.</span> <span class="nav-text">什么是分布式消息系统？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Thrift协议"><span class="nav-number">5.0.2.</span> <span class="nav-text">Thrift协议</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521117985000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

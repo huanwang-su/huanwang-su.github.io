@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="spring," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1 spring的框架介绍spring框架是一个分层架构，它包含一系列的功能要素，并被分为大约20个模块，如下图所示  这些模块被总结为以下几个部分：  Core Container Core Container(核心容器)包含有Core、Beans、Context和Expression Language模块Core和Beans模块是框架的基础部分，提供IoC(转控制)和依赖注入特性。这里的基础概">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring整体框架">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java框架/spring/spring整体框架/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="1 spring的框架介绍spring框架是一个分层架构，它包含一系列的功能要素，并被分为大约20个模块，如下图所示  这些模块被总结为以下几个部分：  Core Container Core Container(核心容器)包含有Core、Beans、Context和Expression Language模块Core和Beans模块是框架的基础部分，提供IoC(转控制)和依赖注入特性。这里的基础概">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829102431155-6949964.png">
+<meta property="og:image" content="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829152136718-840167036.png">
+<meta property="og:image" content="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829163649968-564205900.png">
+<meta property="og:image" content="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170830151426905-1910649735.png">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb70egj30jc043t8w.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb73qlj30k902dweh.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb7vn4j30j505ijri.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8pmzj30hg08774t.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb86guj30ic04n0sy.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8ho7j30j2082aal.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbnh0jj30kb08dgmc.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8by4j30lh05iaae.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8gmej30ja04o3ym.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbo04jj30nh09mjs6.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbaq1xj30m904iwep.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbamrvj30k402mt8r.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbsjknj30kf0ee75g.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbcrezj30ld03ddfz.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbc470j30ms03gglr.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbdb1bj30kg065dg7.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbcztmj30mr03kmxf.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbcifaj30m50403yp.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbzwogj30l00ezta6.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbrfm9j30ms0b5dgh.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fko1p0rjjfj30kl07cq3d.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbsh2bj30n108wt9e.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbyqdhj30n20f5jss.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbx3m1j30jz0deaav.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbzmxsj30nh0f9jsn.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnchjoqj30o60g0409.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnblswkj30iq07fjrv.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnc4uiwj30pz08bq3v.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnc1g19j30mf0f40u5.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbkcvij30l604omxb.jpg">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.160Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring整体框架">
+<meta name="twitter:description" content="1 spring的框架介绍spring框架是一个分层架构，它包含一系列的功能要素，并被分为大约20个模块，如下图所示  这些模块被总结为以下几个部分：  Core Container Core Container(核心容器)包含有Core、Beans、Context和Expression Language模块Core和Beans模块是框架的基础部分，提供IoC(转控制)和依赖注入特性。这里的基础概">
+<meta name="twitter:image" content="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829102431155-6949964.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java框架/spring/spring整体框架/"/>
+
+
+
+
+
+  <title>spring整体框架 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java框架/spring/spring整体框架/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">spring整体框架</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/" itemprop="url" rel="index">
+                    <span itemprop="name">java框架</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java框架/spring/spring整体框架/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java框架/spring/spring整体框架/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-spring的框架介绍"><a href="#1-spring的框架介绍" class="headerlink" title="1 spring的框架介绍"></a>1 spring的框架介绍</h1><p>spring框架是一个分层架构，它包含一系列的功能要素，并被分为大约20个模块，如下图所示</p>
+<p><img src="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829102431155-6949964.png" alt="img"></p>
+<p>这些模块被总结为以下几个部分：</p>
+<ul>
+<li><p>Core Container</p>
+<p>Core Container(核心容器)包含有Core、Beans、Context和Expression Language模块<br>Core和Beans模块是框架的基础部分，提供IoC(转控制)和依赖注入特性。这里的基础概念是BeanFactory，它提供对Factory模式的经典实现来消除对程序性单例模式的需要，并真正地允许你从程序逻辑中分离出依赖关系和配置</p>
+<ul>
+<li>Core模块主要包含Spring框架基本的核心工具类</li>
+<li>Beans模块是所有应用都要用到的，它包含访问配置文件、创建和管理bean以及进行Inversion of Control/Dependency Injection(Ioc/DI)操作相关的所有类</li>
+<li>Context模块构建于Core和Beans模块基础之上，提供了一种类似于JNDI注册器的框架式的对象访问方法。Context模块继承了Beans的特性，为Spring核心提供了大量扩展，添加了对国际化(如资源绑定)、事件传播、资源加载和对Context的透明创建的支持。ApplicationContext接口是Context模块的关键</li>
+<li>Expression Language模块提供了一个强大的表达式语言用于在运行时查询和操纵对象，该语言支持设置/获取属性的值，属性的分配，方法的调用，访问数组上下文、容器和索引器、逻辑和算术运算符、命名变量以及从Spring的IoC容器中根据名称检索对象</li>
+</ul>
+</li>
+<li><p>Data Access/Integration</p>
+<ul>
+<li>JDBC模块提供了一个JDBC抽象层，它可以消除冗长的JDBC编码和解析数据库厂商特有的错误代码，这个模块包含了Spring对JDBC数据访问进行封装的所有类</li>
+<li>ORM模块为流行的对象-关系映射API，如JPA、JDO、Hibernate、iBatis等，提供了一个交互层，利用ORM封装包，可以混合使用所有Spring提供的特性进行O/R映射，如前边提到的简单声明性事务管理</li>
+</ul>
+</li>
+<li><p>Web</p>
+<p>Web上下文模块建立在应用程序上下文模块之上，为基于Web的应用程序提供了上下文，所以Spring框架支持与Jakarta Struts的集成。Web模块还简化了处理多部分请求以及将请求参数绑定到域对象的工作。Web层包含了Web、Web-Servlet、Web-Struts和Web、Porlet模块</p>
+<ul>
+<li>Web模块：提供了基础的面向Web的集成特性，例如，多文件上传、使用Servlet listeners初始化IoC容器以及一个面向Web的应用上下文，它还包含了Spring远程支持中Web的相关部分</li>
+<li>Web-Servlet模块web.servlet.jar：该模块包含Spring的model-view-controller(MVC)实现，Spring的MVC框架使得模型范围内的代码和web forms之间能够清楚地分离开来，并与Spring框架的其他特性基础在一起</li>
+<li>Web-Struts模块：该模块提供了对Struts的支持，使得类在Spring应用中能够与一个典型的Struts Web层集成在一起</li>
+<li>Web-Porlet模块：提供了用于Portlet环境和Web-Servlet模块的MVC的实现</li>
+</ul>
+</li>
+<li><p>AOP</p>
+<p>AOP模块提供了一个符合AOP联盟标准的面向切面编程的实现，它让你可以定义例如方法拦截器和切点，从而将逻辑代码分开，降低它们之间的耦合性，利用source-level的元数据功能，还可以将各种行为信息合并到你的代码中</p>
+<p>Spring AOP模块为基于Spring的应用程序中的对象提供了事务管理服务，通过使用Spring AOP，不用依赖EJB组件，就可以将声明性事务管理集成到应用程序中</p>
+</li>
+<li><p>Test</p>
+<p>Test模块支持使用Junit和TestNG对Spring组件进行测试</p>
+</li>
+</ul>
+<h1 id="2-容器的基本实现"><a href="#2-容器的基本实现" class="headerlink" title="2 容器的基本实现"></a>2 容器的基本实现</h1><h2 id="2-1-容器示例"><a href="#2-1-容器示例" class="headerlink" title="2.1 容器示例"></a>2.1 容器示例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> superfan.springLearn.bean;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">	<span class="keyword">private</span> String sex;</span><br><span class="line">	<span class="keyword">private</span> List&lt;Person&gt; family;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(String name, <span class="keyword">int</span> age)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>();</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		<span class="keyword">this</span>.age = age;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"init"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"destory"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">//getter and setter</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>XML配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">	<span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>     	<span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">	<span class="attr">xsi:schemaLocation</span>=<span class="string">" http://www.springframework.org/schema/beans         </span></span></span><br><span class="line"><span class="tag"><span class="string">						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  </span></span></span><br><span class="line"><span class="tag"><span class="string">						http://www.springframework.org/schema/context            </span></span></span><br><span class="line"><span class="tag"><span class="string">						http://www.springframework.org/schema/context/spring-context-3.0.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"me"</span>  <span class="attr">class</span>=<span class="string">"superfan.springLearn.bean.Person"</span>  <span class="attr">scope</span>=<span class="string">"singleton"</span></span></span><br><span class="line"><span class="tag">		<span class="attr">depends-on</span>=<span class="string">"date"</span> <span class="attr">lazy-init</span>=<span class="string">"false"</span>  <span class="attr">init-method</span>=<span class="string">"init"</span> <span class="attr">destroy-method</span>=<span class="string">"destory"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">value</span>=<span class="string">"wang"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"age"</span> <span class="attr">type</span>=<span class="string">"int"</span> <span class="attr">value</span>=<span class="string">"11"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"family"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">list</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"father"</span> /&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"mother"</span> /&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">list</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"date"</span> <span class="attr">class</span>=<span class="string">"java.util.Date"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"father"</span> <span class="attr">class</span>=<span class="string">"superfan.springLearn.bean.Person"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">value</span>=<span class="string">"ff"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"age"</span> <span class="attr">type</span>=<span class="string">"int"</span> <span class="attr">value</span>=<span class="string">"11"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"mother"</span> <span class="attr">class</span>=<span class="string">"superfan.springLearn.bean.Person"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">value</span>=<span class="string">"mm"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"age"</span> <span class="attr">type</span>=<span class="string">"int"</span> <span class="attr">value</span>=<span class="string">"11"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>测试文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanLoadTest</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@SuppressWarnings</span>(&#123; <span class="string">"deprecation"</span>, <span class="string">"unused"</span>,<span class="string">"resource"</span> &#125;)</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beanLoad</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		BeanFactory beanFactory = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"beans.xml"</span>); </span><br><span class="line">		System.out.println(beanFactory.getBean(<span class="string">"me"</span>));</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-2-Spring的结构组成"><a href="#2-2-Spring的结构组成" class="headerlink" title="2.2 Spring的结构组成"></a>2.2 Spring的结构组成</h2><h3 id="beans包的层级结构"><a href="#beans包的层级结构" class="headerlink" title="beans包的层级结构"></a>beans包的层级结构</h3><p>beans包中的各个源码包的功能如下</p>
+<ul>
+<li>src/main/java 用于展现Spring的主要逻辑</li>
+<li>src/main/resources 用于存放系统的配置文件</li>
+<li>src/test/java 用于对主要逻辑进行单元测试</li>
+<li>src/test/resources 用于存放测试用的配置文件</li>
+</ul>
+<h2 id="2-3主要接口和类介绍"><a href="#2-3主要接口和类介绍" class="headerlink" title="2.3主要接口和类介绍"></a>2.3主要接口和类介绍</h2><h3 id="2-3-1-主要的类"><a href="#2-3-1-主要的类" class="headerlink" title="2.3.1 主要的类"></a>2.3.1 主要的类</h3><p>由于spring功能强大，类和接口数量很多，这里只总结一小部分，是对整个框架的一种简单理解</p>
+<ul>
+<li>Context 应用程序上下文，与main交互</li>
+<li><p>BeanFactory Bean的工厂，存储实例的容器，内部是map实现，但注意保存的不是真正的对象，而是一个BeanDefine，及Bean的定义</p>
+<ul>
+<li>DefaultListableBeanFactory</li>
+</ul>
+</li>
+<li><p>BeanDefinition Bean的定义，可以理解为将XML文件的内容转换为内存对象，类似class文件转换的Class<t>对象</t></p>
+<ul>
+<li>AbstractBeanDefinition 内部属性为scope，lazyInit，initMethodName这些等，及XML的属性</li>
+</ul>
+</li>
+<li><p>BeanDefinitionReader 从文件中获取Bean对象，参考ClassLoader，参考tomcat的ClassLoader，支持多种形式</p>
+<ul>
+<li>AbstractBeanDefinitionReader BeanDefinitionReader接口的抽象实现</li>
+<li>XmlBeanDefinitionReader 读取XML文件的实现</li>
+</ul>
+</li>
+<li><p>DocumentLoader 由于是dom解析XML，定义的读取类</p>
+<ul>
+<li>DefaultDocumentLoader 接口实现，依赖dom包，包括对XML验证的步骤</li>
+</ul>
+</li>
+<li>DefaultBeanDefinitionDocumentReader 该类不实现BeanDefinitionReader接口，从Document（XML）节点进行获取BeanDefinition</li>
+<li>BeanDefinitionParser BeanDefinition的解析器<ul>
+<li>BeanDefinitionParserDelegate DefaultBeanDefinitionDocumentReader的成员，解析任务委托给他，包括各种标签</li>
+</ul>
+</li>
+<li><p>Resource 对资源文件的封装，负责文件的读取，提供文件（可能来自网络）的基本信息。继承自InputStreamSource，提供getInputStream功能</p>
+<ul>
+<li>ClassPathResource 获取classpath路径下的文件</li>
+</ul>
+</li>
+<li>ResourceLoader 加载资源类，与Resource 对应</li>
+</ul>
+<h3 id="2-3-2-注册大致流程"><a href="#2-3-2-注册大致流程" class="headerlink" title="2.3.2 注册大致流程"></a>2.3.2 注册大致流程</h3><ol>
+<li>main函数调用Context获取BeanFactory对象</li>
+<li>Context通过ResourceLoader将xml路径转化为Resource对象</li>
+<li>Context创建BeanFactory并初始化</li>
+<li>Context通过Reader来读取Resource并且注册到BeanFactory中<ol>
+<li>Reader通过DocumentLoader 获取xml文件的dom结构</li>
+<li>DocumentReader通过dom结构获取BeanDefinition<ol>
+<li>DocumentReader将dom结构交给BeanDefinitionParser进行解析各种标签等等，获取BeanDefinition</li>
+</ol>
+</li>
+<li>注册id，别名到BeanFactory</li>
+</ol>
+</li>
+<li>完成</li>
+</ol>
+<h2 id="2-4-核心类介绍"><a href="#2-4-核心类介绍" class="headerlink" title="2.4 核心类介绍"></a>2.4 核心类介绍</h2><h3 id="2-4-1-DefaultListableBeanFactory"><a href="#2-4-1-DefaultListableBeanFactory" class="headerlink" title="2.4.1 DefaultListableBeanFactory"></a>2.4.1 DefaultListableBeanFactory</h3><p><img src="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829152136718-840167036.png" alt="img"></p>
+<p>各个类和接口的作用：</p>
+<ul>
+<li>AliasRegistry：定义对alias的简单增删改等操作</li>
+<li>SimpleAliasRegistry：主要使用map作为alias的缓存，并对接口AliasRegistry进行实现</li>
+<li>SingletonBeanRegistry：定义对单例的注册及获取</li>
+<li>BeanFactory：定义获取bean及bean的各种属性</li>
+<li>DefaultSingletonBeanRegistry：对接口SingletonBeanRegistry各函数的实现</li>
+<li>HierarchicalBeanFactory：继承BeanFactory，也就是在BeanFactory定义的功能的基础上增加了对parentFactory的支持</li>
+<li>BeanDefinitionRegistry：定义对BeanDefinition的各种增删改操作</li>
+<li>FactoryBeanRegistrySupport：在DefaultSingletonBeanRegistry基础上增加了对FactoryBean的特殊处理功能</li>
+<li>ConfigurableBeanFactory：提供配置Factory的各种方法</li>
+<li>ListableBeanFactory：根据各种条件获取bean的配置清单</li>
+<li>AbstractBeanFactory：综合FactoryBeanRegistrySupport和ConfigurationBeanFactory的功能</li>
+<li>AutowireCapableBeanFactory：提供创建bean、自动注入、初始化以及应用bean的后处理器</li>
+<li>AbstractAutowireCapableBeanFactory：综合AbstractBeanFactory并对接口AutowireCapableBeanFactory进行实现</li>
+<li>ConfigurableListableBeanFactory：BeanFactory配置清单，指定忽略类型及接口等</li>
+<li>DefaultListableBeanFactory：综合上面所有功能，主要是对Bean注册后的处理</li>
+</ul>
+<h3 id="2-4-2-XmlBeanDefinitionReader"><a href="#2-4-2-XmlBeanDefinitionReader" class="headerlink" title="2.4.2 XmlBeanDefinitionReader"></a>2.4.2 XmlBeanDefinitionReader</h3><p>XML配置文件的读取是Spring中重要的功能，因为Spring的大部分功能都是以配置作为切入点的。</p>
+<p>各个类的功能：</p>
+<p><img src="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170829163649968-564205900.png" alt="img"></p>
+<ul>
+<li>ResourceLoader：定义资源加载器，主要应用于根据给定的资源文件地址返回对应的Resource</li>
+<li>BeanDefinitionReader：主要定义资源文件读取并转换为BeanDefinition的各个功能</li>
+<li>EnvironmentCapable：定义获取Environment方法</li>
+<li>DocumentLoader：定义从资源文件加载到转换为Document的功能</li>
+<li>AbstractBeanDefinitionReader：对EnvironmentCapable、BeanDefinitionReader类定义的功能进行实现</li>
+<li>BeanDefinitionDocumentReader：定义读取Document并注册BeanDefinition功能</li>
+<li>BeanDefinitionParserDelegate：定义解析Element的各种方法</li>
+</ul>
+<p>整个XML配置文件读取的大致流程，在XmlBeanDefinitionReader中主要包含以下几步处理</p>
+<ol>
+<li>通过继承自AbstractBeanDefinitionReader中的方法，来使用ResourceLoader将资源文件路径转换为对应的Resource文件</li>
+<li>通过DocumentLoader对Resource文件进行转换，将Resource文件转换为Document文件</li>
+<li>通过实现接口BeanDefinitionDocumentReader的DefaultBeanDefinitionDocumentReader类对Document进行解析，并使用BeanDefinitionParserDelegate对Element进行解析</li>
+</ol>
+<h3 id="2-4-3-配置文件封装"><a href="#2-4-3-配置文件封装" class="headerlink" title="2.4.3 配置文件封装"></a>2.4.3 配置文件封装</h3><p>Spring的配置文件读取是通过ClassPathResource进行封装的，Spring对其内部使用到的资源实现了自己的抽象结构：Resource接口来封装底层资源</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">InputStreamSource</span> </span>&#123;</span><br><span class="line">    <span class="function">InputStream <span class="title">getInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Resource</span> <span class="keyword">extends</span> <span class="title">InputStreamSource</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">exists</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isReadable</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isOpen</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">URL <span class="title">getURL</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">URI <span class="title">getURI</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">File <span class="title">getFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">long</span> <span class="title">lastModified</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">Resource <span class="title">createRelative</span><span class="params">(String var1)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">getFilename</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">getDescription</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>InputStreamSource封装任何能返回InputStream的类，比如File、Classpath下的资源和Byte Array等， 它只有一个方法定义：getInputStream()，该方法返回一个新的InputStream对象</p>
+<p>Resource接口抽象了所有Spring内部使用到的底层资源：File、URL、Classpath等。首先，它定义了3个判断当前资源状态的方法：存在性(exists)、可读性(isReadable)、是否处于打开状态(isOpen)。另外，Resource接口还提供了不同资源到URL、URI、File类型的转换，以及获取lastModified属性、文件名(不带路径信息的文件名，getFilename())的方法，为了便于操作，Resource还提供了基于当前资源创建一个相对资源的方法：createRelative()，还提供了getDescription()方法用于在错误处理中的打印信息</p>
+<p>对不同来源的资源文件都有相应的Resource实现：文件(FileSystemResource)、Classpath资源(ClassPathResource)、URL资源(UrlResource)、InputStream资源(InputStreamResource)、Byte数组(ByteArrayResource)等，相关类图如下所示</p>
+<p><img src="http://images2017.cnblogs.com/blog/1143792/201708/1143792-20170830151426905-1910649735.png" alt="img"></p>
+<h2 id="2-5-bean注册源码追踪"><a href="#2-5-bean注册源码追踪" class="headerlink" title="2.5 bean注册源码追踪"></a>2.5 bean注册源码追踪</h2><p>程序入口，以Context入口，常用</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb70egj30jc043t8w.jpg" alt=""></p>
+<p>ClassPathXmlApplication 通过setConfigLocation将配置文件路径保存到本地，再通过调用refresh进行初始化。因为该类支持刷新，看它的继承结构。refresh等同于第一次加载</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb73qlj30k902dweh.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb7vn4j30j505ijri.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8pmzj30hg08774t.jpg" alt=""></p>
+<p>在 521行看到了关键的beanFactory，及DefaultListableBeanFactory</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb86guj30ic04n0sy.jpg" alt=""></p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8ho7j30j2082aal.jpg" alt=""></p>
+<p>这里的130行简单的创建了个工厂，里面啥都没有，133行才是装载BeanFinition</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbnh0jj30kb08dgmc.jpg" alt=""></p>
+<p>这里我们看到了XMLReader，至于为什么是XMLReader，看类名是用XML读取，这里注意组合关系，BeanFactory不负责获取BeanDefinition，是由Context中让Reader去获取的，再填入BeanFactory</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8by4j30lh05iaae.jpg" alt=""></p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnb8gmej30ja04o3ym.jpg" alt=""></p>
+<p>Reader从循环各个Locations里获取beans</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbo04jj30nh09mjs6.jpg" alt=""></p>
+<p>222行resourceLoader加载resource</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbaq1xj30m904iwep.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbamrvj30k402mt8r.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbsjknj30kf0ee75g.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbcrezj30ld03ddfz.jpg" alt=""></p>
+<p>Xml用dom解析，获取dom树</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbc470j30ms03gglr.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbdb1bj30kg065dg7.jpg" alt=""></p>
+<p>解析为dom，包括了校验xml文件是否符合规范的步骤</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbcztmj30mr03kmxf.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbcifaj30m50403yp.jpg" alt=""></p>
+<p>通过DocumentReader来解析</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbzwogj30l00ezta6.jpg" alt=""></p>
+<p>148行委托给BeanDefinitionParserDelegate来解析</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbrfm9j30ms0b5dgh.jpg" alt=""></p>
+<p>这里的175和178行分别对应解析spring标签和用户自定义标签</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fko1p0rjjfj30kl07cq3d.jpg" alt=""></p>
+<p>解析4个子标签import，alias，bean，。。。</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbsh2bj30n108wt9e.jpg" alt=""></p>
+<p>305行获取BeanDefinition的封装类bdHolder</p>
+<p>310行将获取到的BeanDefinition的封装类bdHolder向BeanFactory里注册，包括id，alias等</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbyqdhj30n20f5jss.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbx3m1j30jz0deaav.jpg" alt=""></p>
+<p>437行前获取id和alias</p>
+<p>437获取BeanDefinition</p>
+<p>最后封装为BeanDefinitionHolder，并返回</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbzmxsj30nh0f9jsn.jpg" alt=""></p>
+<p>解析其他属性，如class，构造函数等</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnchjoqj30o60g0409.jpg" alt=""></p>
+<p>解析其他属性，如layz-init，init等等属性</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnblswkj30iq07fjrv.jpg" alt=""></p>
+<p>310行向BeanFactory注册</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnc4uiwj30pz08bq3v.jpg" alt=""><br><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnc1g19j30mf0f40u5.jpg" alt=""><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fknxnbkcvij30l604omxb.jpg" alt=""></p>
+<p>注册BeanName和Alias</p>
+<h2 id="2-5-bean获取源码追踪"><a href="#2-5-bean获取源码追踪" class="headerlink" title="2.5 bean获取源码追踪"></a>2.5 bean获取源码追踪</h2>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spring/" rel="tag"># spring</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/java框架/tomcat/ClassLoader/" rel="next" title="tomcat classLoader">
+                <i class="fa fa-chevron-left"></i> tomcat classLoader
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/java框架/spring/spring aop/" rel="prev" title="spring AOP">
+                spring AOP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-spring的框架介绍"><span class="nav-number">1.</span> <span class="nav-text">1 spring的框架介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-容器的基本实现"><span class="nav-number">2.</span> <span class="nav-text">2 容器的基本实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-容器示例"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 容器示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Spring的结构组成"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Spring的结构组成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beans包的层级结构"><span class="nav-number">2.2.1.</span> <span class="nav-text">beans包的层级结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3主要接口和类介绍"><span class="nav-number">2.3.</span> <span class="nav-text">2.3主要接口和类介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-主要的类"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1 主要的类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2-注册大致流程"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2 注册大致流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-核心类介绍"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 核心类介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-1-DefaultListableBeanFactory"><span class="nav-number">2.4.1.</span> <span class="nav-text">2.4.1 DefaultListableBeanFactory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-2-XmlBeanDefinitionReader"><span class="nav-number">2.4.2.</span> <span class="nav-text">2.4.2 XmlBeanDefinitionReader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-3-配置文件封装"><span class="nav-number">2.4.3.</span> <span class="nav-text">2.4.3 配置文件封装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-bean注册源码追踪"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 bean注册源码追踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-bean获取源码追踪"><span class="nav-number">2.6.</span> <span class="nav-text">2.5 bean获取源码追踪</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

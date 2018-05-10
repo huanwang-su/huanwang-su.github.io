@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="python," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="文件读写要以读文件的模式打开一个文件对象，使用Python内置的open()函数，传入文件名和标示符： 1f = open(&amp;apos;/Users/michael/test.txt&amp;apos;, &amp;apos;r&amp;apos;) 如果文件不存在，open()函数就会抛出一个IOError的错误 如果文件打开成功，接下来，调用read()方法可以一次读取文件的全部内容，Python把内容读到内存，用一">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python IO&amp;并发&amp;正则">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/python基础/python IO&并发&正则/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="文件读写要以读文件的模式打开一个文件对象，使用Python内置的open()函数，传入文件名和标示符： 1f = open(&amp;apos;/Users/michael/test.txt&amp;apos;, &amp;apos;r&amp;apos;) 如果文件不存在，open()函数就会抛出一个IOError的错误 如果文件打开成功，接下来，调用read()方法可以一次读取文件的全部内容，Python把内容读到内存，用一">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.171Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python IO&amp;并发&amp;正则">
+<meta name="twitter:description" content="文件读写要以读文件的模式打开一个文件对象，使用Python内置的open()函数，传入文件名和标示符： 1f = open(&amp;apos;/Users/michael/test.txt&amp;apos;, &amp;apos;r&amp;apos;) 如果文件不存在，open()函数就会抛出一个IOError的错误 如果文件打开成功，接下来，调用read()方法可以一次读取文件的全部内容，Python把内容读到内存，用一">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/python基础/python IO&并发&正则/"/>
+
+
+
+
+
+  <title>python IO&并发&正则 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/python基础/python IO&并发&正则/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python IO&并发&正则</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/基础/" itemprop="url" rel="index">
+                    <span itemprop="name">基础</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/python基础/python IO&并发&正则/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/python基础/python IO&并发&正则/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="文件读写"><a href="#文件读写" class="headerlink" title="文件读写"></a>文件读写</h2><p>要以读文件的模式打开一个文件对象，使用Python内置的<code>open()</code>函数，传入文件名和标示符：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f = open(&apos;/Users/michael/test.txt&apos;, &apos;r&apos;)</span><br></pre></td></tr></table></figure>
+<p>如果文件不存在，<code>open()</code>函数就会抛出一个<code>IOError</code>的错误</p>
+<p>如果文件打开成功，接下来，调用<code>read()</code>方法可以一次读取文件的全部内容，Python把内容读到内存，用一个<code>str</code>对象表示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f.read()</span><br></pre></td></tr></table></figure>
+<p>最后一步是调用<code>close()</code>方法关闭文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f.close()</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    f = open(&apos;/path/to/file&apos;, &apos;r&apos;)</span><br><span class="line">    print(f.read())</span><br><span class="line">finally:</span><br><span class="line">    if f:</span><br><span class="line">        f.close()</span><br></pre></td></tr></table></figure>
+<p>Python引入了<code>with</code>语句来自动帮我们调用<code>close()</code>方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">with open(&apos;/path/to/file&apos;, &apos;r&apos;) as f:</span><br><span class="line">    print(f.read())</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>read()</code>会一次性读取文件的全部内容</li>
+<li><code>read(size)</code></li>
+<li><code>readline()</code>可以每次读取一行内容</li>
+<li><code>readlines()</code>一次读取所有内容并按行返回<code>list</code></li>
+</ul>
+<h3 id="二进制文件"><a href="#二进制文件" class="headerlink" title="二进制文件"></a>二进制文件</h3><p>前面讲的默认都是读取文本文件，并且是UTF-8编码的文本文件。要读取二进制文件，比如图片、视频等等，用<code>&#39;rb&#39;</code>模式打开文件即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = open(&apos;/Users/michael/test.jpg&apos;, &apos;rb&apos;)</span><br><span class="line">&gt;&gt;&gt; f.read()</span><br><span class="line">b&apos;\xff\xd8\xff\xe1\x00\x18Exif\x00\x00...&apos; # 十六进制表示的字节</span><br></pre></td></tr></table></figure>
+<h3 id="字符编码"><a href="#字符编码" class="headerlink" title="字符编码"></a>字符编码</h3><p>要读取非UTF-8编码的文本文件，需要给<code>open()</code>函数传入<code>encoding</code>参数，例如，读取GBK编码的文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = open(&apos;/Users/michael/gbk.txt&apos;, &apos;r&apos;, encoding=&apos;gbk&apos;)</span><br><span class="line">&gt;&gt;&gt; f.read()</span><br></pre></td></tr></table></figure>
+<p><code>open()</code>函数还接收一个<code>errors</code>参数，表示如果遇到编码错误后如何处理。最简单的方式是直接忽略：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = open(&apos;/Users/michael/gbk.txt&apos;, &apos;r&apos;, encoding=&apos;gbk&apos;, errors=&apos;ignore&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="写文件"><a href="#写文件" class="headerlink" title="写文件"></a>写文件</h3><p>写文件和读文件是一样的，唯一区别是调用<code>open()</code>函数时，传入标识符<code>&#39;w&#39;</code>或者<code>&#39;wb&#39;</code>表示写文本文件或写二进制文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = open(&apos;/Users/michael/test.txt&apos;, &apos;w&apos;)</span><br><span class="line">&gt;&gt;&gt; f.write(&apos;Hello, world!&apos;)</span><br><span class="line">&gt;&gt;&gt; f.close()</span><br></pre></td></tr></table></figure>
+<h3 id="StringIO"><a href="#StringIO" class="headerlink" title="StringIO"></a>StringIO</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f = StringIO()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f.write(<span class="string">'hello'</span>)</span><br><span class="line"><span class="number">5</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f.write(<span class="string">' '</span>)</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f.write(<span class="string">'world!'</span>)</span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(f.getvalue())</span><br><span class="line">hello world!</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f = StringIO(<span class="string">'Hello!\nHi!\nGoodbye!'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"><span class="meta">... </span>    s = f.readline()</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">if</span> s == <span class="string">''</span>:</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">break</span></span><br><span class="line"><span class="meta">... </span>    print(s.strip())</span><br><span class="line">...</span><br><span class="line">Hello!</span><br><span class="line">Hi!</span><br><span class="line">Goodbye!</span><br></pre></td></tr></table></figure>
+<h3 id="BytesIO"><a href="#BytesIO" class="headerlink" title="BytesIO"></a>BytesIO</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f = BytesIO()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f.write(<span class="string">'中文'</span>.encode(<span class="string">'utf-8'</span>))</span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(f.getvalue())</span><br><span class="line"><span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f = BytesIO(<span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f.read()</span><br><span class="line"><span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span></span><br></pre></td></tr></table></figure>
+<h3 id="操作文件和目录"><a href="#操作文件和目录" class="headerlink" title="操作文件和目录"></a>操作文件和目录</h3><p>Python内置的<code>os</code>模块也可以直接调用操作系统提供的接口函数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import os</span><br><span class="line">&gt;&gt;&gt; os.name # 操作系统类型</span><br><span class="line">&apos;posix&apos;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.uname()</span><br><span class="line">posix.uname_result(sysname=<span class="string">'Darwin'</span>, nodename=<span class="string">'MichaelMacPro.local'</span>, release=<span class="string">'14.3.0'</span>, version=<span class="string">'Darwin Kernel Version 14.3.0: Mon Mar 23 11:59:05 PDT 2015; root:xnu-2782.20.48~5/RELEASE_X86_64'</span>, machine=<span class="string">'x86_64'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.environ</span><br><span class="line">environ(&#123;<span class="string">'VERSIONER_PYTHON_PREFER_32_BIT'</span>: <span class="string">'no'</span>, <span class="string">'TERM_PROGRAM_VERSION'</span>: <span class="string">'326'</span>, <span class="string">'LOGNAME'</span>: <span class="string">'michael'</span>, <span class="string">'USER'</span>: <span class="string">'michael'</span>, <span class="string">'PATH'</span>: <span class="string">'/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/mysql/bin'</span>, ...&#125;)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.environ.get(<span class="string">'PATH'</span>)</span><br><span class="line"><span class="string">'/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/mysql/bin'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.environ.get(<span class="string">'x'</span>, <span class="string">'default'</span>)</span><br><span class="line"><span class="string">'default'</span></span><br></pre></td></tr></table></figure>
+<p>操作文件和目录的函数一部分放在<code>os</code>模块中，一部分放在<code>os.path</code>模块中，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看当前目录的绝对路径:</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.path.abspath(<span class="string">'.'</span>)</span><br><span class="line"><span class="string">'/Users/michael'</span></span><br><span class="line"><span class="comment"># 在某个目录下创建一个新目录，首先把新目录的完整路径表示出来:</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.path.join(<span class="string">'/Users/michael'</span>, <span class="string">'testdir'</span>)</span><br><span class="line"><span class="string">'/Users/michael/testdir'</span></span><br><span class="line"><span class="comment"># 然后创建一个目录:</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.mkdir(<span class="string">'/Users/michael/testdir'</span>)</span><br><span class="line"><span class="comment"># 删掉一个目录:</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.rmdir(<span class="string">'/Users/michael/testdir'</span>)</span><br></pre></td></tr></table></figure>
+<p>但是复制文件的函数在<code>os</code>模块中不存在！原因是复制文件并非由操作系统提供的系统调用。</p>
+<p>幸运的是<code>shutil</code>模块提供了<code>copyfile()</code>的函数，你还可以在<code>shutil</code>模块中找到很多实用函数，它们可以看做是<code>os</code>模块的补充。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>[x <span class="keyword">for</span> x <span class="keyword">in</span> os.listdir(<span class="string">'.'</span>) <span class="keyword">if</span> os.path.isdir(x)]</span><br><span class="line">[<span class="string">'.lein'</span>, <span class="string">'.local'</span>, <span class="string">'.m2'</span>, <span class="string">'.npm'</span>, <span class="string">'.ssh'</span>, <span class="string">'.Trash'</span>, <span class="string">'.vim'</span>, <span class="string">'Applications'</span>, <span class="string">'Desktop'</span>, ...]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>[x <span class="keyword">for</span> x <span class="keyword">in</span> os.listdir(<span class="string">'.'</span>) <span class="keyword">if</span> os.path.isfile(x) <span class="keyword">and</span> os.path.splitext(x)[<span class="number">1</span>]==<span class="string">'.py'</span>]</span><br><span class="line">[<span class="string">'apis.py'</span>, <span class="string">'config.py'</span>, <span class="string">'models.py'</span>, <span class="string">'pymonitor.py'</span>, <span class="string">'test_db.py'</span>, <span class="string">'urls.py'</span>, <span class="string">'wsgiapp.py'</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h3><p>Python提供了<code>pickle</code>模块来实现序列化。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import pickle</span><br><span class="line">&gt;&gt;&gt; d = dict(name=&apos;Bob&apos;, age=20, score=88)</span><br><span class="line">&gt;&gt;&gt; pickle.dumps(d)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = open(&apos;dump.txt&apos;, &apos;wb&apos;)</span><br><span class="line">&gt;&gt;&gt; pickle.dump(d, f)</span><br><span class="line">&gt;&gt;&gt; f.close()</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = open(&apos;dump.txt&apos;, &apos;rb&apos;)</span><br><span class="line">&gt;&gt;&gt; d = pickle.load(f)</span><br><span class="line">&gt;&gt;&gt; f.close()</span><br><span class="line">&gt;&gt;&gt; d</span><br><span class="line">&#123;&apos;age&apos;: 20, &apos;score&apos;: 88, &apos;name&apos;: &apos;Bob&apos;&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h4><table>
+<thead>
+<tr>
+<th>JSON类型</th>
+<th>Python类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{}</td>
+<td>dict</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>list</td>
+</tr>
+<tr>
+<td>“string”</td>
+<td>str</td>
+</tr>
+<tr>
+<td>1234.56</td>
+<td>int或float</td>
+</tr>
+<tr>
+<td>true/false</td>
+<td>True/False</td>
+</tr>
+<tr>
+<td>null</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import json</span><br><span class="line">&gt;&gt;&gt; d = dict(name=&apos;Bob&apos;, age=20, score=88)</span><br><span class="line">&gt;&gt;&gt; json.dumps(d)</span><br><span class="line">&apos;&#123;&quot;age&quot;: 20, &quot;score&quot;: 88, &quot;name&quot;: &quot;Bob&quot;&#125;&apos;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; json_str = &apos;&#123;&quot;age&quot;: 20, &quot;score&quot;: 88, &quot;name&quot;: &quot;Bob&quot;&#125;&apos;</span><br><span class="line">&gt;&gt;&gt; json.loads(json_str)</span><br><span class="line">&#123;&apos;age&apos;: 20, &apos;score&apos;: 88, &apos;name&apos;: &apos;Bob&apos;&#125;</span><br></pre></td></tr></table></figure>
+<p>Python的对象序列化：需要为类专门写一个转换函数，再把函数传进去即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">student2dict</span><span class="params">(std)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="string">'name'</span>: std.name,</span><br><span class="line">        <span class="string">'age'</span>: std.age,</span><br><span class="line">        <span class="string">'score'</span>: std.score</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(json.dumps(s, default=student2dict))</span><br><span class="line">&#123;<span class="string">"age"</span>: <span class="number">20</span>, <span class="string">"name"</span>: <span class="string">"Bob"</span>, <span class="string">"score"</span>: <span class="number">88</span>&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="进程和线程"><a href="#进程和线程" class="headerlink" title="进程和线程"></a>进程和线程</h2><h3 id="多进程"><a href="#多进程" class="headerlink" title="多进程"></a>多进程</h3><p>Python的<code>os</code>模块封装了常见的系统调用，其中就包括<code>fork</code>，可以在Python程序中轻松创建子进程：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">print(<span class="string">'Process (%s) start...'</span> % os.getpid())</span><br><span class="line"><span class="comment"># Only works on Unix/Linux/Mac:</span></span><br><span class="line">pid = os.fork()</span><br><span class="line"><span class="keyword">if</span> pid == <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">'I am child process (%s) and my parent is %s.'</span> % (os.getpid(), os.getppid()))</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'I (%s) just created a child process (%s).'</span> % (os.getpid(), pid))</span><br></pre></td></tr></table></figure>
+<h4 id="multiprocessing"><a href="#multiprocessing" class="headerlink" title="multiprocessing"></a>multiprocessing</h4><p><code>multiprocessing</code>模块就是跨平台版本的多进程模块。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Process</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="comment"># 子进程要执行的代码</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_proc</span><span class="params">(name)</span>:</span></span><br><span class="line">    print(<span class="string">'Run child process %s (%s)...'</span> % (name, os.getpid()))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">'Parent process %s.'</span> % os.getpid())</span><br><span class="line">    p = Process(target=run_proc, args=(<span class="string">'test'</span>,))</span><br><span class="line">    print(<span class="string">'Child process will start.'</span>)</span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br><span class="line">    print(<span class="string">'Child process end.'</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="Pool"><a href="#Pool" class="headerlink" title="Pool"></a>Pool</h4><p>如果要启动大量的子进程，可以用进程池的方式批量创建子进程：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</span><br><span class="line"><span class="keyword">import</span> os, time, random</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">long_time_task</span><span class="params">(name)</span>:</span></span><br><span class="line">    print(<span class="string">'Run task %s (%s)...'</span> % (name, os.getpid()))</span><br><span class="line">    start = time.time()</span><br><span class="line">    time.sleep(random.random() * <span class="number">3</span>)</span><br><span class="line">    end = time.time()</span><br><span class="line">    print(<span class="string">'Task %s runs %0.2f seconds.'</span> % (name, (end - start)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">'Parent process %s.'</span> % os.getpid())</span><br><span class="line">    p = Pool(<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        p.apply_async(long_time_task, args=(i,))</span><br><span class="line">    print(<span class="string">'Waiting for all subprocesses done...'</span>)</span><br><span class="line">    p.close()</span><br><span class="line">    p.join()</span><br><span class="line">    print(<span class="string">'All subprocesses done.'</span>)</span><br></pre></td></tr></table></figure>
+<p>对<code>Pool</code>对象调用<code>join()</code>方法会等待所有子进程执行完毕，调用<code>join()</code>之前必须先调用<code>close()</code>，调用<code>close()</code>之后就不能继续添加新的<code>Process</code>了。</p>
+<h4 id="子进程"><a href="#子进程" class="headerlink" title="子进程"></a>子进程</h4><p>很多时候，子进程并不是自身，而是一个外部进程。我们创建了子进程后，还需要控制子进程的输入和输出。</p>
+<p><code>subprocess</code>模块可以让我们非常方便地启动一个子进程，然后控制其输入和输出。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">print(<span class="string">'$ nslookup www.python.org'</span>)</span><br><span class="line">r = subprocess.call([<span class="string">'nslookup'</span>, <span class="string">'www.python.org'</span>])</span><br><span class="line">print(<span class="string">'Exit code:'</span>, r)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行结果：</span></span><br><span class="line">$ nslookup www.python.org</span><br><span class="line">Server:        <span class="number">192.168</span><span class="number">.19</span><span class="number">.4</span></span><br><span class="line">Address:    <span class="number">192.168</span><span class="number">.19</span><span class="number">.4</span><span class="comment">#53</span></span><br></pre></td></tr></table></figure>
+<p>如果子进程还需要输入，则可以通过<code>communicate()</code>方法输入：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">print(<span class="string">'$ nslookup'</span>)</span><br><span class="line">p = subprocess.Popen([<span class="string">'nslookup'</span>], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)</span><br><span class="line">output, err = p.communicate(<span class="string">b'set q=mx\npython.org\nexit\n'</span>)</span><br><span class="line">print(output.decode(<span class="string">'utf-8'</span>))</span><br><span class="line">print(<span class="string">'Exit code:'</span>, p.returncode)</span><br></pre></td></tr></table></figure>
+<h4 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h4><p><code>multiprocessing</code>模块包装了底层的机制，提供了<code>Queue</code>、<code>Pipes</code>等多种方式来交换数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 父进程创建Queue，并传给各个子进程：</span></span><br><span class="line">q = Queue()</span><br><span class="line">pw = Process(target=write, args=(q,))</span><br><span class="line">pr = Process(target=read, args=(q,))</span><br><span class="line"><span class="comment"># 启动子进程pw，写入:</span></span><br><span class="line">pw.start()</span><br><span class="line"><span class="comment"># 启动子进程pr，读取:</span></span><br><span class="line">pr.start()</span><br><span class="line"><span class="comment"># 等待pw结束:</span></span><br><span class="line">pw.join()</span><br><span class="line"><span class="comment"># pr进程里是死循环，无法等待其结束，只能强行终止:</span></span><br><span class="line">pr.terminate()</span><br></pre></td></tr></table></figure>
+<h3 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h3><p>Python的标准库提供了两个模块：<code>_thread</code>和<code>threading</code>，<code>_thread</code>是低级模块，<code>threading</code>是高级模块，对<code>_thread</code>进行了封装。绝大多数情况下，我们只需要使用<code>threading</code>这个高级模块。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time, threading</span><br><span class="line"></span><br><span class="line"><span class="comment"># 新线程执行的代码:</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'thread %s is running...'</span> % threading.current_thread().name)</span><br><span class="line">    n = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> n &lt; <span class="number">5</span>:</span><br><span class="line">        n = n + <span class="number">1</span></span><br><span class="line">        print(<span class="string">'thread %s &gt;&gt;&gt; %s'</span> % (threading.current_thread().name, n))</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">'thread %s ended.'</span> % threading.current_thread().name)</span><br><span class="line"></span><br><span class="line">print(<span class="string">'thread %s is running...'</span> % threading.current_thread().name)</span><br><span class="line">t = threading.Thread(target=loop, name=<span class="string">'LoopThread'</span>)</span><br><span class="line">t.start()</span><br><span class="line">t.join()</span><br><span class="line">print(<span class="string">'thread %s ended.'</span> % threading.current_thread().name)</span><br></pre></td></tr></table></figure>
+<p>主线程实例的名字叫<code>MainThread</code>，子线程的名字在创建时指定，我们用<code>LoopThread</code>命名子线程。名字仅仅在打印时用来显示，完全没有其他意义，如果不起名字Python就自动给线程命名为<code>Thread-1</code>，<code>Thread-2</code>……</p>
+<h4 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h4><p>创建一个锁就是通过<code>threading.Lock()</code>来实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">lock = threading.Lock()</span><br><span class="line">lock.acquire()</span><br><span class="line">    try:</span><br><span class="line">   		# 放心地改吧:</span><br><span class="line">    	change_it(n)</span><br><span class="line">    finally:</span><br><span class="line">    	# 改完了一定要释放锁:</span><br><span class="line">    	lock.release()</span><br></pre></td></tr></table></figure>
+<h4 id="多核CPU"><a href="#多核CPU" class="headerlink" title="多核CPU"></a>多核CPU</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import threading, multiprocessing</span><br><span class="line"></span><br><span class="line">def loop():</span><br><span class="line">    x = 0</span><br><span class="line">    while True:</span><br><span class="line">        x = x ^ 1</span><br><span class="line"></span><br><span class="line">for i in range(multiprocessing.cpu_count()):</span><br><span class="line">    t = threading.Thread(target=loop)</span><br><span class="line">    t.start()</span><br></pre></td></tr></table></figure>
+<p>动与CPU核心数量相同的N个线程，在4核CPU上可以监控到CPU占用率仅有102%，但是用C、C++或Java来改写相同的死循环，直接可以把全部核心跑满，4核就跑到400%，8核就跑到800%。    </p>
+<p>因为Python的线程虽然是真正的线程，但解释器执行代码时，有一个GIL锁：Global Interpreter Lock，任何Python线程执行前，必须先获得GIL锁，然后，每执行100条字节码，解释器就自动释放GIL锁，让别的线程有机会执行。这个GIL全局锁实际上把所有线程的执行代码都给上了锁，所以，多线程在Python中只能交替执行，即使100个线程跑在100核CPU上，也只能用到1个核。</p>
+<p>Python虽然不能利用多线程实现多核任务，但可以通过多进程实现多核任务。多个Python进程有各自独立的GIL锁，互不影响。</p>
+<h3 id="ThreadLocal"><a href="#ThreadLocal" class="headerlink" title="ThreadLocal"></a>ThreadLocal</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 创建全局ThreadLocal对象:</span><br><span class="line">local_school = threading.local</span><br></pre></td></tr></table></figure>
+<h3 id="进程-vs-线程"><a href="#进程-vs-线程" class="headerlink" title="进程 vs. 线程"></a>进程 vs. 线程</h3><ul>
+<li>多进程模式最大的优点就是稳定性高，因为一个子进程崩溃了，不会影响主进程和其他子进程。</li>
+<li>多进程模式的缺点是创建进程的代价大</li>
+<li>多线程模式通常比多进程快一点，多线程模式致命的缺点就是任何一个线程挂掉都可能直接造成整个进程崩溃，因为所有线程共享进程的内存。</li>
+</ul>
+<p>线程切换</p>
+<h3 id="分布式进程"><a href="#分布式进程" class="headerlink" title="分布式进程"></a>分布式进程</h3><p>在Thread和Process中，应当优选Process，因为Process更稳定，而且，Process可以分布到多台机器上，而Thread最多只能分布到同一台机器的多个CPU上。</p>
+<p>Python的<code>multiprocessing</code>模块不但支持多进程，其中<code>managers</code>子模块还支持把多进程分布到多台机器上。一个服务进程可以作为调度者，将任务分布到其他多个进程中，依靠网络通信。由于<code>managers</code>模块封装很好，不必了解网络通信的细节，就可以很容易地编写分布式多进程程序。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># task_master.py</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> random, time, queue</span><br><span class="line"><span class="keyword">from</span> multiprocessing.managers <span class="keyword">import</span> BaseManager</span><br><span class="line"></span><br><span class="line"><span class="comment"># 发送任务的队列:</span></span><br><span class="line">task_queue = queue.Queue()</span><br><span class="line"><span class="comment"># 接收结果的队列:</span></span><br><span class="line">result_queue = queue.Queue()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从BaseManager继承的QueueManager:</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QueueManager</span><span class="params">(BaseManager)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把两个Queue都注册到网络上, callable参数关联了Queue对象:</span></span><br><span class="line">QueueManager.register(<span class="string">'get_task_queue'</span>, callable=<span class="keyword">lambda</span>: task_queue)</span><br><span class="line">QueueManager.register(<span class="string">'get_result_queue'</span>, callable=<span class="keyword">lambda</span>: result_queue)</span><br><span class="line"><span class="comment"># 绑定端口5000, 设置验证码'abc':</span></span><br><span class="line">manager = QueueManager(address=(<span class="string">''</span>, <span class="number">5000</span>), authkey=<span class="string">b'abc'</span>)</span><br><span class="line"><span class="comment"># 启动Queue:</span></span><br><span class="line">manager.start()</span><br><span class="line"><span class="comment"># 获得通过网络访问的Queue对象:</span></span><br><span class="line">task = manager.get_task_queue()</span><br><span class="line">result = manager.get_result_queue()</span><br><span class="line"><span class="comment"># 放几个任务进去:</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">    n = random.randint(<span class="number">0</span>, <span class="number">10000</span>)</span><br><span class="line">    print(<span class="string">'Put task %d...'</span> % n)</span><br><span class="line">    task.put(n)</span><br><span class="line"><span class="comment"># 从result队列读取结果:</span></span><br><span class="line">print(<span class="string">'Try get results...'</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">    r = result.get(timeout=<span class="number">10</span>)</span><br><span class="line">    print(<span class="string">'Result: %s'</span> % r)</span><br><span class="line"><span class="comment"># 关闭:</span></span><br><span class="line">manager.shutdown()</span><br><span class="line">print(<span class="string">'master exit.'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><ul>
+<li><p><code>\d</code>可以匹配一个数字，</p>
+</li>
+<li><p><code>\w</code>可以匹配一个字母或数字</p>
+</li>
+<li><p><code>\s</code>可以匹配一个空格（也包括Tab等空白符）</p>
+<ul>
+<li><code>&#39;00\d&#39;</code>可以匹配<code>&#39;007&#39;</code>，但无法匹配<code>&#39;00A&#39;</code>；</li>
+<li><code>&#39;\d\d\d&#39;</code>可以匹配<code>&#39;010&#39;</code>；</li>
+</ul>
+</li>
+<li><p><code>.</code>可以匹配任意字符</p>
+</li>
+<li><p><code>*</code>表示任意个字符（包括0个）</p>
+</li>
+<li><p><code>+</code>表示至少一个字符</p>
+</li>
+<li><p><code>?</code>表示0个或1个字符</p>
+</li>
+<li><p><code>{n}</code>表示n个字符</p>
+</li>
+<li><p><code>{n,m}</code>表示n-m个字符</p>
+<ul>
+<li><code>\d{3}\s+\d{3,8}</code>以任意个空格隔开的带区号的电话号码。</li>
+</ul>
+</li>
+<li><p><code>[]</code>表示范围</p>
+<p><code>[0-9a-zA-Z\_]</code>可以匹配一个数字、字母或者下划线；</p>
+</li>
+<li><p><code>A|B</code>可以匹配A或B，</p>
+<ul>
+<li><code>(P|p)ython</code>可以匹配<code>&#39;Python&#39;</code>或者<code>python</code></li>
+</ul>
+</li>
+<li><p><code>^</code>表示行的开头</p>
+</li>
+<li><p><code>$</code>表示行的结束</p>
+</li>
+</ul>
+<h3 id="re模块"><a href="#re模块" class="headerlink" title="re模块"></a>re模块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import re</span><br><span class="line">&gt;&gt;&gt; re.match(r&apos;^\d&#123;3&#125;\-\d&#123;3,8&#125;$&apos;, &apos;010-12345&apos;)</span><br><span class="line">&lt;_sre.SRE_Match object; span=(0, 9), match=&apos;010-12345&apos;&gt;</span><br><span class="line">&gt;&gt;&gt; re.match(r&apos;^\d&#123;3&#125;\-\d&#123;3,8&#125;$&apos;, &apos;010 12345&apos;)</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; &apos;a b   c&apos;.split(&apos; &apos;)</span><br><span class="line">[&apos;a&apos;, &apos;b&apos;, &apos;&apos;, &apos;&apos;, &apos;c&apos;]</span><br><span class="line">&gt;&gt;&gt; re.split(r&apos;\s+&apos;, &apos;a b   c&apos;)</span><br><span class="line">[&apos;a&apos;, &apos;b&apos;, &apos;c&apos;]</span><br><span class="line">&gt;&gt;&gt; re.split(r&apos;[\s\,]+&apos;, &apos;a,b, c  d&apos;)</span><br><span class="line">[&apos;a&apos;, &apos;b&apos;, &apos;c&apos;, &apos;d&apos;]</span><br></pre></td></tr></table></figure>
+<h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>m = re.match(<span class="string">r'^(\d&#123;3&#125;)-(\d&#123;3,8&#125;)$'</span>, <span class="string">'010-12345'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>m</span><br><span class="line">&lt;_sre.SRE_Match object; span=(<span class="number">0</span>, <span class="number">9</span>), match=<span class="string">'010-12345'</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>m.group(<span class="number">0</span>)</span><br><span class="line"><span class="string">'010-12345'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>m.group(<span class="number">1</span>)</span><br><span class="line"><span class="string">'010'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>m.group(<span class="number">2</span>)</span><br><span class="line"><span class="string">'12345'</span></span><br></pre></td></tr></table></figure>
+<p><code>()</code>表示的就是要提取的分组（Group）</p>
+<h3 id="贪婪匹配"><a href="#贪婪匹配" class="headerlink" title="贪婪匹配"></a>贪婪匹配</h3><p>正则匹配默认是贪婪匹配，也就是匹配尽可能多的字符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; re.match(r&apos;^(\d+)(0*)$&apos;, &apos;102300&apos;).groups()</span><br><span class="line">(&apos;102300&apos;, &apos;&apos;)</span><br></pre></td></tr></table></figure>
+<p>由于<code>\d+</code>采用贪婪匹配，直接把后面的<code>0</code>全部匹配了</p>
+<p>加个<code>?</code>就可以让<code>\d+</code>采用非贪婪匹配：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; re.match(r&apos;^(\d+?)(0*)$&apos;, &apos;102300&apos;).groups()</span><br><span class="line">(&apos;1023&apos;, &apos;00&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><p>当我们在Python中使用正则表达式时，re模块内部会干两件事情：</p>
+<ol>
+<li>编译正则表达式，如果正则表达式的字符串本身不合法，会报错；</li>
+<li>用编译后的正则表达式去匹配字符串。</li>
+</ol>
+<p>如果一个正则表达式要重复使用几千次，出于效率的考虑，我们可以预编译该正则表达式，接下来重复使用时就不需要编译这个步骤了，直接匹配：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import re</span><br><span class="line"># 编译:</span><br><span class="line">&gt;&gt;&gt; re_telephone = re.compile(r&apos;^(\d&#123;3&#125;)-(\d&#123;3,8&#125;)$&apos;)</span><br><span class="line"># 使用：</span><br><span class="line">&gt;&gt;&gt; re_telephone.match(&apos;010-12345&apos;).groups()</span><br><span class="line">(&apos;010&apos;, &apos;12345&apos;)</span><br><span class="line">&gt;&gt;&gt; re_telephone.match(&apos;010-8086&apos;).groups()</span><br><span class="line">(&apos;010&apos;, &apos;8086&apos;)</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>\</td>
+<td>将下一字符标记为特殊字符、文本、反向引用或八进制转义符。例如，”n”匹配字符”n”。”\n”匹配换行符。序列”\\“匹配”\”，”\(“匹配”(“。</td>
+</tr>
+<tr>
+<td>^</td>
+<td>匹配输入字符串开始的位置。如果设置了 <strong>RegExp</strong> 对象的 <strong>Multiline</strong> 属性，^ 还会与”\n”或”\r”之后的位置匹配。</td>
+</tr>
+<tr>
+<td>$</td>
+<td>匹配输入字符串结尾的位置。如果设置了 <strong>RegExp</strong> 对象的 <strong>Multiline</strong> 属性，$ 还会与”\n”或”\r”之前的位置匹配。</td>
+</tr>
+<tr>
+<td>*</td>
+<td>零次或多次匹配前面的字符或子表达式。例如，zo<em> 匹配”z”和”zoo”。</em> 等效于 {0,}。</td>
+</tr>
+<tr>
+<td>+</td>
+<td>一次或多次匹配前面的字符或子表达式。例如，”zo+”与”zo”和”zoo”匹配，但与”z”不匹配。+ 等效于 {1,}。</td>
+</tr>
+<tr>
+<td>?</td>
+<td>零次或一次匹配前面的字符或子表达式。例如，”do(es)?”匹配”do”或”does”中的”do”。? 等效于 {0,1}。</td>
+</tr>
+<tr>
+<td>{<em>n</em>}</td>
+<td>n 是非负整数。正好匹配 n 次。例如，”o{2}”与”Bob”中的”o”不匹配，但与”food”中的两个”o”匹配。</td>
+</tr>
+<tr>
+<td>{<em>n</em>,}</td>
+<td>n是非负整数。至少匹配 n次。例如，”o{2,}”不匹配”Bob”中的”o”，而匹配”foooood”中的所有 o。”o{1,}”等效于”o+”。”o{0,}”等效于”o*”。</td>
+</tr>
+<tr>
+<td>{<em>n</em>,<em>m</em>}</td>
+<td>M和 n 是非负整数，其中 n &lt;= m。匹配至少 <em>n</em> 次，至多 <em>m</em> 次。例如，”o{1,3}”匹配”fooooood”中的头三个 o。’o{0,1}’ 等效于 ‘o?’。注意：您不能将空格插入逗号和数字之间。</td>
+</tr>
+<tr>
+<td>?</td>
+<td>当此字符紧随任何其他限定符（<em>、+、?、{</em>n<em>}、{</em>n<em>,}、{</em>n<em>,</em>m}）之后时，匹配模式是”非贪心的”。”非贪心的”模式匹配搜索到的、尽可能短的字符串，而默认的”贪心的”模式匹配搜索到的、尽可能长的字符串。例如，在字符串”oooo”中，”o+?”只匹配单个”o”，而”o+”匹配所有”o”。</td>
+</tr>
+<tr>
+<td>.</td>
+<td>匹配除”\r\n”之外的任何单个字符。若要匹配包括”\r\n”在内的任意字符，请使用诸如”[\s\S]”之类的模式。</td>
+</tr>
+<tr>
+<td>(<em>pattern</em>)</td>
+<td>匹配 <em>pattern</em> 并捕获该匹配的子表达式。可以使用 <strong>$0…$9</strong> 属性从结果”匹配”集合中检索捕获的匹配。若要匹配括号字符 ( )，请使用”(“或者”)“。</td>
+</tr>
+<tr>
+<td>(?:<em>pattern</em>)</td>
+<td>匹配 <em>pattern</em> 但不捕获该匹配的子表达式，即它是一个非捕获匹配，不存储供以后使用的匹配。这对于用”or”字符 (\</td>
+<td>) 组合模式部件的情况很有用。例如，’industr(?:y\</td>
+<td>ies) 是比 ‘industry\</td>
+<td>industries’ 更经济的表达式。</td>
+</tr>
+<tr>
+<td>(?=<em>pattern</em>)</td>
+<td>执行正向预测先行搜索的子表达式，该表达式匹配处于匹配 <em>pattern</em> 的字符串的起始点的字符串。它是一个非捕获匹配，即不能捕获供以后使用的匹配。例如，’Windows (?=95\</td>
+<td>98\</td>
+<td>NT\</td>
+<td>2000)’ 匹配”Windows 2000”中的”Windows”，但不匹配”Windows 3.1”中的”Windows”。预测先行不占用字符，即发生匹配后，下一匹配的搜索紧随上一匹配之后，而不是在组成预测先行的字符后。</td>
+</tr>
+<tr>
+<td>(?!<em>pattern</em>)</td>
+<td>执行反向预测先行搜索的子表达式，该表达式匹配不处于匹配 <em>pattern</em> 的字符串的起始点的搜索字符串。它是一个非捕获匹配，即不能捕获供以后使用的匹配。例如，’Windows (?!95\</td>
+<td>98\</td>
+<td>NT\</td>
+<td>2000)’ 匹配”Windows 3.1”中的 “Windows”，但不匹配”Windows 2000”中的”Windows”。预测先行不占用字符，即发生匹配后，下一匹配的搜索紧随上一匹配之后，而不是在组成预测先行的字符后。</td>
+</tr>
+<tr>
+<td><em>x</em>\</td>
+<td><em>y</em></td>
+<td>匹配 <em>x</em> 或 <em>y</em>。例如，’z\</td>
+<td>food’ 匹配”z”或”food”。’(z\</td>
+<td>f)ood’ 匹配”zood”或”food”。</td>
+</tr>
+<tr>
+<td>[<em>xyz</em>]</td>
+<td>字符集。匹配包含的任一字符。例如，”[abc]”匹配”plain”中的”a”。</td>
+</tr>
+<tr>
+<td>[^<em>xyz</em>]</td>
+<td>反向字符集。匹配未包含的任何字符。例如，”[^abc]”匹配”plain”中”p”，”l”，”i”，”n”。</td>
+</tr>
+<tr>
+<td>[<em>a-z</em>]</td>
+<td>字符范围。匹配指定范围内的任何字符。例如，”[a-z]”匹配”a”到”z”范围内的任何小写字母。</td>
+</tr>
+<tr>
+<td>[^<em>a-z</em>]</td>
+<td>反向范围字符。匹配不在指定的范围内的任何字符。例如，”[^a-z]”匹配任何不在”a”到”z”范围内的任何字符。</td>
+</tr>
+<tr>
+<td>\b</td>
+<td>匹配一个字边界，即字与空格间的位置。例如，”er\b”匹配”never”中的”er”，但不匹配”verb”中的”er”。</td>
+</tr>
+<tr>
+<td>\B</td>
+<td>非字边界匹配。”er\B”匹配”verb”中的”er”，但不匹配”never”中的”er”。</td>
+</tr>
+<tr>
+<td>\c<em>x</em></td>
+<td>匹配 <em>x</em> 指示的控制字符。例如，\cM 匹配 Control-M 或回车符。<em>x</em> 的值必须在 A-Z 或 a-z 之间。如果不是这样，则假定 c 就是”c”字符本身。</td>
+</tr>
+<tr>
+<td>\d</td>
+<td>数字字符匹配。等效于 [0-9]。</td>
+</tr>
+<tr>
+<td>\D</td>
+<td>非数字字符匹配。等效于 [^0-9]。</td>
+</tr>
+<tr>
+<td>\f</td>
+<td>换页符匹配。等效于 \x0c 和 \cL。</td>
+</tr>
+<tr>
+<td>\n</td>
+<td>换行符匹配。等效于 \x0a 和 \cJ。</td>
+</tr>
+<tr>
+<td>\r</td>
+<td>匹配一个回车符。等效于 \x0d 和 \cM。</td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配任何空白字符，包括空格、制表符、换页符等。与 [ \f\n\r\t\v] 等效。</td>
+</tr>
+<tr>
+<td>\S</td>
+<td>匹配任何非空白字符。与 [^ \f\n\r\t\v] 等效。</td>
+</tr>
+<tr>
+<td>\t</td>
+<td>制表符匹配。与 \x09 和 \cI 等效。</td>
+</tr>
+<tr>
+<td>\v</td>
+<td>垂直制表符匹配。与 \x0b 和 \cK 等效。</td>
+</tr>
+<tr>
+<td>\w</td>
+<td>匹配任何字类字符，包括下划线。与”[A-Za-z0-9_]”等效。</td>
+</tr>
+<tr>
+<td>\W</td>
+<td>与任何非单词字符匹配。与”[^A-Za-z0-9_]”等效。</td>
+</tr>
+<tr>
+<td>\x<em>n</em></td>
+<td>匹配 <em>n</em>，此处的 <em>n</em> 是一个十六进制转义码。十六进制转义码必须正好是两位数长。例如，”\x41”匹配”A”。”\x041”与”\x04”&amp;”1”等效。允许在正则表达式中使用 ASCII 代码。</td>
+</tr>
+<tr>
+<td>*num*</td>
+<td>匹配 <em>num</em>，此处的 <em>num</em> 是一个正整数。到捕获匹配的反向引用。例如，”(.)\1”匹配两个连续的相同字符。</td>
+</tr>
+<tr>
+<td>*n*</td>
+<td>标识一个八进制转义码或反向引用。如果 *n<em> 前面至少有 </em>n<em> 个捕获子表达式，那么 </em>n<em> 是反向引用。否则，如果 </em>n<em>是八进制数 (0-7)，那么 </em>n* 是八进制转义码。</td>
+</tr>
+<tr>
+<td>*nm*</td>
+<td>标识一个八进制转义码或反向引用。如果 *nm<em> 前面至少有 </em>nm<em> 个捕获子表达式，那么 </em>nm<em> 是反向引用。如果 \</em>nm<em>前面至少有 </em>n<em> 个捕获，则 </em>n<em> 是反向引用，后面跟有字符 </em>m<em>。如果两种前面的情况都不存在，则 \</em>nm<em> 匹配八进制值</em>nm<em>，其中 </em>n <em>和 </em>m* 是八进制数字 (0-7)。</td>
+</tr>
+<tr>
+<td>\nml</td>
+<td>当 <em>n</em> 是八进制数 (0-3)，<em>m</em> 和 <em>l</em> 是八进制数 (0-7) 时，匹配八进制转义码 <em>nml</em>。</td>
+</tr>
+<tr>
+<td>\u<em>n</em></td>
+<td>匹配 <em>n</em>，其中 <em>n</em> 是以四位十六进制数表示的 Unicode 字符。例如，\u00A9 匹配版权符号 (©)。</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/python基础/python常见内置模块/" rel="next" title="python常见内置模块">
+                <i class="fa fa-chevron-left"></i> python常见内置模块
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/计算机网络/tcp-http/" rel="prev" title="tcp/http">
+                tcp/http <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件读写"><span class="nav-number">1.</span> <span class="nav-text">文件读写</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制文件"><span class="nav-number">1.1.</span> <span class="nav-text">二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符编码"><span class="nav-number">1.2.</span> <span class="nav-text">字符编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写文件"><span class="nav-number">1.3.</span> <span class="nav-text">写文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StringIO"><span class="nav-number">1.4.</span> <span class="nav-text">StringIO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BytesIO"><span class="nav-number">1.5.</span> <span class="nav-text">BytesIO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作文件和目录"><span class="nav-number">1.6.</span> <span class="nav-text">操作文件和目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化"><span class="nav-number">1.7.</span> <span class="nav-text">序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JSON"><span class="nav-number">1.7.1.</span> <span class="nav-text">JSON</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程和线程"><span class="nav-number">2.</span> <span class="nav-text">进程和线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多进程"><span class="nav-number">2.1.</span> <span class="nav-text">多进程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#multiprocessing"><span class="nav-number">2.1.1.</span> <span class="nav-text">multiprocessing</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pool"><span class="nav-number">2.1.2.</span> <span class="nav-text">Pool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#子进程"><span class="nav-number">2.1.3.</span> <span class="nav-text">子进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#进程间通信"><span class="nav-number">2.1.4.</span> <span class="nav-text">进程间通信</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程"><span class="nav-number">2.2.</span> <span class="nav-text">多线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Lock"><span class="nav-number">2.2.1.</span> <span class="nav-text">Lock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多核CPU"><span class="nav-number">2.2.2.</span> <span class="nav-text">多核CPU</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ThreadLocal"><span class="nav-number">2.3.</span> <span class="nav-text">ThreadLocal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程-vs-线程"><span class="nav-number">2.4.</span> <span class="nav-text">进程 vs. 线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式进程"><span class="nav-number">2.5.</span> <span class="nav-text">分布式进程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则表达式"><span class="nav-number">3.</span> <span class="nav-text">正则表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#re模块"><span class="nav-number">3.1.</span> <span class="nav-text">re模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分组"><span class="nav-number">3.2.</span> <span class="nav-text">分组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#贪婪匹配"><span class="nav-number">3.3.</span> <span class="nav-text">贪婪匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译"><span class="nav-number">3.4.</span> <span class="nav-text">编译</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

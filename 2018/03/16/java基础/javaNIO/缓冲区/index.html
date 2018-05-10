@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="nio," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="缓冲区一个Buffer对象是固定数量的数据的容器。其作用是一个存储器，或者分段运输区，在这里数据可被存储并在之后用于检索。 缓冲区的工作与通道紧密联系。通道是I/O传输发生时通过的入口，而缓冲区是这些数据传输的来源或目标。 类层次图 基础缓冲区是包在一个对象内的基本数据元素数组。Buffer类相比一个简单数组的优点是它将关于数据的数据内容和信息包含在一个单一的对象中。 属性 容量（Capacity">
+<meta name="keywords" content="nio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java nio 缓冲区">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java基础/javaNIO/缓冲区/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="缓冲区一个Buffer对象是固定数量的数据的容器。其作用是一个存储器，或者分段运输区，在这里数据可被存储并在之后用于检索。 缓冲区的工作与通道紧密联系。通道是I/O传输发生时通过的入口，而缓冲区是这些数据传输的来源或目标。 类层次图 基础缓冲区是包在一个对象内的基本数据元素数组。Buffer类相比一个简单数组的优点是它将关于数据的数据内容和信息包含在一个单一的对象中。 属性 容量（Capacity">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/kpBm6pf.jpg">
+<meta property="og:image" content="http://i.imgur.com/1VztuMp.jpg">
+<meta property="og:image" content="http://i.imgur.com/unKPKLf.jpg">
+<meta property="og:image" content="http://i.imgur.com/KzvHCVt.jpg">
+<meta property="og:image" content="http://i.imgur.com/fbcv8Kt.jpg">
+<meta property="og:image" content="http://i.imgur.com/Fpx2a2U.jpg">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.125Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java nio 缓冲区">
+<meta name="twitter:description" content="缓冲区一个Buffer对象是固定数量的数据的容器。其作用是一个存储器，或者分段运输区，在这里数据可被存储并在之后用于检索。 缓冲区的工作与通道紧密联系。通道是I/O传输发生时通过的入口，而缓冲区是这些数据传输的来源或目标。 类层次图 基础缓冲区是包在一个对象内的基本数据元素数组。Buffer类相比一个简单数组的优点是它将关于数据的数据内容和信息包含在一个单一的对象中。 属性 容量（Capacity">
+<meta name="twitter:image" content="http://i.imgur.com/kpBm6pf.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java基础/javaNIO/缓冲区/"/>
+
+
+
+
+
+  <title>java nio 缓冲区 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/javaNIO/缓冲区/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java nio 缓冲区</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">java基础</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/javaNIO/" itemprop="url" rel="index">
+                    <span itemprop="name">javaNIO</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java基础/javaNIO/缓冲区/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java基础/javaNIO/缓冲区/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="缓冲区"><a href="#缓冲区" class="headerlink" title="缓冲区"></a>缓冲区</h1><p>一个Buffer对象是固定数量的数据的容器。其作用是一个存储器，或者分段运输区，在这里数据可被存储并在之后用于检索。</p>
+<p>缓冲区的工作与通道紧密联系。通道是I/O传输发生时通过的入口，而缓冲区是这些数据传输的来源或目标。</p>
+<h4 id="类层次图"><a href="#类层次图" class="headerlink" title="类层次图"></a>类层次图</h4><p><img src="http://i.imgur.com/kpBm6pf.jpg" alt=""></p>
+<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><p>缓冲区是包在一个对象内的基本数据元素数组。Buffer类相比一个简单数组的优点是它将关于数据的数据内容和信息包含在一个单一的对象中。</p>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><ol>
+<li>容量（Capacity） 缓冲区能够容纳的数据元素的最大数量。</li>
+<li>上界（Limit） 缓冲区的第一个不能被读或写的元素。</li>
+<li>位置（Position） 下一个要被读或写的元素的索引。</li>
+<li>标记（Mark） 一个备忘位置。调用mark( )来设定mark = postion</li>
+</ol>
+<p>0 &lt;= mark &lt;= position &lt;= limit &lt;= capacity 。容量是固定的，但另外的三个属性可以在使用缓冲区时改变。</p>
+<h3 id="缓冲区API"><a href="#缓冲区API" class="headerlink" title="缓冲区API"></a>缓冲区API</h3><pre><code>package java.nio;
+public abstract class Buffer
+{ 
+    public final int capacity( )
+    public final int position( )
+    public final Buffer position (int newPosition)
+    public final int limit( ) 
+    public final Buffer limit (int newLimit) 
+    public final Buffer mark( ) 
+    public final Buffer reset( ) 
+    public final Buffer clear( ) 
+    public final Buffer flip( ) 
+    public final Buffer rewind( ) 
+    public final int remaining( ) 
+    public final boolean hasRemaining( ) 
+    public abstract boolean isReadOnly( ); 
+}
+</code></pre><p>像clear()这类函数，您通常应当返回void，而不是Buffer引用。这些函数将引用返回到它们在(this)上被引用的对象。这是一个允许<strong>级联调用</strong>的类设计方法。</p>
+<pre><code>buffer.mark().position(5).reset( );
+</code></pre><h3 id="存取"><a href="#存取" class="headerlink" title="存取"></a>存取</h3><p>在调用put()时指出了下一个数据元素应该被插入的位置，或者当get()被调用时指出下一个元素应从何处检索  </p>
+<pre><code>public abstract class ByteBuffer extends Buffer implements Comparable { // This is a partial API listing 
+    public abstract byte get( ); 
+    public abstract byte get (int index); 
+    public abstract ByteBuffer put (byte b); 
+    public abstract ByteBuffer put (int index, byte b); 
+}
+</code></pre><h3 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h3><p>buffer.put((byte)’H’).put((byte)’e’).put((byte)’l’).put((byte)’l’).put((byte)’o’);</p>
+<p><img src="http://i.imgur.com/1VztuMp.jpg" alt=""></p>
+<p>buffer.put(0,(byte)’M’).put((byte)’w’);</p>
+<p><img src="http://i.imgur.com/unKPKLf.jpg" alt=""></p>
+<h3 id="翻转"><a href="#翻转" class="headerlink" title="翻转"></a>翻转</h3><p>Buffer.flip();</p>
+<p>Flip()函数将一个能够继续添加数据元素的填充状态的缓冲区翻转成一个准备读出元素的释放状态。</p>
+<p><img src="http://i.imgur.com/KzvHCVt.jpg" alt=""></p>
+<p>Rewind()函数与flip()相似，但不影响上界属性。它只是将位置值设回0。您可以使用rewind()后退，重读已经被翻转的缓冲区中的数据。</p>
+<p>两次flip()后缓冲区的大小为0</p>
+<h3 id="释放"><a href="#释放" class="headerlink" title="释放"></a>释放</h3><p>如果我们现在将上图的缓冲区传入通道，它将取出我们存放在那里的数据，从位置开始直到上界结束。</p>
+<p>布尔函数hasRemaining()会在释放缓冲区时告诉您是否已经达到缓冲区的上界。以下是一种将数据元素从缓冲区释放到一个数组的方法</p>
+<pre><code>for (int i = 0; buffer.hasRemaining( ), i++) {
+    myByteArray [i] = buffer.get( ); 
+}
+</code></pre><p>remaining()函数将告知您从当前位置到上界还剩余的元素数目</p>
+<pre><code>int count = buffer.remaining( ); 
+for (int i = 0; i &lt; count, i++) { 
+    myByteArray [i] = buffer.get( ); 
+}
+</code></pre><p>例子:</p>
+<pre><code>package com.ronsoft.books.nio.buffers;
+import java.nio.CharBuffer;
+ /** * Buffer fill/drain example. This code uses the simplest 
+ * means of filling and draining a buffer: one element at 
+ * a time. * @author Ron Hitchens (ron@ronsoft.com) 
+ */
+ public class BufferFillDrain { 
+     public static void main (String [] argv) throws Exception { 
+         CharBuffer buffer = CharBuffer.allocate (100); 
+         while (fillBuffer (buffer)) { 
+             buffer.flip( ); 
+             drainBuffer (buffer); 
+             buffer.clear( ); 
+         } 
+     } 
+
+     private static void drainBuffer (CharBuffer buffer) {
+         while (buffer.hasRemaining( )) {
+             System.out.print (buffer.get( ));
+         } System.out.println (&quot;&quot;);
+     }
+     private static boolean fillBuffer (CharBuffer buffer) {
+         if (index &gt;= strings.length) { 
+             return (false); 
+         }
+         String string = strings [index++]; 
+         for (int i = 0; i &lt; string.length( ); i++) { 
+             buffer.put (string.charAt (i)); 
+         }
+
+         return (true); 
+     } 
+     private static int index = 0; 
+     private static String [] strings = { &quot;A random string value&quot;, 
+     &quot;The product ofan infinite number of monkeys&quot;, 
+     &quot;Hey hey we&apos;re the Monkees&quot;, 
+     &quot;Opening actfor the Monkees: Jimi Hendrix&quot;,
+         &quot;&apos;Scuse me while I kiss this fly&quot;, // Sorry Jimi ;-) 
+         &quot;Help Me! Help Me!&quot;
+     }; 
+ }
+</code></pre><h3 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h3><p>buffer.compact()</p>
+<p><img src="http://i.imgur.com/fbcv8Kt.jpg" alt=""></p>
+<p><img src="http://i.imgur.com/Fpx2a2U.jpg" alt=""></p>
+<p>调用compact()的作用是丢弃已经释放的数据，保留未释放的数据，并使缓冲区对重新填充容量准备就绪。</p>
+<h3 id="标记"><a href="#标记" class="headerlink" title="标记"></a>标记</h3><p>缓冲区的标记在mark( )函数被调用之前是未定义的，调用时标记被设为当前位置的值。reset( )函数将位置设为当前的标记值。一些缓冲区函数会抛弃已经设定的标记（rewind( )，clear( )，以及flip( )总是抛弃标记）</p>
+<h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><pre><code>equals( ) //如果每个缓冲区中剩余的内容相同，那么equals( )函数将返回true
+compareTo( )
+</code></pre><h3 id="批量移动"><a href="#批量移动" class="headerlink" title="批量移动"></a>批量移动</h3><pre><code>public abstract class CharBuffer extends Buffer implements CharSequence, Comparable {
+// This is a partial API listing 
+    public CharBuffer get (char [] dst) 
+    public CharBuffer get (char [] dst, int offset, int length) 
+    public final CharBuffer put (char[] src) 
+    public CharBuffer put (char [] src, int offset, int length) 
+    public CharBuffer put (CharBuffer src) 
+    public final CharBuffer put (String src) 
+    public CharBuffer put (String src, int start, int end) 
+}
+</code></pre><h2 id="创建缓冲区"><a href="#创建缓冲区" class="headerlink" title="创建缓冲区"></a>创建缓冲区</h2><pre><code>public abstract class CharBuffer extends Buffer implements CharSequence, Comparable {
+ // This is a partial API listing 
+    public static CharBuffer allocate (int capacity) 
+    public static CharBuffer wrap (char [] array) 
+    public static CharBuffer wrap (char [] array, int offset, int length) 
+    public final boolean hasArray( ) 
+    public final char [] array( ) 
+    public final int arrayOffset( ) 
+}
+</code></pre><p>新的缓冲区是由分配或包装操作创建的。分配操作创建一个缓冲区对象并分配一个私有的空间来储存容量大小的数据元素。包装操作创建一个缓冲区对象但是不分配任何空间来储存数据元素。它使用您所提供的数组作为存储空间来储存缓冲区中的数据元素。</p>
+<pre><code>CharBuffer charBuffer = CharBuffer.allocate (100);
+
+char [] myArray = new char [100]; 
+CharBuffer charbuffer = CharBuffer.wrap (myArray);
+</code></pre><h2 id="复制缓冲区"><a href="#复制缓冲区" class="headerlink" title="复制缓冲区"></a>复制缓冲区</h2><pre><code>public abstract class CharBuffer extends Buffer implements CharSequence, Comparable 
+{ // This is a partial API listing 
+    public abstract CharBuffer duplicate( ); 
+    public abstract CharBuffer asReadOnlyBuffer( ); 
+    public abstract CharBuffer slice( ); 
+}
+</code></pre><p>Duplicate()函数创建了一个与原始缓冲区相似的新缓冲区。两个缓冲区共享数据元素，拥有同样的容量，但每个缓冲区拥有各自的位置，上界和标记属性。对一个缓冲区内的数据元素所做的改变会反映在另外一个缓冲区上。</p>
+<p>asReadOnlyBuffer()函数来生成一个只读的缓冲区视图</p>
+<p>分割缓冲区与复制相似，但slice()创建一个从原始缓冲区的当前位置开始的新缓冲区，并且其容量是原始缓冲区的剩余元素数量（limit-position）。这个新缓冲区与原始缓冲区共享一段数据元素子序列。分割出来的缓冲区也会继承只读和直接属性</p>
+<h2 id="字节缓冲区"><a href="#字节缓冲区" class="headerlink" title="字节缓冲区"></a>字节缓冲区</h2><h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><pre><code>public abstract class ByteBuffer extends Buffer implements Comparable {
+    public static ByteBuffer allocate (int capacity) 
+    public static ByteBuffer allocateDirect (int capacity) 
+    public abstract boolean isDirect( );    //是否为直接缓冲区。
+    public static ByteBuffer wrap (byte[] array, int offset, int length) 
+    public static ByteBuffer wrap (byte[] array) 
+
+    public abstract ByteBuffer duplicate( ); 
+    public abstract ByteBuffer asReadOnlyBuffer( ); 
+    public abstract ByteBuffer slice( ); 
+
+    public final boolean hasArray( ) 
+    public final byte [] array( ) 
+    public final int arrayOffset( ) 
+
+    public abstract byte get( ); 
+    public abstract byte get (int index); 
+    public ByteBuffer get (byte[] dst, int offset, int length) 
+    public ByteBuffer get (byte[] dst, int offset, int length) 
+    public abstract ByteBuffer put (byte b); 
+    public abstract ByteBuffer put (int index, byte b); 
+    public ByteBuffer put (ByteBuffer src) 
+    public ByteBuffer put (byte[] src, int offset, int length) 
+    public final ByteBuffer put (byte[] src) 
+
+    public final ByteOrder order( ) 
+    public final ByteBuffer order (ByteOrder bo) 
+    public abstract CharBuffer asCharBuffer( ); 
+    public abstract ShortBuffer asShortBuffer( ); 
+    public abstract IntBuffer asIntBuffer( ); 
+    public abstract LongBuffer asLongBuffer( ); 
+    public abstract FloatBuffer asFloatBuffer( ); 
+    public abstract DoubleBuffer asDoubleBuffer( ); 
+
+    public abstract char getChar( ); 
+    public abstract char getChar (int index); 
+    public abstract ByteBuffer putChar (char value); 
+    public abstract ByteBuffer putChar (int index, char value); 
+    public abstract short getShort( ); 
+    public abstract short getShort (int index); 
+    public abstract ByteBuffer putShort (short value); 
+    public abstract ByteBuffer putShort (int index, short value); 
+    public abstract int getInt( ); 
+    public abstract int getInt (int index); 
+    public abstract ByteBuffer putInt (int value); 
+    public abstract ByteBuffer putInt (int index, int value); 
+    public abstract long getLong( ); 
+    public abstract long getLong (int index); 
+    public abstract ByteBuffer putLong (long value); 
+    public abstract ByteBuffer putLong (int index, long value); 
+    public abstract float getFloat( ); 
+    public abstract float getFloat (int index); 
+    public abstract ByteBuffer putFloat (float value); 
+    public abstract ByteBuffer putFloat (int index, float value); 
+    public abstract double getDouble( ); 
+    public abstract double getDouble (int index); 
+    public abstract ByteBuffer putDouble (double value); 
+    public abstract ByteBuffer putDouble (int index, double value); 
+    public abstract ByteBuffer compact( ); 
+    public boolean equals (Object ob)         
+    public int compareTo (Object ob) 
+    public String toString( ) public int hashCode( ) 
+}
+</code></pre><h3 id="直接缓冲区"><a href="#直接缓冲区" class="headerlink" title="直接缓冲区"></a>直接缓冲区</h3><p>字节缓冲区跟其他缓冲区类型最明显的不同在于，它们可以成为通道所执行的I/O的源头和/或目标。</p>
+<p>直接缓冲区时I/O的最佳选择，但可能比创建非直接缓冲区要花费更高的成本。直接缓冲区使用的内存是通过调用本地操作系统方面的代码分配的，绕过了标准JVM堆栈。建立和销毁直接缓冲区会明显比具有堆栈的缓冲区更加破费，这取决于主操作系统以及JVM实现。直接缓冲区的内存区域不受无用存储单元收集支配，因为它们位于标准JVM堆栈之外。</p>
+<h3 id="视图缓冲区"><a href="#视图缓冲区" class="headerlink" title="视图缓冲区"></a>视图缓冲区</h3><pre><code>as...Buffer();
+</code></pre><p>视图缓冲区通过已存在的缓冲区对象实例的工厂方法来创建。这种视图对象维护它自己的属性，容量，位置，上界和标记，但是和原来的缓冲区共享数据元素。</p>
+<p>下面的代码创建了一个ByteBuffer缓冲区的CharBuffer视图</p>
+<pre><code>CharBuffer charBuffer = byteBuffer.asCharBuffer( );
+</code></pre><p>一旦您得到了视图缓冲区，您可以用duplicate()，slice()和asReadOnlyBuffer()函数创建进一步的子视图</p>
+<h3 id="数据元素视图"><a href="#数据元素视图" class="headerlink" title="数据元素视图"></a>数据元素视图</h3><p>ByteBuffer类为每一种原始数据类型提供了存取的和转化的方法：</p>
+<pre><code>public abstract char getChar( ); //index=position
+public abstract char getChar (int index); 
+...
+
+public abstract ByteBuffer putInt (int value);  //index=position
+public abstract ByteBuffer putInt (int index, int value);     
+...
+</code></pre><p>如果是getInt()则一次读取4个字节, 其他类似</p>
+<h3 id="内存映射缓冲区"><a href="#内存映射缓冲区" class="headerlink" title="内存映射缓冲区"></a>内存映射缓冲区</h3><p>映射缓冲区是带有存储在文件，通过内存映射来存取数据元素的字节缓冲区。映射缓冲区通常是直接存取内存的，只能通过FileChannel类创建</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nio/" rel="tag"># nio</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/java基础/javaNIO/选择器/" rel="next" title="java nio 选择器">
+                <i class="fa fa-chevron-left"></i> java nio 选择器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/java基础/javaNIO/简介/" rel="prev" title="java nio 简介">
+                java nio 简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#缓冲区"><span class="nav-number">1.</span> <span class="nav-text">缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类层次图"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">类层次图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础"><span class="nav-number">1.1.</span> <span class="nav-text">基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#属性"><span class="nav-number">1.1.1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓冲区API"><span class="nav-number">1.1.2.</span> <span class="nav-text">缓冲区API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存取"><span class="nav-number">1.1.3.</span> <span class="nav-text">存取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#填充"><span class="nav-number">1.1.4.</span> <span class="nav-text">填充</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#翻转"><span class="nav-number">1.1.5.</span> <span class="nav-text">翻转</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#释放"><span class="nav-number">1.1.6.</span> <span class="nav-text">释放</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#压缩"><span class="nav-number">1.1.7.</span> <span class="nav-text">压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标记"><span class="nav-number">1.1.8.</span> <span class="nav-text">标记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#比较"><span class="nav-number">1.1.9.</span> <span class="nav-text">比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#批量移动"><span class="nav-number">1.1.10.</span> <span class="nav-text">批量移动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建缓冲区"><span class="nav-number">1.2.</span> <span class="nav-text">创建缓冲区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制缓冲区"><span class="nav-number">1.3.</span> <span class="nav-text">复制缓冲区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字节缓冲区"><span class="nav-number">1.4.</span> <span class="nav-text">字节缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#API"><span class="nav-number">1.4.1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接缓冲区"><span class="nav-number">1.4.2.</span> <span class="nav-text">直接缓冲区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#视图缓冲区"><span class="nav-number">1.4.3.</span> <span class="nav-text">视图缓冲区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据元素视图"><span class="nav-number">1.4.4.</span> <span class="nav-text">数据元素视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存映射缓冲区"><span class="nav-number">1.4.5.</span> <span class="nav-text">内存映射缓冲区</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

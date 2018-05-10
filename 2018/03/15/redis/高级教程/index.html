@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Redis 数据备份与恢复Redis SAVE 命令用于创建当前数据库的备份。 语法redis Save 命令基本语法如下： 1redis 127.0.0.1:6379&amp;gt; SAVE 实例12redis 127.0.0.1:6379&amp;gt; SAVE OK 该命令将在 redis 安装目录中创建dump.rdb文件。  恢复数据如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 r">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis高级教程">
+<meta property="og:url" content="http://hvan.wang/2018/03/15/redis/高级教程/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="Redis 数据备份与恢复Redis SAVE 命令用于创建当前数据库的备份。 语法redis Save 命令基本语法如下： 1redis 127.0.0.1:6379&amp;gt; SAVE 实例12redis 127.0.0.1:6379&amp;gt; SAVE OK 该命令将在 redis 安装目录中创建dump.rdb文件。  恢复数据如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 r">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.180Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis高级教程">
+<meta name="twitter:description" content="Redis 数据备份与恢复Redis SAVE 命令用于创建当前数据库的备份。 语法redis Save 命令基本语法如下： 1redis 127.0.0.1:6379&amp;gt; SAVE 实例12redis 127.0.0.1:6379&amp;gt; SAVE OK 该命令将在 redis 安装目录中创建dump.rdb文件。  恢复数据如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 r">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/15/redis/高级教程/"/>
+
+
+
+
+
+  <title>Redis高级教程 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/15/redis/高级教程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis高级教程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T20:46:25+08:00">
+                2018-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/15/redis/高级教程/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/15/redis/高级教程/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Redis-数据备份与恢复"><a href="#Redis-数据备份与恢复" class="headerlink" title="Redis 数据备份与恢复"></a>Redis 数据备份与恢复</h1><p>Redis <strong>SAVE</strong> 命令用于创建当前数据库的备份。</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>redis Save 命令基本语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; SAVE</span><br></pre></td></tr></table></figure>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; SAVE </span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+<p>该命令将在 redis 安装目录中创建dump.rdb文件。</p>
+<hr>
+<h2 id="恢复数据"><a href="#恢复数据" class="headerlink" title="恢复数据"></a>恢复数据</h2><p>如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 redis 安装目录并启动服务即可。获取 redis 目录可以使用 </p>
+<p>CONFIG</p>
+<p>命令，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; CONFIG GET dir</span><br><span class="line">1) &quot;dir&quot;</span><br><span class="line">2) &quot;/usr/local/redis/bin&quot;</span><br></pre></td></tr></table></figure>
+<p>以上命令 <strong>CONFIG GET dir</strong> 输出的 redis 安装目录为 /usr/local/redis/bin。</p>
+<hr>
+<h2 id="Bgsave"><a href="#Bgsave" class="headerlink" title="Bgsave"></a>Bgsave</h2><p>创建 redis 备份文件也可以使用命令 <strong>BGSAVE</strong>，该命令在后台执行。</p>
+<h3 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; BGSAVE</span><br><span class="line"></span><br><span class="line">Background saving started</span><br></pre></td></tr></table></figure>
+<h1 id="Redis-安全"><a href="#Redis-安全" class="headerlink" title="Redis 安全"></a>Redis 安全</h1><p>我们可以通过 redis 的配置文件设置密码参数，这样客户端连接到 redis 服务就需要密码验证，这样可以让你的 redis 服务更安全。</p>
+<h3 id="实例-2"><a href="#实例-2" class="headerlink" title="实例"></a>实例</h3><p>我们可以通过以下命令查看是否设置了密码验证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; CONFIG get requirepass</span><br><span class="line">1) &quot;requirepass&quot;</span><br><span class="line">2) &quot;&quot;</span><br></pre></td></tr></table></figure>
+<p>默认情况下 requirepass 参数是空的，这就意味着你无需通过密码验证就可以连接到 redis 服务。</p>
+<p>你可以通过以下命令来修改该参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; CONFIG set requirepass &quot;runoob&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; CONFIG get requirepass</span><br><span class="line">1) &quot;requirepass&quot;</span><br><span class="line">2) &quot;runoob&quot;</span><br></pre></td></tr></table></figure>
+<p>设置密码后，客户端连接 redis 服务就需要密码验证，否则无法执行命令。</p>
+<h3 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h3><p><strong>AUTH</strong> 命令基本语法格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; AUTH password</span><br></pre></td></tr></table></figure>
+<h3 id="实例-3"><a href="#实例-3" class="headerlink" title="实例"></a>实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; AUTH &quot;runoob&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET mykey &quot;Test value&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GET mykey</span><br><span class="line">&quot;Test value&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="Redis-性能测试"><a href="#Redis-性能测试" class="headerlink" title="Redis 性能测试"></a>Redis 性能测试</h1><p>Redis 性能测试是通过同时执行多个命令实现的。</p>
+<h3 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h3><p>redis 性能测试的基本命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-benchmark [option] [option value]</span><br></pre></td></tr></table></figure>
+<h3 id="实例-4"><a href="#实例-4" class="headerlink" title="实例"></a>实例</h3><p>以下实例同时执行 10000 个请求来检测性能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">redis-benchmark -n 10000</span><br><span class="line"></span><br><span class="line">PING_INLINE: 141043.72 requests per second</span><br><span class="line">PING_BULK: 142857.14 requests per second</span><br><span class="line">SET: 141442.72 requests per second</span><br><span class="line">GET: 145348.83 requests per second</span><br><span class="line">INCR: 137362.64 requests per second</span><br><span class="line">LPUSH: 145348.83 requests per second</span><br><span class="line">LPOP: 146198.83 requests per second</span><br><span class="line">SADD: 146198.83 requests per second</span><br><span class="line">SPOP: 149253.73 requests per second</span><br><span class="line">LPUSH (needed to benchmark LRANGE): 148588.42 requests per second</span><br><span class="line">LRANGE_100 (first 100 elements): 58411.21 requests per second</span><br><span class="line">LRANGE_300 (first 300 elements): 21195.42 requests per second</span><br><span class="line">LRANGE_500 (first 450 elements): 14539.11 requests per second</span><br><span class="line">LRANGE_600 (first 600 elements): 10504.20 requests per second</span><br><span class="line">MSET (10 keys): 93283.58 requests per second</span><br></pre></td></tr></table></figure>
+<p>redis 性能测试工具可选参数如下所示：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>选项</th>
+<th>描述</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>-h</strong></td>
+<td>指定服务器主机名</td>
+<td>127.0.0.1</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>-p</strong></td>
+<td>指定服务器端口</td>
+<td>6379</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>-s</strong></td>
+<td>指定服务器 socket</td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>-c</strong></td>
+<td>指定并发连接数</td>
+<td>50</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>-n</strong></td>
+<td>指定请求数</td>
+<td>10000</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>-d</strong></td>
+<td>以字节的形式指定 SET/GET 值的数据大小</td>
+<td>2</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>-k</strong></td>
+<td>1=keep alive 0=reconnect</td>
+<td>1</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>-r</strong></td>
+<td>SET/GET/INCR 使用随机 key, SADD 使用随机值</td>
+<td></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>-P</strong></td>
+<td>通过管道传输 <numreq> 请求</numreq></td>
+<td>1</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>-q</strong></td>
+<td>强制退出 redis。仅显示 query/sec 值</td>
+<td></td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>–csv</strong></td>
+<td>以 CSV 格式输出</td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>-l</strong></td>
+<td>生成循环，永久执行测试</td>
+<td></td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>-t</strong></td>
+<td>仅运行以逗号分隔的测试命令列表。</td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>-I</strong></td>
+<td>Idle 模式。仅打开 N 个 idle 连接并等待。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="实例-5"><a href="#实例-5" class="headerlink" title="实例"></a>实例</h3><p>以下实例我们使用了多个参数来测试 redis 性能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">redis-benchmark -h 127.0.0.1 -p 6379 -t set,lpush -n 10000 -q</span><br><span class="line"></span><br><span class="line">SET: 146198.83 requests per second</span><br><span class="line">LPUSH: 145560.41 requests per second</span><br></pre></td></tr></table></figure>
+<p>以上实例中主机为 127.0.0.1，端口号为 6379，执行的命令为 set,lpush，请求数为 10000，通过 -q 参数让结果只显示每秒执行的请求数。</p>
+<h1 id="Redis-客户端连接"><a href="#Redis-客户端连接" class="headerlink" title="Redis 客户端连接"></a>Redis 客户端连接</h1><p>Redis 通过监听一个 TCP 端口或者 Unix socket 的方式来接收来自客户端的连接，当一个连接建立后，Redis 内部会进行以下一些操作：</p>
+<ul>
+<li>首先，客户端 socket 会被设置为非阻塞模式，因为 Redis 在网络事件处理上采用的是非阻塞多路复用模型。</li>
+<li>然后为这个 socket 设置 TCP_NODELAY 属性，禁用 Nagle 算法</li>
+<li>然后创建一个可读的文件事件用于监听这个客户端 socket 的数据发送</li>
+</ul>
+<hr>
+<h2 id="最大连接数"><a href="#最大连接数" class="headerlink" title="最大连接数"></a>最大连接数</h2><p>在 Redis2.4 中，最大连接数是被直接硬编码在代码里面的，而在2.6版本中这个值变成可配置的。</p>
+<p>maxclients 的默认值是 10000，你也可以在 redis.conf 中对这个值进行修改。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">config get maxclients</span><br><span class="line"></span><br><span class="line">1) &quot;maxclients&quot;</span><br><span class="line">2) &quot;10000&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="实例-6"><a href="#实例-6" class="headerlink" title="实例"></a>实例</h3><p>以下实例我们在服务启动时设置最大连接数为 100000：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-server --maxclients 100000</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="客户端命令"><a href="#客户端命令" class="headerlink" title="客户端命令"></a>客户端命令</h2><table>
+<thead>
+<tr>
+<th>S.N.</th>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>CLIENT LIST</strong></td>
+<td>返回连接到 redis 服务的客户端列表</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>CLIENT SETNAME</strong></td>
+<td>设置当前连接的名称</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>CLIENT GETNAME</strong></td>
+<td>获取通过 CLIENT SETNAME 命令设置的服务名称</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>CLIENT PAUSE</strong></td>
+<td>挂起客户端连接，指定挂起的时间以毫秒计</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>CLIENT KILL</strong></td>
+<td>关闭客户端连接</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Redis-管道技术"><a href="#Redis-管道技术" class="headerlink" title="Redis 管道技术"></a>Redis 管道技术</h1><p>Redis是一种基于客户端-服务端模型以及请求/响应协议的TCP服务。这意味着通常情况下一个请求会遵循以下步骤：</p>
+<ul>
+<li>客户端向服务端发送一个查询请求，并监听Socket返回，通常是以阻塞模式，等待服务端响应。</li>
+<li>服务端处理命令，并将结果返回给客户端。</li>
+</ul>
+<hr>
+<h2 id="Redis-管道技术-1"><a href="#Redis-管道技术-1" class="headerlink" title="Redis 管道技术"></a>Redis 管道技术</h2><p>Redis 管道技术可以在服务端未响应时，客户端可以继续向服务端发送请求，并最终一次性读取所有服务端的响应。</p>
+<h3 id="实例-7"><a href="#实例-7" class="headerlink" title="实例"></a>实例</h3><p>查看 redis 管道，只需要启动 redis 实例并输入以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$(echo -en &quot;PING\r\n SET runoobkey redis\r\nGET runoobkey\r\nINCR visitor\r\nINCR visitor\r\nINCR visitor\r\n&quot;; sleep 10) | nc localhost 6379</span><br><span class="line"></span><br><span class="line">+PONG</span><br><span class="line">+OK</span><br><span class="line">redis</span><br><span class="line">:1</span><br><span class="line">:2</span><br><span class="line">:3</span><br></pre></td></tr></table></figure>
+<p>以上实例中我们通过使用 <strong>PING</strong> 命令查看redis服务是否可用， 之后我们们设置了 runoobkey 的值为 redis，然后我们获取 runoobkey 的值并使得 visitor 自增 3 次。</p>
+<p>在返回的结果中我们可以看到这些命令一次性向 redis 服务提交，并最终一次性读取所有服务端的响应</p>
+<hr>
+<h2 id="管道技术的优势"><a href="#管道技术的优势" class="headerlink" title="管道技术的优势"></a>管道技术的优势</h2><p>管道技术最显著的优势是提高了 redis 服务的性能。</p>
+<h3 id="一些测试数据"><a href="#一些测试数据" class="headerlink" title="一些测试数据"></a>一些测试数据</h3><p>在下面的测试中，我们将使用Redis的Ruby客户端，支持管道技术特性，测试管道技术对速度的提升效果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">require &apos;rubygems&apos; </span><br><span class="line">require &apos;redis&apos;</span><br><span class="line">def bench(descr) </span><br><span class="line">start = Time.now </span><br><span class="line">yield </span><br><span class="line">puts &quot;#&#123;descr&#125; #&#123;Time.now-start&#125; seconds&quot; </span><br><span class="line">end</span><br><span class="line">def without_pipelining </span><br><span class="line">r = Redis.new </span><br><span class="line">10000.times &#123; </span><br><span class="line">    r.ping </span><br><span class="line">&#125; </span><br><span class="line">end</span><br><span class="line">def with_pipelining </span><br><span class="line">r = Redis.new </span><br><span class="line">r.pipelined &#123; </span><br><span class="line">    10000.times &#123; </span><br><span class="line">        r.ping </span><br><span class="line">    &#125; </span><br><span class="line">&#125; </span><br><span class="line">end</span><br><span class="line">bench(&quot;without pipelining&quot;) &#123; </span><br><span class="line">    without_pipelining </span><br><span class="line">&#125; </span><br><span class="line">bench(&quot;with pipelining&quot;) &#123; </span><br><span class="line">    with_pipelining </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从处于局域网中的Mac OS X系统上执行上面这个简单脚本的数据表明，开启了管道操作后，往返时延已经被改善得相当低了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">without pipelining 1.185238 seconds </span><br><span class="line">with pipelining 0.250783 seconds</span><br></pre></td></tr></table></figure>
+<p>如你所见，开启管道后，我们的速度效率提升了5倍。</p>
+<h1 id="Redis-分区"><a href="#Redis-分区" class="headerlink" title="Redis 分区"></a>Redis 分区</h1><p>分区是分割数据到多个Redis实例的处理过程，因此每个实例只保存key的一个子集。</p>
+<h3 id="分区的优势"><a href="#分区的优势" class="headerlink" title="分区的优势"></a>分区的优势</h3><ul>
+<li>通过利用多台计算机内存的和值，允许我们构造更大的数据库。</li>
+<li>通过多核和多台计算机，允许我们扩展计算能力；通过多台计算机和网络适配器，允许我们扩展网络带宽。</li>
+</ul>
+<h3 id="分区的不足"><a href="#分区的不足" class="headerlink" title="分区的不足"></a>分区的不足</h3><p>redis的一些特性在分区方面表现的不是很好：</p>
+<ul>
+<li>涉及多个key的操作通常是不被支持的。举例来说，当两个set映射到不同的redis实例上时，你就不能对这两个set执行交集操作。</li>
+<li>涉及多个key的redis事务不能使用。</li>
+<li>当使用分区时，数据处理较为复杂，比如你需要处理多个rdb/aof文件，并且从多个实例和主机备份持久化文件。</li>
+<li>增加或删除容量也比较复杂。redis集群大多数支持在运行时增加、删除节点的透明数据平衡的能力，但是类似于客户端分区、代理等其他系统则不支持这项特性。然而，一种叫做presharding的技术对此是有帮助的。</li>
+</ul>
+<hr>
+<h2 id="分区类型"><a href="#分区类型" class="headerlink" title="分区类型"></a>分区类型</h2><p>Redis 有两种类型分区。 假设有4个Redis实例 R0，R1，R2，R3，和类似user:1，user:2这样的表示用户的多个key，对既定的key有多种不同方式来选择这个key存放在哪个实例中。也就是说，有不同的系统来映射某个key到某个Redis服务。</p>
+<h3 id="范围分区"><a href="#范围分区" class="headerlink" title="范围分区"></a>范围分区</h3><p>最简单的分区方式是按范围分区，就是映射一定范围的对象到特定的Redis实例。</p>
+<p>比如，ID从0到10000的用户会保存到实例R0，ID从10001到 20000的用户会保存到R1，以此类推。</p>
+<p>这种方式是可行的，并且在实际中使用，不足就是要有一个区间范围到实例的映射表。这个表要被管理，同时还需要各 种对象的映射表，通常对Redis来说并非是好的方法。</p>
+<h3 id="哈希分区"><a href="#哈希分区" class="headerlink" title="哈希分区"></a>哈希分区</h3><p>另外一种分区方法是hash分区。这对任何key都适用，也无需是object_name:这种形式，像下面描述的一样简单：</p>
+<ul>
+<li>用一个hash函数将key转换为一个数字，比如使用crc32 hash函数。对key foobar执行crc32(foobar)会输出类似93024922的整数。</li>
+<li>对这个整数取模，将其转化为0-3之间的数字，就可以将这个整数映射到4个Redis实例中的一个了。93024922 % 4 = 2，就是说key foobar应该被存到R2实例中。注意：取模操作是取除的余数，通常在多种编程语言中用%操作符实现。</li>
+</ul>
+<h1 id="Java-使用-Redis"><a href="#Java-使用-Redis" class="headerlink" title="Java 使用 Redis"></a>Java 使用 Redis</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>开始在 Java 中使用 Redis 前， 我们需要确保已经安装了 redis 服务及 Java redis 驱动，且你的机器上能正常使用 Java。 Java的安装配置可以参考我们的 <a href="http://www.runoob.com/redis/java-environment-setup.html" target="_blank" rel="noopener">Java开发环境配置 </a>接下来让我们安装 Java redis 驱动：</p>
+<ul>
+<li>首先你需要下载驱动包 <a href="https://mvnrepository.com/artifact/redis.clients/jedis" target="_blank" rel="noopener"><strong>下载 jedis.jar</strong></a>，确保下载最新驱动包。</li>
+<li>在你的 classpath 中包含该驱动包。</li>
+</ul>
+<blockquote>
+<p>本站提供了 2.9.0 jar 版本下载： <a href="http://static.runoob.com/download/jedis-2.9.0.jar" target="_blank" rel="noopener">jedis-2.9.0.jar</a></p>
+</blockquote>
+<hr>
+<h2 id="连接到-redis-服务"><a href="#连接到-redis-服务" class="headerlink" title="连接到 redis 服务"></a>连接到 redis 服务</h2><h2 id="实例-8"><a href="#实例-8" class="headerlink" title="实例"></a>实例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisJava</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//连接本地的 Redis 服务</span></span><br><span class="line">        Jedis jedis = <span class="keyword">new</span> Jedis(<span class="string">"localhost"</span>);</span><br><span class="line">        System.out.println(<span class="string">"连接成功"</span>);</span><br><span class="line">        <span class="comment">//查看服务是否运行</span></span><br><span class="line">        System.out.println(<span class="string">"服务正在运行: "</span>+jedis.ping());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译以上 Java 程序，确保驱动包的路径是正确的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">连接成功</span><br><span class="line">服务正在运行: PONG</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-Java-String-字符串-实例"><a href="#Redis-Java-String-字符串-实例" class="headerlink" title="Redis Java String(字符串) 实例"></a>Redis Java String(字符串) 实例</h2><h2 id="实例-9"><a href="#实例-9" class="headerlink" title="实例"></a>实例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisStringJava</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//连接本地的 Redis 服务</span></span><br><span class="line">        Jedis jedis = <span class="keyword">new</span> Jedis(<span class="string">"localhost"</span>);</span><br><span class="line">        System.out.println(<span class="string">"连接成功"</span>);</span><br><span class="line">        <span class="comment">//设置 redis 字符串数据</span></span><br><span class="line">        jedis.set(<span class="string">"runoobkey"</span>, <span class="string">"www.runoob.com"</span>);</span><br><span class="line">        <span class="comment">// 获取存储的数据并输出</span></span><br><span class="line">        System.out.println(<span class="string">"redis 存储的字符串为: "</span>+ jedis.get(<span class="string">"runoobkey"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译以上程序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">连接成功</span><br><span class="line">redis 存储的字符串为: www.runoob.com</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-Java-List-列表-实例"><a href="#Redis-Java-List-列表-实例" class="headerlink" title="Redis Java List(列表) 实例"></a>Redis Java List(列表) 实例</h2><h2 id="实例-10"><a href="#实例-10" class="headerlink" title="实例"></a>实例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisListJava</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//连接本地的 Redis 服务</span></span><br><span class="line">        Jedis jedis = <span class="keyword">new</span> Jedis(<span class="string">"localhost"</span>);</span><br><span class="line">        System.out.println(<span class="string">"连接成功"</span>);</span><br><span class="line">        <span class="comment">//存储数据到列表中</span></span><br><span class="line">        jedis.lpush(<span class="string">"site-list"</span>, <span class="string">"Runoob"</span>);</span><br><span class="line">        jedis.lpush(<span class="string">"site-list"</span>, <span class="string">"Google"</span>);</span><br><span class="line">        jedis.lpush(<span class="string">"site-list"</span>, <span class="string">"Taobao"</span>);</span><br><span class="line">        <span class="comment">// 获取存储的数据并输出</span></span><br><span class="line">        List&lt;String&gt; list = jedis.lrange(<span class="string">"site-list"</span>, <span class="number">0</span> ,<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;list.size(); i++) &#123;</span><br><span class="line">            System.out.println(<span class="string">"列表项为: "</span>+list.get(i));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译以上程序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">连接成功</span><br><span class="line">列表项为: Taobao</span><br><span class="line">列表项为: Google</span><br><span class="line">列表项为: Runoob</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-Java-Keys-实例"><a href="#Redis-Java-Keys-实例" class="headerlink" title="Redis Java Keys 实例"></a>Redis Java Keys 实例</h2><h2 id="实例-11"><a href="#实例-11" class="headerlink" title="实例"></a>实例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisKeyJava</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//连接本地的 Redis 服务</span></span><br><span class="line">        Jedis jedis = <span class="keyword">new</span> Jedis(<span class="string">"localhost"</span>);</span><br><span class="line">        System.out.println(<span class="string">"连接成功"</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 获取数据并输出</span></span><br><span class="line">        Set&lt;String&gt; keys = jedis.keys(<span class="string">"*"</span>); </span><br><span class="line">        Iterator&lt;String&gt; it=keys.iterator() ;   </span><br><span class="line">        <span class="keyword">while</span>(it.hasNext())&#123;   </span><br><span class="line">            String key = it.next();   </span><br><span class="line">            System.out.println(key);   </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译以上程序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">连接成功</span><br><span class="line">runoobkey</span><br><span class="line">site-list</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/15/大数据/hdfs/hdfs java api/" rel="next" title="HDFS java api">
+                <i class="fa fa-chevron-left"></i> HDFS java api
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/15/数据库/mysql结构/" rel="prev" title="数据库-mysql">
+                数据库-mysql <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-数据备份与恢复"><span class="nav-number">1.</span> <span class="nav-text">Redis 数据备份与恢复</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">1.0.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">1.0.2.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#恢复数据"><span class="nav-number">1.1.</span> <span class="nav-text">恢复数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bgsave"><span class="nav-number">1.2.</span> <span class="nav-text">Bgsave</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-安全"><span class="nav-number">2.</span> <span class="nav-text">Redis 安全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-2"><span class="nav-number">2.0.1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-1"><span class="nav-number">2.0.2.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-3"><span class="nav-number">2.0.3.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-性能测试"><span class="nav-number">3.</span> <span class="nav-text">Redis 性能测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-2"><span class="nav-number">3.0.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-4"><span class="nav-number">3.0.2.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-5"><span class="nav-number">3.0.3.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-客户端连接"><span class="nav-number">4.</span> <span class="nav-text">Redis 客户端连接</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#最大连接数"><span class="nav-number">4.1.</span> <span class="nav-text">最大连接数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-6"><span class="nav-number">4.1.1.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端命令"><span class="nav-number">4.2.</span> <span class="nav-text">客户端命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-管道技术"><span class="nav-number">5.</span> <span class="nav-text">Redis 管道技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-管道技术-1"><span class="nav-number">5.1.</span> <span class="nav-text">Redis 管道技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-7"><span class="nav-number">5.1.1.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管道技术的优势"><span class="nav-number">5.2.</span> <span class="nav-text">管道技术的优势</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一些测试数据"><span class="nav-number">5.2.1.</span> <span class="nav-text">一些测试数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-分区"><span class="nav-number">6.</span> <span class="nav-text">Redis 分区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分区的优势"><span class="nav-number">6.0.1.</span> <span class="nav-text">分区的优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分区的不足"><span class="nav-number">6.0.2.</span> <span class="nav-text">分区的不足</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分区类型"><span class="nav-number">6.1.</span> <span class="nav-text">分区类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#范围分区"><span class="nav-number">6.1.1.</span> <span class="nav-text">范围分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#哈希分区"><span class="nav-number">6.1.2.</span> <span class="nav-text">哈希分区</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-使用-Redis"><span class="nav-number">7.</span> <span class="nav-text">Java 使用 Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">7.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接到-redis-服务"><span class="nav-number">7.2.</span> <span class="nav-text">连接到 redis 服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-8"><span class="nav-number">7.3.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Java-String-字符串-实例"><span class="nav-number">7.4.</span> <span class="nav-text">Redis Java String(字符串) 实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-9"><span class="nav-number">7.5.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Java-List-列表-实例"><span class="nav-number">7.6.</span> <span class="nav-text">Redis Java List(列表) 实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-10"><span class="nav-number">7.7.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Java-Keys-实例"><span class="nav-number">7.8.</span> <span class="nav-text">Redis Java Keys 实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-11"><span class="nav-number">7.9.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521117985000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

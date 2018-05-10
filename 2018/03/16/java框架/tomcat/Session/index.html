@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="9 Session管理Catalina通过Session管理器来管理建立的Session对象，该组件由org.apache.catalina.Manager接口提供 Session管理器与一个Context容器关联，且必须与一个Context容器关联。Session管理器负责创建、更新、销毁Session对象 默认情况下，Session对象放在内存中，但是，在Tomcat中，也可以做持久化。 9.">
+<meta name="keywords" content="tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tomcat session">
+<meta property="og:url" content="http://hvan.wang/2018/03/16/java框架/tomcat/Session/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="9 Session管理Catalina通过Session管理器来管理建立的Session对象，该组件由org.apache.catalina.Manager接口提供 Session管理器与一个Context容器关联，且必须与一个Context容器关联。Session管理器负责创建、更新、销毁Session对象 默认情况下，Session对象放在内存中，但是，在Tomcat中，也可以做持久化。 9.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3gly1fl3vvj7627j30ks06x0ud.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fl446ig3xkj30l80int9u.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fl44q3tfqmj30lm0chdi4.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fl49ichndrj30j007u74a.jpg">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.164Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tomcat session">
+<meta name="twitter:description" content="9 Session管理Catalina通过Session管理器来管理建立的Session对象，该组件由org.apache.catalina.Manager接口提供 Session管理器与一个Context容器关联，且必须与一个Context容器关联。Session管理器负责创建、更新、销毁Session对象 默认情况下，Session对象放在内存中，但是，在Tomcat中，也可以做持久化。 9.">
+<meta name="twitter:image" content="http://ww1.sinaimg.cn/large/0063bT3gly1fl3vvj7627j30ks06x0ud.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/16/java框架/tomcat/Session/"/>
+
+
+
+
+
+  <title>tomcat session | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java框架/tomcat/Session/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tomcat session</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/" itemprop="url" rel="index">
+                    <span itemprop="name">java框架</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java框架/tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/16/java框架/tomcat/Session/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/java框架/tomcat/Session/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="9-Session管理"><a href="#9-Session管理" class="headerlink" title="9 Session管理"></a>9 Session管理</h1><p>Catalina通过Session管理器来管理建立的Session对象，该组件由org.apache.catalina.Manager接口提供</p>
+<p>Session管理器与一个Context容器关联，且必须与一个Context容器关联。Session管理器负责创建、更新、销毁Session对象</p>
+<p>默认情况下，Session对象放在内存中，但是，在Tomcat中，也可以做持久化。</p>
+<h2 id="9-1-Session对象"><a href="#9-1-Session对象" class="headerlink" title="9.1 Session对象"></a>9.1 Session对象</h2><p>在servlet编程方面中，Session对象由javax.servlet.http.HttpSession接口表示。Catalina的Session接口的实现是StandardSession类，但是为了安全起见，这里使用了一个外观类StandardSessionFacade</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3gly1fl3vvj7627j30ks06x0ud.jpg" alt=""></p>
+<h3 id="9-1-1-Session接口"><a href="#9-1-1-Session接口" class="headerlink" title="9.1.1 Session接口"></a>9.1.1 Session接口</h3><p>session保存了客户端用户请求和Context之间的状态信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Session</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SESSION_CREATED_EVENT = <span class="string">"createSession"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SESSION_DESTROYED_EVENT = <span class="string">"destroySession"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SESSION_ACTIVATED_EVENT = <span class="string">"activateSession"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SESSION_PASSIVATED_EVENT = <span class="string">"passivateSession"</span>;</span><br><span class="line">	<span class="comment">/** 认证类型 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAuthType</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAuthType</span><span class="params">(String authType)</span></span>;</span><br><span class="line">  	<span class="comment">/** 创建时间 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getCreationTime</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getCreationTimeInternal</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCreationTime</span><span class="params">(<span class="keyword">long</span> time)</span></span>;</span><br><span class="line">  	<span class="comment">/** id */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getIdInternal</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** 设置id并通知监听器新的session创建了 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(String id)</span></span>;</span><br><span class="line">  	<span class="comment">/** 设置id并，可选通知监听器新的session创建了 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(String id, <span class="keyword">boolean</span> notify)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getIdInternal</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** 获取最新的请求访问时间（绑定在该Session），请求完成时间 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getThisAccessedTime</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getThisAccessedTimeInternal</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** 获取最新的请求访问时间（绑定在该Session），请求开始时间 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getLastAccessedTime</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getLastAccessedTimeInternal</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** 获取空闲时间 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getIdleTime</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getIdleTimeInternal</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** Manager */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Manager <span class="title">getManager</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setManager</span><span class="params">(Manager manager)</span></span>;    </span><br><span class="line">  	<span class="comment">/** 最大有限时间间隔，单位second */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getMaxInactiveInterval</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMaxInactiveInterval</span><span class="params">(<span class="keyword">int</span> interval)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNew</span><span class="params">(<span class="keyword">boolean</span> isNew)</span></span>;</span><br><span class="line">  	<span class="comment">/** 认证凭证 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Principal <span class="title">getPrincipal</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPrincipal</span><span class="params">(Principal principal)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> HttpSession <span class="title">getSession</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** 有效性 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValid</span><span class="params">(<span class="keyword">boolean</span> isValid)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** Update the accessed time */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">access</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addSessionListener</span><span class="params">(SessionListener listener)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">endAccess</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">expire</span><span class="params">()</span></span>;</span><br><span class="line">  	<span class="comment">/** 绑定的对象 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getNote</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Iterator&lt;String&gt; <span class="title">getNoteNames</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recycle</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeNote</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeSessionListener</span><span class="params">(SessionListener listener)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNote</span><span class="params">(String name, Object value)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">tellChangedSessionId</span><span class="params">(String newId, String oldId, <span class="keyword">boolean</span> notifySessionListeners, <span class="keyword">boolean</span> notifyContainerListeners)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAttributeDistributable</span><span class="params">(String name, Object value)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>上面有四个SessionEvent常量，代表4个事件，用于Session事件监听</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SessionListener</span> <span class="keyword">extends</span> <span class="title">EventListener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionEvent</span><span class="params">(SessionEvent event)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一堆过期，访问等时间</p>
+</li>
+<li><p>XXXNote，Note表示代表绑定在Session上的对象</p>
+</li>
+<li><p>isAttributeDistributable表明还支持分布式</p>
+</li>
+<li><p>XXXInternal与XXX区别在于XXXInternal不做有效性校验</p>
+</li>
+</ul>
+<p>Session对象存在于SessionManager中，而SessionManager关联在Context中。SessionManager通过getLastAccessedTime判断有效性，通过setValid设置有效性。每访问一个Session时，会调用其access来修改Session的最后访问时间。最后SessionManager会调用expire设置为过期，可以通过getSession获取一个经过Session外观类包装的HttpSession对象</p>
+<h3 id="9-1-2-StandardSession"><a href="#9-1-2-StandardSession" class="headerlink" title="9.1.2 StandardSession"></a>9.1.2 StandardSession</h3><p>StandardSession是Session接口的实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StandardSession</span> <span class="keyword">implements</span> <span class="title">HttpSession</span>, <span class="title">Session</span>, <span class="title">Serializable</span></span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>支持序列化，以便支持分布式Session和Session在不同JVM的传输</p>
+</li>
+<li><p>构造器 必须绑定个SessionManager</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">StandardSession</span><span class="params">(Manager manager)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Session属性map</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> ConcurrentMap&lt;String, Object&gt; attributes = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>外观类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">transient</span> StandardSessionFacade facade = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>notesMap ，这里与Session属性map有区别，StandardSession实现了HttpSession接口，attributes用于该接口，而notes用于容器和管理器的一些内容</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">transient</span> Map&lt;String, Object&gt; notes = <span class="keyword">new</span> Hashtable&lt;&gt;();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>getSession返回外观类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> HttpSession <span class="title">getSession</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (facade == <span class="keyword">null</span>)&#123;</span><br><span class="line">		<span class="keyword">if</span> (SecurityUtil.isPackageProtectionEnabled())&#123;</span><br><span class="line">			<span class="keyword">final</span> StandardSession fsession = <span class="keyword">this</span>;</span><br><span class="line">			facade = AccessController.doPrivileged(</span><br><span class="line">					<span class="keyword">new</span> PrivilegedAction&lt;StandardSessionFacade&gt;()&#123;</span><br><span class="line">				<span class="meta">@Override</span></span><br><span class="line">				<span class="function"><span class="keyword">public</span> StandardSessionFacade <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">					<span class="keyword">return</span> <span class="keyword">new</span> StandardSessionFacade(fsession);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			facade = <span class="keyword">new</span> StandardSessionFacade(<span class="keyword">this</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> (facade);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Session长时间未访问会设为过期，这个时间是maxInactiveInterval决定，为负则永不过期。expire用来设置过期</p>
+<ol>
+<li>如果失效则立即返回</li>
+<li>设置 expiring = true</li>
+<li>通知相应监听器，context和session级别的</li>
+<li>SessionManager删除该session</li>
+<li>回收，解除所有绑定，并设置 expiring = false和isValid =false</li>
+</ol>
+</li>
+</ul>
+<h3 id="9-1-3-HttpSession"><a href="#9-1-3-HttpSession" class="headerlink" title="9.1.3 HttpSession"></a>9.1.3 HttpSession</h3><p>servlet容器使用此接口在HTTP客户端和HTTP服务器之间创建会话。 会话在指定的时间段内持续，跨越来自用户的多个连接或页面请求。 会话通常对应一个用户，谁可以访问一个网站多次。 服务器可以通过许多方式维护会话，例如使用Cookie或重写URL。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HttpSession</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getCreationTime</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getLastAccessedTime</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServletContext <span class="title">getServletContext</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMaxInactiveInterval</span><span class="params">(<span class="keyword">int</span> interval)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getMaxInactiveInterval</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="meta">@Deprecated</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HttpSessionContext <span class="title">getSessionContext</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getAttribute</span><span class="params">(String name)</span></span>;</span><br><span class="line">	<span class="meta">@Deprecated</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Enumeration&lt;String&gt; <span class="title">getAttributeNames</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="meta">@Deprecated</span></span><br><span class="line">    <span class="keyword">public</span> String[] getValueNames();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAttribute</span><span class="params">(String name, Object value)</span></span>;</span><br><span class="line">	<span class="meta">@Deprecated</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putValue</span><span class="params">(String name, Object value)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeAttribute</span><span class="params">(String name)</span></span>;</span><br><span class="line">	<span class="meta">@Deprecated</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeValue</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 设置失效</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invalidate</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns &lt;code&gt;true&lt;/code&gt; if the client does not yet know about the</span></span><br><span class="line"><span class="comment">     * session or if the client chooses not to join the session. For example, if</span></span><br><span class="line"><span class="comment">     * the server used only cookie-based sessions, and the client had disabled</span></span><br><span class="line"><span class="comment">     * the use of cookies, then a session would be new on each request.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isNew</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意@Deprecated的方法，被XXXAttribute替代</p>
+<p>如果不支持session则isNew永远返回true</p>
+<h3 id="9-1-4-StandardSessionFacade"><a href="#9-1-4-StandardSessionFacade" class="headerlink" title="9.1.4 StandardSessionFacade"></a>9.1.4 StandardSessionFacade</h3><p>这个类是个外观类，代理了真正的StandardSession，不提供get方法，防止向下转型StandardSession访问敏感方法，如expire等</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StandardSessionFacade</span> <span class="keyword">implements</span> <span class="title">HttpSession</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> HttpSession session;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StandardSessionFacade</span><span class="params">(HttpSession session)</span> 	  </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.session = session;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...........</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="9-2-Manager"><a href="#9-2-Manager" class="headerlink" title="9.2 Manager"></a>9.2 Manager</h2><p>用来管理Session实例</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fl446ig3xkj30l80int9u.jpg" alt=""></p>
+<ul>
+<li>提供了关联Context的方法</li>
+<li>Session的创建删除查找</li>
+<li>设置Session的过期时间，最大活跃数等属性</li>
+<li>load，upload持久化方法</li>
+</ul>
+<p>ManagerBase提供了常用功能的实现，有两个子类，是StandardManager和PersistentManagerBase类</p>
+<p>当Catalina运行是StandardManager将Session保存在内存中，关闭时存储到文件中，当再次启动时，将载入这些Session对象</p>
+<p>PersistentManagerBase支持其他持久化方式的基类</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fl44q3tfqmj30lm0chdi4.jpg" alt=""></p>
+<h3 id="9-2-1-ManagerBase"><a href="#9-2-1-ManagerBase" class="headerlink" title="9.2.1 ManagerBase"></a>9.2.1 ManagerBase</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ManagerBase</span> <span class="keyword">extends</span> <span class="title">LifecycleMBeanBase</span> <span class="keyword">implements</span> <span class="title">Manager</span></span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Context context;</span><br><span class="line">  <span class="keyword">protected</span> SessionIdGenerator sessionIdGenerator = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">volatile</span> <span class="keyword">int</span> sessionMaxAliveTime;</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">final</span> Deque&lt;SessionTiming&gt; sessionCreationTiming =</span><br><span class="line">            <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">final</span> Deque&lt;SessionTiming&gt; sessionExpirationTiming =</span><br><span class="line">            <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">final</span> AtomicLong expiredSessions = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">int</span> maxActiveSessions = -<span class="number">1</span>;</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">volatile</span> <span class="keyword">int</span> maxActive=<span class="number">0</span>;</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">long</span> sessionCounter=<span class="number">0</span>;</span><br><span class="line">  <span class="keyword">private</span> Pattern sessionAttributeNamePattern;</span><br><span class="line">  <span class="keyword">private</span> Pattern sessionAttributeValueClassNamePattern;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">boolean</span> warnOnSessionAttributeFilterFailure;</span><br><span class="line">  <span class="keyword">protected</span> Map&lt;String, Session&gt; sessions = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ManagerBase继承自LifecycleMBeanBase，也是tomcat的组件</p>
+<ul>
+<li>一些Manager需要的状态量</li>
+<li>sessionAttributeValueClassNamePattern等用作Session对属性的过滤器</li>
+<li>sessions保存Session对象</li>
+<li>sessionCreationTiming和sessionExpirationTiming还不懂</li>
+</ul>
+<h4 id="9-2-2-1-Tomcat的Session过期处理策略"><a href="#9-2-2-1-Tomcat的Session过期处理策略" class="headerlink" title="9.2.2.1 Tomcat的Session过期处理策略"></a>9.2.2.1 Tomcat的Session过期处理策略</h4><p>tomcat容器实现类都继承了ContainerBase类,容器在启动的时候都会调用ContainerBase类的threadStart()方法,threadStart()方法如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">threadStart</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (thread != <span class="keyword">null</span>)  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">    <span class="keyword">if</span> (backgroundProcessorDelay &lt;= <span class="number">0</span>)  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">  </span><br><span class="line">    threadDone = <span class="keyword">false</span>;  </span><br><span class="line">    String threadName = <span class="string">"ContainerBackgroundProcessor["</span> + toString() + <span class="string">"]"</span>;  </span><br><span class="line">    thread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> ContainerBackgroundProcessor(), threadName);  </span><br><span class="line">    thread.setDaemon(<span class="keyword">true</span>);  </span><br><span class="line">    thread.start();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>StandardHost,StandardContext,StandardWrapper类的backgroundProcessorDelay的值都为-1,所以ContainerBackgroundProcessor线程都没有启动.而StandardEngine类在创建的时候 将backgroundProcessorDelay 的值设置为10.所以ContainerBackgroundProcessor线程在StandardEngine里启动,ContainerBackgroundProcessor线程代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="class"><span class="keyword">class</span> <span class="title">ContainerBackgroundProcessor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">while</span> (!threadDone) &#123;  </span><br><span class="line">      <span class="keyword">try</span> &#123;  </span><br><span class="line">        Thread.sleep(backgroundProcessorDelay * <span class="number">1000L</span>);  </span><br><span class="line">      &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;  </span><br><span class="line">        ;  </span><br><span class="line">      &#125;  </span><br><span class="line">      <span class="keyword">if</span> (!threadDone) &#123;  </span><br><span class="line">        Container parent = (Container) getMappingObject();<span class="comment">//得到StandardEngine  </span></span><br><span class="line">        ClassLoader cl =   </span><br><span class="line">          Thread.currentThread().getContextClassLoader();  </span><br><span class="line">        <span class="keyword">if</span> (parent.getLoader() != <span class="keyword">null</span>) &#123;  </span><br><span class="line">          cl = parent.getLoader().getClassLoader();  </span><br><span class="line">        &#125;  </span><br><span class="line">        processChildren(parent, cl);  </span><br><span class="line">      &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">processChildren</span><span class="params">(Container container, ClassLoader cl)</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">      <span class="keyword">if</span> (container.getLoader() != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        Thread.currentThread().setContextClassLoader  </span><br><span class="line">          (container.getLoader().getClassLoader());  </span><br><span class="line">      &#125;  </span><br><span class="line">      container.backgroundProcess();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;  </span><br><span class="line">      log.error(<span class="string">"Exception invoking periodic operation: "</span>, t);  </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;  </span><br><span class="line">      Thread.currentThread().setContextClassLoader(cl);  </span><br><span class="line">    &#125;  </span><br><span class="line">    Container[] children = container.findChildren();  </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; children.length; i++) &#123;  </span><br><span class="line">      <span class="keyword">if</span> (children[i].getBackgroundProcessorDelay() &lt;= <span class="number">0</span>) &#123;  </span><br><span class="line">        processChildren(children[i], cl);  </span><br><span class="line">      &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ContainerBackgroundProcessor每隔10秒执行一下线程,线程递归调用StandardEngine,StandardHost,StandardContext,StandardWrapper类的backgroundProcess()方法(backgroundProcess()方法在ContainerBase类中)</p>
+<p>backgroundProcess()方法如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backgroundProcess</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">      </span><br><span class="line">    <span class="keyword">if</span> (!started)  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (cluster != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            cluster.backgroundProcess();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            log.warn(sm.getString(<span class="string">"containerBase.backgroundProcess.cluster"</span>, cluster), e);                  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">if</span> (loader != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            loader.backgroundProcess();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            log.warn(sm.getString(<span class="string">"containerBase.backgroundProcess.loader"</span>, loader), e);                  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">if</span> (manager != <span class="keyword">null</span>) &#123;<span class="comment">//manager的实现类StandardManager  </span></span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            manager.backgroundProcess();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            log.warn(sm.getString(<span class="string">"containerBase.backgroundProcess.manager"</span>, manager), e);                  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">if</span> (realm != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            realm.backgroundProcess();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            log.warn(sm.getString(<span class="string">"containerBase.backgroundProcess.realm"</span>, realm), e);                  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    Valve current = pipeline.getFirst();  </span><br><span class="line">    <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            current.backgroundProcess();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            log.warn(sm.getString(<span class="string">"containerBase.backgroundProcess.valve"</span>, current), e);                  </span><br><span class="line">        &#125;  </span><br><span class="line">        current = current.getNext();  </span><br><span class="line">    &#125;  </span><br><span class="line">    lifecycle.fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, <span class="keyword">null</span>);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在调用StandContext类的backgroundProcess()方法时, 会调用StandardManager的backgroundProcess()方法,该方法如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backgroundProcess</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    count = (count + <span class="number">1</span>) % processExpiresFrequency;  </span><br><span class="line">    <span class="keyword">if</span> (count == <span class="number">0</span>)  </span><br><span class="line">        processExpires();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>processExpiresFrequency的默认值为6,所以每6*10秒会调一次processExpires()方法,processExpires()方法如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">processExpires</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">long</span> timeNow = System.currentTimeMillis();  </span><br><span class="line">    Session sessions[] = findSessions();  </span><br><span class="line">    <span class="keyword">int</span> expireHere = <span class="number">0</span> ;  </span><br><span class="line">      </span><br><span class="line">    <span class="keyword">if</span>(log.isDebugEnabled())  </span><br><span class="line">        log.debug(<span class="string">"Start expire sessions "</span> + getName() + <span class="string">" at "</span> + timeNow + <span class="string">" sessioncount "</span> + sessions.length);  </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sessions.length; i++) &#123;  </span><br><span class="line">        <span class="keyword">if</span> (sessions[i]!=<span class="keyword">null</span> &amp;&amp; !sessions[i].isValid()) &#123;<span class="comment">//判断session是否有效,无效则清除  </span></span><br><span class="line">            expireHere++;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">long</span> timeEnd = System.currentTimeMillis();  </span><br><span class="line">    <span class="keyword">if</span>(log.isDebugEnabled())  </span><br><span class="line">         log.debug(<span class="string">"End expire sessions "</span> + getName() + <span class="string">" processingTime "</span> + (timeEnd - timeNow) + <span class="string">" expired sessions: "</span> + expireHere);  </span><br><span class="line">    processingTime += ( timeEnd - timeNow );  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方法主要判断session是否过期,过期则清除.</p>
+<p>整个过程看起来有点复杂,简单地来说,就是tomcat服务器在启动的时候初始化了一个守护线程,定期6*10秒去检查有没有Session过期.过期则清除.</p>
+<h3 id="9-2-3-StandardManager"><a href="#9-2-3-StandardManager" class="headerlink" title="9.2.3 StandardManager"></a>9.2.3 StandardManager</h3><p>StandardManager主要提供了持久化功能，在canalina启动或关闭时，会调用它的stop和start方法（继承至LifecycleMBeanBase），关闭时会在work目录下生成个SESSION.ser文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StandardManager</span> <span class="keyword">extends</span> <span class="title">ManagerBase</span> </span>&#123;</span><br><span class="line">  <span class="keyword">protected</span> String pathname = <span class="string">"SESSIONS.ser"</span>;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要定义了load，unload， stopInternal，startInternal方法</p>
+<h3 id="9-2-4-PersistentManagerBase"><a href="#9-2-4-PersistentManagerBase" class="headerlink" title="9.2.4 PersistentManagerBase"></a>9.2.4 PersistentManagerBase</h3><p>是所有持久化Session管理器的父类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">PersistentManagerBase</span> <span class="keyword">extends</span> <span class="title">ManagerBase</span> <span class="keyword">implements</span> <span class="title">StoreManager</span></span>&#123;</span><br><span class="line">      <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Store object which will manage the Session store.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> Store store = <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对Session的增删改查都是通过Story接口</p>
+<h4 id="9-2-4-1-StoreManager接口"><a href="#9-2-4-1-StoreManager接口" class="headerlink" title="9.2.4.1 StoreManager接口"></a>9.2.4.1 StoreManager接口</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">StoreManager</span> <span class="keyword">extends</span> <span class="title">DistributedManager</span> </span>&#123;</span><br><span class="line">    <span class="function">Store <span class="title">getStore</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">removeSuper</span><span class="params">(Session session)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="9-2-4-2-Store接口"><a href="#9-2-4-2-Store接口" class="headerlink" title="9.2.4.2 Store接口"></a>9.2.4.2 Store接口</h4><p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fl49ichndrj30j007u74a.jpg" alt=""></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Store</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Manager <span class="title">getManager</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setManager</span><span class="params">(Manager manager)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSize</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addPropertyChangeListener</span><span class="params">(PropertyChangeListener listener)</span></span>;</span><br><span class="line">    <span class="keyword">public</span> String[] keys() <span class="keyword">throws</span> IOException;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Session <span class="title">load</span><span class="params">(String id)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> ClassNotFoundException, IOException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String id)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removePropertyChangeListener</span><span class="params">(PropertyChangeListener listener)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(Session session)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>StoreBase</strong></p>
+<p>子类StoreBase也是组件，通过processExpires处理过期数据</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">StoreBase</span> <span class="keyword">extends</span> <span class="title">LifecycleBase</span> <span class="keyword">implements</span> <span class="title">Store</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>FileStore</strong></p>
+<p>FileStore是文件处理，下面是save和remove操作，一个id对应一个文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(Session session)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="comment">// Open an output stream to the specified pathname, if any</span></span><br><span class="line">  File file = file(session.getIdInternal());</span><br><span class="line">  <span class="keyword">if</span> (file == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (manager.getContext().getLogger().isDebugEnabled()) &#123;</span><br><span class="line">    manager.getContext().getLogger().debug(sm.getString(getStoreName() + <span class="string">".saving"</span>,</span><br><span class="line">                                                        session.getIdInternal(), file.getAbsolutePath()));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> (FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(file.getAbsolutePath());</span><br><span class="line">       ObjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> BufferedOutputStream(fos))) &#123;</span><br><span class="line">    ((StandardSession)session).writeObjectData(oos);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String id)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  File file = file(id);</span><br><span class="line">  <span class="keyword">if</span> (file == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  file.delete();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>JdbcStore</strong> </p>
+<p>通过jdbc的方式，以remove为例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String id)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">    <span class="keyword">int</span> numberOfTries = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">while</span> (numberOfTries &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      Connection _conn = getConnection();</span><br><span class="line">      <span class="keyword">if</span> (_conn == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        remove(id, _conn);</span><br><span class="line">        <span class="comment">// Break out after the finally block</span></span><br><span class="line">        numberOfTries = <span class="number">0</span>;</span><br><span class="line">      &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">        <span class="keyword">if</span> (dbConnection != <span class="keyword">null</span>)</span><br><span class="line">          close(dbConnection);</span><br><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        release(_conn);</span><br><span class="line">      &#125;</span><br><span class="line">      numberOfTries--;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String id, Connection _conn)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (preparedRemoveSql == <span class="keyword">null</span>) &#123;</span><br><span class="line">    String removeSql = <span class="string">"DELETE FROM "</span> + sessionTable</span><br><span class="line">      + <span class="string">" WHERE "</span> + sessionIdCol + <span class="string">" = ?  AND "</span></span><br><span class="line">      + sessionAppCol + <span class="string">" = ?"</span>;</span><br><span class="line">    preparedRemoveSql = _conn.prepareStatement(removeSql);</span><br><span class="line">  &#125;</span><br><span class="line">  preparedRemoveSql.setString(<span class="number">1</span>, id);</span><br><span class="line">  preparedRemoveSql.setString(<span class="number">2</span>, getName());</span><br><span class="line">  preparedRemoveSql.execute();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tomcat/" rel="tag"># tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/java框架/tomcat/服务器组件/" rel="next" title="tomcat 服务器组件和服务组件">
+                <i class="fa fa-chevron-left"></i> tomcat 服务器组件和服务组件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/java框架/tomcat/生命周期/" rel="prev" title="tomcat 生命周期">
+                tomcat 生命周期 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#9-Session管理"><span class="nav-number">1.</span> <span class="nav-text">9 Session管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#9-1-Session对象"><span class="nav-number">1.1.</span> <span class="nav-text">9.1 Session对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-1-Session接口"><span class="nav-number">1.1.1.</span> <span class="nav-text">9.1.1 Session接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-2-StandardSession"><span class="nav-number">1.1.2.</span> <span class="nav-text">9.1.2 StandardSession</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-3-HttpSession"><span class="nav-number">1.1.3.</span> <span class="nav-text">9.1.3 HttpSession</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-4-StandardSessionFacade"><span class="nav-number">1.1.4.</span> <span class="nav-text">9.1.4 StandardSessionFacade</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-2-Manager"><span class="nav-number">1.2.</span> <span class="nav-text">9.2 Manager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#9-2-1-ManagerBase"><span class="nav-number">1.2.1.</span> <span class="nav-text">9.2.1 ManagerBase</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#9-2-2-1-Tomcat的Session过期处理策略"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">9.2.2.1 Tomcat的Session过期处理策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-2-3-StandardManager"><span class="nav-number">1.2.2.</span> <span class="nav-text">9.2.3 StandardManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-2-4-PersistentManagerBase"><span class="nav-number">1.2.3.</span> <span class="nav-text">9.2.4 PersistentManagerBase</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#9-2-4-1-StoreManager接口"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">9.2.4.1 StoreManager接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-2-4-2-Store接口"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">9.2.4.2 Store接口</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521160105000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="redis,HyperLogLog," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Redis HyperLogLogRedis 在 2.8.9 版本添加了 HyperLogLog 结构。 Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。 在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同">
+<meta name="keywords" content="redis,HyperLogLog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis HyperLogLog基数统计">
+<meta property="og:url" content="http://hvan.wang/2018/03/15/redis/HyperLogLog-发布订阅-事务-连接-服务器/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="Redis HyperLogLogRedis 在 2.8.9 版本添加了 HyperLogLog 结构。 Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。 在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-28T16:50:59.177Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis HyperLogLog基数统计">
+<meta name="twitter:description" content="Redis HyperLogLogRedis 在 2.8.9 版本添加了 HyperLogLog 结构。 Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。 在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/03/15/redis/HyperLogLog-发布订阅-事务-连接-服务器/"/>
+
+
+
+
+
+  <title>Redis HyperLogLog基数统计 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/15/redis/HyperLogLog-发布订阅-事务-连接-服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis HyperLogLog基数统计</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T20:46:25+08:00">
+                2018-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/15/redis/HyperLogLog-发布订阅-事务-连接-服务器/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/15/redis/HyperLogLog-发布订阅-事务-连接-服务器/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Redis-HyperLogLog"><a href="#Redis-HyperLogLog" class="headerlink" title="Redis HyperLogLog"></a>Redis HyperLogLog</h1><p>Redis 在 2.8.9 版本添加了 HyperLogLog 结构。</p>
+<p>Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。</p>
+<p>在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基 数。这和计算基数时，元素越多耗费内存就越多的集合形成鲜明对比。</p>
+<p>但是，因为 HyperLogLog 只会根据输入元素来计算基数，而不会储存输入元素本身，所以 HyperLogLog 不能像集合那样，返回输入的各个元素。</p>
+<h2 id="什么是基数"><a href="#什么是基数" class="headerlink" title="什么是基数?"></a>什么是基数?</h2><p>比如数据集 {1, 3, 5, 7, 5, 7, 8}， 那么这个数据集的基数集为 {1, 3, 5 ,7, 8}, 基数(不重复元素)为5。 基数估计就是在误差可接受的范围内，快速计算基数。</p>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>以下实例演示了 HyperLogLog 的工作过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; PFADD runoobkey &quot;redis&quot;</span><br><span class="line"></span><br><span class="line">1) (integer) 1</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; PFADD runoobkey &quot;mongodb&quot;</span><br><span class="line"></span><br><span class="line">1) (integer) 1</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; PFADD runoobkey &quot;mysql&quot;</span><br><span class="line"></span><br><span class="line">1) (integer) 1</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; PFCOUNT runoobkey</span><br><span class="line"></span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-HyperLogLog-命令"><a href="#Redis-HyperLogLog-命令" class="headerlink" title="Redis HyperLogLog 命令"></a>Redis HyperLogLog 命令</h2><p>下表列出了 redis HyperLogLog 的基本命令：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>命令及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="http://www.runoob.com/redis/hyperloglog-pfadd.html" target="_blank" rel="noopener">PFADD key element [element …]</a> 添加指定元素到 HyperLogLog 中。</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="http://www.runoob.com/redis/hyperloglog-pfcount.html" target="_blank" rel="noopener">PFCOUNT key [key …]</a> 返回给定 HyperLogLog 的基数估算值。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="http://www.runoob.com/redis/hyperloglog-pfmerge.html" target="_blank" rel="noopener">PFMERGE destkey sourcekey [sourcekey …]</a> 将多个 HyperLogLog 合并为一个 HyperLogLog</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Redis-发布订阅"><a href="#Redis-发布订阅" class="headerlink" title="Redis 发布订阅"></a>Redis 发布订阅</h1><p>Redis 发布订阅(pub/sub)是一种消息通信模式：发送者(pub)发送消息，订阅者(sub)接收消息。</p>
+<p>Redis 客户端可以订阅任意数量的频道。</p>
+<p>下图展示了频道 channel1 ， 以及订阅这个频道的三个客户端 —— client2 、 client5 和 client1 之间的关系：</p>
+<p>当有新消息通过 PUBLISH 命令发送给频道 channel1 时， 这个消息就会被发送给订阅它的三个客户端：</p>
+<hr>
+<h2 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h2><p>以下实例演示了发布订阅是如何工作的。在我们实例中我们创建了订阅频道名为 <strong>redisChat</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; SUBSCRIBE redisChat</span><br><span class="line"></span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;subscribe&quot;</span><br><span class="line">2) &quot;redisChat&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
+<p>现在，我们先重新开启个 redis 客户端，然后在同一个频道 redisChat 发布两次消息，订阅者就能接收到消息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; PUBLISH redisChat &quot;Redis is a great caching technique&quot;</span><br><span class="line"></span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; PUBLISH redisChat &quot;Learn redis by runoob.com&quot;</span><br><span class="line"></span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line"># 订阅者的客户端会显示如下消息</span><br><span class="line">1) &quot;message&quot;</span><br><span class="line">2) &quot;redisChat&quot;</span><br><span class="line">3) &quot;Redis is a great caching technique&quot;</span><br><span class="line">1) &quot;message&quot;</span><br><span class="line">2) &quot;redisChat&quot;</span><br><span class="line">3) &quot;Learn redis by runoob.com&quot;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-发布订阅命令"><a href="#Redis-发布订阅命令" class="headerlink" title="Redis 发布订阅命令"></a>Redis 发布订阅命令</h2><p>下表列出了 redis 发布订阅常用命令：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>命令及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="http://www.runoob.com/redis/pub-sub-psubscribe.html" target="_blank" rel="noopener">PSUBSCRIBE pattern [pattern …]</a> 订阅一个或多个符合给定模式的频道。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>[PUBSUB subcommand <a href="http://www.runoob.com/redis/pub-sub-pubsub.html" target="_blank" rel="noopener">argument [argument …]]</a> 查看订阅与发布系统状态。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="http://www.runoob.com/redis/pub-sub-publish.html" target="_blank" rel="noopener">PUBLISH channel message</a> 将信息发送到指定的频道。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>[PUNSUBSCRIBE <a href="http://www.runoob.com/redis/pub-sub-punsubscribe.html" target="_blank" rel="noopener">pattern [pattern …]]</a> 退订所有给定模式的频道。</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="http://www.runoob.com/redis/pub-sub-subscribe.html" target="_blank" rel="noopener">SUBSCRIBE channel [channel …]</a> 订阅给定的一个或多个频道的信息。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>[UNSUBSCRIBE <a href="http://www.runoob.com/redis/pub-sub-unsubscribe.html" target="_blank" rel="noopener">channel [channel …]]</a> 指退订给定的频道。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Redis-事务"><a href="#Redis-事务" class="headerlink" title="Redis 事务"></a>Redis 事务</h1><p>Redis 事务可以一次执行多个命令， 并且带有以下两个重要的保证：</p>
+<ul>
+<li>事务是一个单独的隔离操作：事务中的所有命令都会序列化、按顺序地执行。事务在执行的过程中，不会被其他客户端发送来的命令请求所打断。</li>
+<li>事务是一个原子操作：事务中的命令要么全部被执行，要么全部都不执行。</li>
+</ul>
+<p>一个事务从开始到执行会经历以下三个阶段：</p>
+<ul>
+<li>开始事务。</li>
+<li>命令入队。</li>
+<li>执行事务。</li>
+</ul>
+<hr>
+<h2 id="实例-2"><a href="#实例-2" class="headerlink" title="实例"></a>实例</h2><p>以下是一个事务的例子， 它先以 <strong>MULTI</strong> 开始一个事务， 然后将多个命令入队到事务中， 最后由 <strong>EXEC</strong> 命令触发事务， 一并执行事务中的所有命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; SET book-name &quot;Mastering C++ in 21 days&quot;</span><br><span class="line">QUEUED</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; GET book-name</span><br><span class="line">QUEUED</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; SADD tag &quot;C++&quot; &quot;Programming&quot; &quot;Mastering Series&quot;</span><br><span class="line">QUEUED</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; SMEMBERS tag</span><br><span class="line">QUEUED</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; EXEC</span><br><span class="line">1) OK</span><br><span class="line">2) &quot;Mastering C++ in 21 days&quot;</span><br><span class="line">3) (integer) 3</span><br><span class="line">4) 1) &quot;Mastering Series&quot;</span><br><span class="line">   2) &quot;C++&quot;</span><br><span class="line">   3) &quot;Programming&quot;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-事务命令"><a href="#Redis-事务命令" class="headerlink" title="Redis 事务命令"></a>Redis 事务命令</h2><p>下表列出了 redis 事务的相关命令：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>命令及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="http://www.runoob.com/redis/transactions-discard.html" target="_blank" rel="noopener">DISCARD</a> 取消事务，放弃执行事务块内的所有命令。</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="http://www.runoob.com/redis/transactions-exec.html" target="_blank" rel="noopener">EXEC</a> 执行所有事务块内的命令。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="http://www.runoob.com/redis/transactions-multi.html" target="_blank" rel="noopener">MULTI</a> 标记一个事务块的开始。</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="http://www.runoob.com/redis/transactions-unwatch.html" target="_blank" rel="noopener">UNWATCH</a> 取消 WATCH 命令对所有 key 的监视。</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="http://www.runoob.com/redis/transactions-watch.html" target="_blank" rel="noopener">WATCH key [key …]</a> 监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Redis-脚本"><a href="#Redis-脚本" class="headerlink" title="Redis 脚本"></a>Redis 脚本</h1><p>Redis 脚本使用 Lua 解释器来执行脚本。 Reids 2.6 版本通过内嵌支持 Lua 环境。执行脚本的常用命令为 <strong>EVAL</strong>。</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>Eval 命令的基本语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; EVAL script numkeys key [key ...] arg [arg ...]</span><br></pre></td></tr></table></figure>
+<h3 id="实例-3"><a href="#实例-3" class="headerlink" title="实例"></a>实例</h3><p>以下实例演示了 redis 脚本工作过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; EVAL &quot;return &#123;KEYS[1],KEYS[2],ARGV[1],ARGV[2]&#125;&quot; 2 key1 key2 first second</span><br><span class="line"></span><br><span class="line">1) &quot;key1&quot;</span><br><span class="line">2) &quot;key2&quot;</span><br><span class="line">3) &quot;first&quot;</span><br><span class="line">4) &quot;second&quot;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-脚本命令"><a href="#Redis-脚本命令" class="headerlink" title="Redis 脚本命令"></a>Redis 脚本命令</h2><p>下表列出了 redis 脚本常用命令：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>命令及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="http://www.runoob.com/redis/scripting-eval.html" target="_blank" rel="noopener">EVAL script numkeys key [key …] arg [arg …]</a> 执行 Lua 脚本。</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="http://www.runoob.com/redis/scripting-evalsha.html" target="_blank" rel="noopener">EVALSHA sha1 numkeys key [key …] arg [arg …]</a> 执行 Lua 脚本。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="http://www.runoob.com/redis/scripting-script-exists.html" target="_blank" rel="noopener">SCRIPT EXISTS script [script …]</a> 查看指定的脚本是否已经被保存在缓存当中。</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="http://www.runoob.com/redis/scripting-script-flush.html" target="_blank" rel="noopener">SCRIPT FLUSH</a> 从脚本缓存中移除所有脚本。</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="http://www.runoob.com/redis/scripting-script-kill.html" target="_blank" rel="noopener">SCRIPT KILL</a> 杀死当前正在运行的 Lua 脚本。</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="http://www.runoob.com/redis/scripting-script-load.html" target="_blank" rel="noopener">SCRIPT LOAD script</a> 将脚本 script 添加到脚本缓存中，但并不立即执行这个脚本。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Redis-连接"><a href="#Redis-连接" class="headerlink" title="Redis 连接"></a>Redis 连接</h1><p>Redis 连接命令主要是用于连接 redis 服务。</p>
+<h3 id="实例-4"><a href="#实例-4" class="headerlink" title="实例"></a>实例</h3><p>以下实例演示了客户端如何通过密码验证连接到 redis 服务，并检测服务是否在运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; AUTH &quot;password&quot;</span><br><span class="line">OK</span><br><span class="line">redis 127.0.0.1:6379&gt; PING</span><br><span class="line">PONG</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-连接命令"><a href="#Redis-连接命令" class="headerlink" title="Redis 连接命令"></a>Redis 连接命令</h2><p>下表列出了 redis 连接的基本命令：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>命令及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="http://www.runoob.com/redis/connection-auth.html" target="_blank" rel="noopener">AUTH password</a> 验证密码是否正确</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="http://www.runoob.com/redis/connection-echo.html" target="_blank" rel="noopener">ECHO message</a> 打印字符串</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="http://www.runoob.com/redis/connection-ping.html" target="_blank" rel="noopener">PING</a> 查看服务是否运行</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="http://www.runoob.com/redis/connection-quit.html" target="_blank" rel="noopener">QUIT</a> 关闭当前连接</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="http://www.runoob.com/redis/connection-select.html" target="_blank" rel="noopener">SELECT index</a> 切换到指定的数据库</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Redis-服务器"><a href="#Redis-服务器" class="headerlink" title="Redis 服务器"></a>Redis 服务器</h1><p>Redis 服务器命令主要是用于管理 redis 服务。</p>
+<h3 id="实例-5"><a href="#实例-5" class="headerlink" title="实例"></a>实例</h3><p>以下实例演示了如何获取 redis 服务器的统计信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; INFO</span><br><span class="line"></span><br><span class="line"># Server</span><br><span class="line">redis_version:2.8.13</span><br><span class="line">redis_git_sha1:00000000</span><br><span class="line">redis_git_dirty:0</span><br><span class="line">redis_build_id:c2238b38b1edb0e2</span><br><span class="line">redis_mode:standalone</span><br><span class="line">os:Linux 3.5.0-48-generic x86_64</span><br><span class="line">arch_bits:64</span><br><span class="line">multiplexing_api:epoll</span><br><span class="line">gcc_version:4.7.2</span><br><span class="line">process_id:3856</span><br><span class="line">run_id:0e61abd297771de3fe812a3c21027732ac9f41fe</span><br><span class="line">tcp_port:6379</span><br><span class="line">uptime_in_seconds:11554</span><br><span class="line">uptime_in_days:0</span><br><span class="line">hz:10</span><br><span class="line">lru_clock:16651447</span><br><span class="line">config_file:</span><br><span class="line"></span><br><span class="line"># Clients</span><br><span class="line">connected_clients:1</span><br><span class="line">client-longest_output_list:0</span><br><span class="line">client-biggest_input_buf:0</span><br><span class="line">blocked_clients:0</span><br><span class="line"></span><br><span class="line"># Memory</span><br><span class="line">used_memory:589016</span><br><span class="line">used_memory_human:575.21K</span><br><span class="line">used_memory_rss:2461696</span><br><span class="line">used_memory_peak:667312</span><br><span class="line">used_memory_peak_human:651.67K</span><br><span class="line">used_memory_lua:33792</span><br><span class="line">mem_fragmentation_ratio:4.18</span><br><span class="line">mem_allocator:jemalloc-3.6.0</span><br><span class="line"></span><br><span class="line"># Persistence</span><br><span class="line">loading:0</span><br><span class="line">rdb_changes_since_last_save:3</span><br><span class="line">rdb_bgsave_in_progress:0</span><br><span class="line">rdb_last_save_time:1409158561</span><br><span class="line">rdb_last_bgsave_status:ok</span><br><span class="line">rdb_last_bgsave_time_sec:0</span><br><span class="line">rdb_current_bgsave_time_sec:-1</span><br><span class="line">aof_enabled:0</span><br><span class="line">aof_rewrite_in_progress:0</span><br><span class="line">aof_rewrite_scheduled:0</span><br><span class="line">aof_last_rewrite_time_sec:-1</span><br><span class="line">aof_current_rewrite_time_sec:-1</span><br><span class="line">aof_last_bgrewrite_status:ok</span><br><span class="line">aof_last_write_status:ok</span><br><span class="line"></span><br><span class="line"># Stats</span><br><span class="line">total_connections_received:24</span><br><span class="line">total_commands_processed:294</span><br><span class="line">instantaneous_ops_per_sec:0</span><br><span class="line">rejected_connections:0</span><br><span class="line">sync_full:0</span><br><span class="line">sync_partial_ok:0</span><br><span class="line">sync_partial_err:0</span><br><span class="line">expired_keys:0</span><br><span class="line">evicted_keys:0</span><br><span class="line">keyspace_hits:41</span><br><span class="line">keyspace_misses:82</span><br><span class="line">pubsub_channels:0</span><br><span class="line">pubsub_patterns:0</span><br><span class="line">latest_fork_usec:264</span><br><span class="line"></span><br><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_repl_offset:0</span><br><span class="line">repl_backlog_active:0</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:0</span><br><span class="line">repl_backlog_histlen:0</span><br><span class="line"></span><br><span class="line"># CPU</span><br><span class="line">used_cpu_sys:10.49</span><br><span class="line">used_cpu_user:4.96</span><br><span class="line">used_cpu_sys_children:0.00</span><br><span class="line">used_cpu_user_children:0.01</span><br><span class="line"></span><br><span class="line"># Keyspace</span><br><span class="line">db0:keys=94,expires=1,avg_ttl=41638810</span><br><span class="line">db1:keys=1,expires=0,avg_ttl=0</span><br><span class="line">db3:keys=1,expires=0,avg_ttl=0</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Redis-服务器命令"><a href="#Redis-服务器命令" class="headerlink" title="Redis 服务器命令"></a>Redis 服务器命令</h2><p>下表列出了 redis 服务器的相关命令:</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>命令及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="http://www.runoob.com/redis/server-bgrewriteaof.html" target="_blank" rel="noopener">BGREWRITEAOF</a> 异步执行一个 AOF（AppendOnly File） 文件重写操作</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="http://www.runoob.com/redis/server-bgsave.html" target="_blank" rel="noopener">BGSAVE</a> 在后台异步保存当前数据库的数据到磁盘</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="http://www.runoob.com/redis/server-client-kill.html" target="_blank" rel="noopener">CLIENT KILL [ip:port] [ID client-id]</a> 关闭客户端连接</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="http://www.runoob.com/redis/server-client-list.html" target="_blank" rel="noopener">CLIENT LIST</a> 获取连接到服务器的客户端连接列表</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="http://www.runoob.com/redis/server-client-getname.html" target="_blank" rel="noopener">CLIENT GETNAME</a> 获取连接的名称</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="http://www.runoob.com/redis/server-client-pause.html" target="_blank" rel="noopener">CLIENT PAUSE timeout</a> 在指定时间内终止运行来自客户端的命令</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="http://www.runoob.com/redis/server-client-setname.html" target="_blank" rel="noopener">CLIENT SETNAME connection-name</a> 设置当前连接的名称</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="http://www.runoob.com/redis/server-cluster-slots.html" target="_blank" rel="noopener">CLUSTER SLOTS</a> 获取集群节点的映射数组</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a href="http://www.runoob.com/redis/server-command.html" target="_blank" rel="noopener">COMMAND</a> 获取 Redis 命令详情数组</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="http://www.runoob.com/redis/server-command-count.html" target="_blank" rel="noopener">COMMAND COUNT</a> 获取 Redis 命令总数</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="http://www.runoob.com/redis/server-command-getkeys.html" target="_blank" rel="noopener">COMMAND GETKEYS</a> 获取给定命令的所有键</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="http://www.runoob.com/redis/server-time.html" target="_blank" rel="noopener">TIME</a> 返回当前服务器时间</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="http://www.runoob.com/redis/server-command-info.html" target="_blank" rel="noopener">COMMAND INFO command-name [command-name …]</a> 获取指定 Redis 命令描述的数组</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="http://www.runoob.com/redis/server-config-get.html" target="_blank" rel="noopener">CONFIG GET parameter</a> 获取指定配置参数的值</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="http://www.runoob.com/redis/server-config-rewrite.html" target="_blank" rel="noopener">CONFIG REWRITE</a> 对启动 Redis 服务器时所指定的 redis.conf 配置文件进行改写</td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="http://www.runoob.com/redis/server-config-set.html" target="_blank" rel="noopener">CONFIG SET parameter value</a> 修改 redis 配置参数，无需重启</td>
+</tr>
+<tr>
+<td>17</td>
+<td><a href="http://www.runoob.com/redis/server-config-resetstat.html" target="_blank" rel="noopener">CONFIG RESETSTAT</a> 重置 INFO 命令中的某些统计数据</td>
+</tr>
+<tr>
+<td>18</td>
+<td><a href="http://www.runoob.com/redis/server-dbsize.html" target="_blank" rel="noopener">DBSIZE</a> 返回当前数据库的 key 的数量</td>
+</tr>
+<tr>
+<td>19</td>
+<td><a href="http://www.runoob.com/redis/server-debug-object.html" target="_blank" rel="noopener">DEBUG OBJECT key</a> 获取 key 的调试信息</td>
+</tr>
+<tr>
+<td>20</td>
+<td><a href="http://www.runoob.com/redis/server-debug-segfault.html" target="_blank" rel="noopener">DEBUG SEGFAULT</a> 让 Redis 服务崩溃</td>
+</tr>
+<tr>
+<td>21</td>
+<td><a href="http://www.runoob.com/redis/server-flushall.html" target="_blank" rel="noopener">FLUSHALL</a> 删除所有数据库的所有key</td>
+</tr>
+<tr>
+<td>22</td>
+<td><a href="http://www.runoob.com/redis/server-flushdb.html" target="_blank" rel="noopener">FLUSHDB</a> 删除当前数据库的所有key</td>
+</tr>
+<tr>
+<td>23</td>
+<td><a href="http://www.runoob.com/redis/server-info.html" target="_blank" rel="noopener">INFO [section]</a> 获取 Redis 服务器的各种信息和统计数值</td>
+</tr>
+<tr>
+<td>24</td>
+<td><a href="http://www.runoob.com/redis/server-lastsave.html" target="_blank" rel="noopener">LASTSAVE</a> 返回最近一次 Redis 成功将数据保存到磁盘上的时间，以 UNIX 时间戳格式表示</td>
+</tr>
+<tr>
+<td>25</td>
+<td><a href="http://www.runoob.com/redis/server-monitor.html" target="_blank" rel="noopener">MONITOR</a> 实时打印出 Redis 服务器接收到的命令，调试用</td>
+</tr>
+<tr>
+<td>26</td>
+<td><a href="http://www.runoob.com/redis/server-role.html" target="_blank" rel="noopener">ROLE</a> 返回主从实例所属的角色</td>
+</tr>
+<tr>
+<td>27</td>
+<td><a href="http://www.runoob.com/redis/server-save.html" target="_blank" rel="noopener">SAVE</a> 异步保存数据到硬盘</td>
+</tr>
+<tr>
+<td>28</td>
+<td><a href="http://www.runoob.com/redis/server-shutdown.html" target="_blank" rel="noopener">SHUTDOWN [NOSAVE] [SAVE]</a> 异步保存数据到硬盘，并关闭服务器</td>
+</tr>
+<tr>
+<td>29</td>
+<td><a href="http://www.runoob.com/redis/server-slaveof.html" target="_blank" rel="noopener">SLAVEOF host port</a> 将当前服务器转变为指定服务器的从属服务器(slave server)</td>
+</tr>
+<tr>
+<td>30</td>
+<td><a href="http://www.runoob.com/redis/server-showlog.html" target="_blank" rel="noopener">SLOWLOG subcommand [argument]</a> 管理 redis 的慢日志</td>
+</tr>
+<tr>
+<td>31</td>
+<td><a href="http://www.runoob.com/redis/server-sync.html" target="_blank" rel="noopener">SYNC</a> 用于复制功能(replication)的内部命令</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+            <a href="/tags/HyperLogLog/" rel="tag"># HyperLogLog</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/15/redis/简介/" rel="next" title="Redis 简介">
+                <i class="fa fa-chevron-left"></i> Redis 简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/15/redis/数据类型/" rel="prev" title="Redis数据类型">
+                Redis数据类型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-HyperLogLog"><span class="nav-number">1.</span> <span class="nav-text">Redis HyperLogLog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是基数"><span class="nav-number">1.1.</span> <span class="nav-text">什么是基数?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例"><span class="nav-number">1.2.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-HyperLogLog-命令"><span class="nav-number">1.3.</span> <span class="nav-text">Redis HyperLogLog 命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-发布订阅"><span class="nav-number">2.</span> <span class="nav-text">Redis 发布订阅</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-1"><span class="nav-number">2.1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-发布订阅命令"><span class="nav-number">2.2.</span> <span class="nav-text">Redis 发布订阅命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-事务"><span class="nav-number">3.</span> <span class="nav-text">Redis 事务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-2"><span class="nav-number">3.1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-事务命令"><span class="nav-number">3.2.</span> <span class="nav-text">Redis 事务命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-脚本"><span class="nav-number">4.</span> <span class="nav-text">Redis 脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">4.0.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-3"><span class="nav-number">4.0.2.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-脚本命令"><span class="nav-number">4.1.</span> <span class="nav-text">Redis 脚本命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-连接"><span class="nav-number">5.</span> <span class="nav-text">Redis 连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-4"><span class="nav-number">5.0.1.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-连接命令"><span class="nav-number">5.1.</span> <span class="nav-text">Redis 连接命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-服务器"><span class="nav-number">6.</span> <span class="nav-text">Redis 服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-5"><span class="nav-number">6.0.1.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-服务器命令"><span class="nav-number">6.1.</span> <span class="nav-text">Redis 服务器命令</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1521117985000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
