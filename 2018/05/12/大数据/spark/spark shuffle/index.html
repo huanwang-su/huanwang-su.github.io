@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="spark," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="spark shuffle对于大数据计算框架而言，Shuffle阶段的设计优劣是决定性能好坏的关键因素之一。  shuffle基本概念shuffle是一个算子，表达的是多对多的依赖关系，在MapReduce计算框架中，是连接Map阶段和Reduce阶段的纽带，即每个Reduce Task从每个Map Task产生数的据中读取一片数据。通常shuffle分为两部分：Map阶段的数据准备和Reduce">
+<meta name="keywords" content="spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark shuffle">
+<meta property="og:url" content="http://hvan.wang/2018/05/12/大数据/spark/spark shuffle/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="spark shuffle对于大数据计算框架而言，Shuffle阶段的设计优劣是决定性能好坏的关键因素之一。  shuffle基本概念shuffle是一个算子，表达的是多对多的依赖关系，在MapReduce计算框架中，是连接Map阶段和Reduce阶段的纽带，即每个Reduce Task从每个Map Task产生数的据中读取一片数据。通常shuffle分为两部分：Map阶段的数据准备和Reduce">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://img-blog.csdn.net/20160916114543412">
+<meta property="og:image" content="https://img-blog.csdn.net/20160916121108219">
+<meta property="og:image" content="https://img-blog.csdn.net/20160916121058297">
+<meta property="og:image" content="https://img-blog.csdn.net/20160914195030665">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fre7raa5w2j305v0c1gmc.jpg">
+<meta property="og:image" content="https://img-blog.csdn.net/20170505064115674?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZHVhbl96aGlodWE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center">
+<meta property="og:image" content="https://img-blog.csdn.net/20160920161953798">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1063603-66198ebd48a0a66e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-17T08:00:40.638Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spark shuffle">
+<meta name="twitter:description" content="spark shuffle对于大数据计算框架而言，Shuffle阶段的设计优劣是决定性能好坏的关键因素之一。  shuffle基本概念shuffle是一个算子，表达的是多对多的依赖关系，在MapReduce计算框架中，是连接Map阶段和Reduce阶段的纽带，即每个Reduce Task从每个Map Task产生数的据中读取一片数据。通常shuffle分为两部分：Map阶段的数据准备和Reduce">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20160916114543412">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/05/12/大数据/spark/spark shuffle/"/>
+
+
+
+
+
+  <title>spark shuffle | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/05/12/大数据/spark/spark shuffle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">spark shuffle</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-12T15:30:25+08:00">
+                2018-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/spark/" itemprop="url" rel="index">
+                    <span itemprop="name">spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/12/大数据/spark/spark shuffle/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/05/12/大数据/spark/spark shuffle/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="spark-shuffle"><a href="#spark-shuffle" class="headerlink" title="spark shuffle"></a>spark shuffle</h1><p>对于大数据计算框架而言，Shuffle阶段的设计优劣是决定性能好坏的关键因素之一。 </p>
+<p><strong>shuffle基本概念</strong><br>shuffle是一个算子，表达的是多对多的依赖关系，在MapReduce计算框架中，是连接Map阶段和Reduce阶段的纽带，即每个Reduce Task从每个Map Task产生数的据中读取一片数据。<br>通常shuffle分为两部分：Map阶段的数据准备和Reduce阶段的数据拷贝。</p>
+<p><strong>Map阶段的数据准备</strong><br>Map阶段需根据Reduce阶段的Task数量决定每个Map Task输出的数据分片数目，有多种方式存放这些数据分片，不同的数据存放方式各有优缺点和适用场景。</p>
+<p>一般而言，shuffle在Map端的数据要存储到磁盘上，以防止容错触发重算带来的庞大开销（如果保存到Reduce端内存中，一旦Reduce Task挂掉了，所有Map Task需要重算）。</p>
+<p>数据在磁盘上存放方式有多种可选方案，在MapReduce前期设计中，每个Map Task为每个Reduce Task产生一个文件，该文件只保存特定Reduce Task需处理的数据，这样会产生M*R个文件，如果M和R非常庞大，比如均为1000，则会产生100w个文件，产生和读取这些文件会产生大量的随机IO，效率非常低下。解决这个问题的一种直观方法是减少文件数目，常用的方法有：</p>
+<ul>
+<li><p>将一个节点上所有Map产生的文件合并成一个大文件（MapReduce现在采用的方案）， </p>
+</li>
+<li><p>每个节点产生{(slot数目)*R}个文件（Spark优化后的方案）。 </p>
+<p> 不管是MapReduce 1.0还是Spark，每个节点的资源会被抽象成若干个slot，由于一个Task占用一个slot，因此slot数目可看成是最多同时运行的Task数目。如果一个Job的Task数目非常多，限于slot数目有限，可能需要运行若干轮。这样，只需要由第一轮产生{(slot数目)*R}个文件，后续几轮产生的数据追加到这些文件末尾即可。因此，后一种方案可减少大作业产生的文件数目。</p>
+</li>
+</ul>
+<p><strong>Reduce阶段的数据拷贝</strong><br>在Reduce端，各个Task会并发启动多个线程同时从多个Map Task端拉取数据。<br>在Reduce阶段的主要任务是对数据进行按组规约。也就是说，需要将数据分成若干组，以便以组为单位进行处理。大家知道，分组的方式非常多，常见的有： </p>
+<ul>
+<li>Map/HashTable（key相同的，放到同一个value list中）； </li>
+<li>Sort（按key进行排序，key相同的一组，经排序后会挨在一起）。 </li>
+</ul>
+<p>这两种方式各有优缺点：<br>第一种复杂度低，效率高，但是需要将数据全部放到内存中；<br>第二种方案复杂度高，但能够借助磁盘（外部排序）处理庞大的数据集。</p>
+<p>Spark前期采用了第一种方案，而在最新的版本中加入了第二种方案，Hadoop MapReduce则从一开始就选用了基于sort的方案。下面将对其进行详细分析。</p>
+<h3 id="什么是Spark的Shuffle"><a href="#什么是Spark的Shuffle" class="headerlink" title="什么是Spark的Shuffle"></a>什么是Spark的Shuffle</h3><p><img src="https://img-blog.csdn.net/20160916114543412" alt="这里写图片描述"> </p>
+<p>Spark有很多算子，比如：groupByKey、join等等都会产生shuffle。<br>产生shuffle的时候，首先会产生Stage划分。 </p>
+<p>上一个Stage会把 计算结果放在LocalSystemFile中，并汇报给Driver；<br>下一个Stage的运行由Driver触发，Executor向Driver请求，把上一个Stage的计算结果抓取过来。</p>
+<h2 id="Hadoop-MapReduce-Shuffle发展史"><a href="#Hadoop-MapReduce-Shuffle发展史" class="headerlink" title="Hadoop MapReduce Shuffle发展史"></a>Hadoop MapReduce Shuffle发展史</h2><p><img src="https://img-blog.csdn.net/20160916121108219" alt="这里写图片描述"> </p>
+<p>该图表达了<strong>Hadoop</strong>的map和reduce两个阶段，<strong>通过Shuffle怎样把map task的输出结果有效地传送到reduce端，描述着数据从map task输出到reduce task输入的这段过程</strong>。<br>map的计算为reduce产生不同的文件，在Hadoop集群环境中，大部分map task与reduce task的执行是在不同的节点上，reduce执行时需要跨节点去拉取其它节点上的map task结果，那么对集群内部的网络资源消耗会很严重。我们希望最大化地减少不必要的消耗, 于是对Shuffle过程的期望有： </p>
+<ul>
+<li>完整地从map task端拉取数据到reduce 端。 </li>
+<li>在跨节点拉取数据时，尽可能地减少对带宽的不必要消耗。 </li>
+<li>减少磁盘IO对task执行的影响。<br>可优化的地方主要在于减少拉取数据的量及尽量使用内存而不是磁盘。</li>
+</ul>
+<h3 id="map端的Shuffle细节："><a href="#map端的Shuffle细节：" class="headerlink" title="map端的Shuffle细节："></a>map端的Shuffle细节：</h3><p>整个map流程，简单些可以这样说：<br>1）input, 根据split输入数据，运行map任务；<br>2）patition, 每个map task都有一个内存缓冲区，存储着map的输出结果；<br>3）spill, 当缓冲区快满的时候需要将缓冲区的数据以临时文件的方式存放到磁盘；<br>4）merge, 当整个map task结束后再对磁盘中这个map task产生的所有临时文件做合并，生成最终的正式输出文件，然后等待reduce task来拉数据。</p>
+<p><strong>map流程的细节：</strong><br>输入数据：在Map Reduce中，map task只读取split，Split与block的对应关系可能是多对一，默认是一对一； </p>
+<ol>
+<li>mapper运行后，通过Partitioner接口，根据key或value及reduce的数量来决定当前map的输出数据最终应该交由哪个reduce task处理。然后将数据写入内存缓冲区中，缓冲区的作用是批量收集map结果，减少磁盘IO的影响。我们的key/value对以及Partition的结果都会被写入缓冲区。当然写入之前，key与value值都会被序列化成字节数组； </li>
+<li>内存缓冲区有大小限制，默认是100MB。需要在一定条件下将缓冲区中的数据临时写入磁盘，从内存往磁盘写数据的过程被称为Spill（溢写）； </li>
+<li>splill是由单独线程来完成，不影响往缓冲区写map结果的线程,splill的过程会涉及到Sort和Combiner，当splill线程启动后，需要对锁定内存块空间内的key做排序，是对序列化的字节做排序。 如果有很多个key/value对需要发送到某个reduce端去，那么需要将这些key/value值拼接到一块，减少与partition相关的索引记录，非正式地合并数据叫做combine了， Combiner会优化MapReduce的中间结果。 </li>
+<li>每次溢写会在磁盘上生成一个溢写文件，如果map的输出结果很大，就会有多个溢写文件存在。当map task完成时，内存缓冲区中的数据也全部溢写到磁盘中形成一个溢写文件。最终磁盘中会至少有一个这样的溢写文件存在(如果map的输出结果很少，当map执行完成时，只会产生一个溢写文件)，因为最终的文件只有一个，所以需要将这些溢写文件归并到一起，这个过程就叫做Merge。</li>
+</ol>
+<p>至此，map端的所有工作都已结束，最终生成的这个文件也存放在TaskTracker够得着的某个本地目录内。每个reduce task不断地通过RPC从JobTracker那里获取map task是否完成的信息，如果获知TaskTracker上的map task执行完成，Shuffle的后半段过程开始启动。</p>
+<h3 id="reduce-端的Shuffle细节："><a href="#reduce-端的Shuffle细节：" class="headerlink" title="reduce 端的Shuffle细节："></a>reduce 端的Shuffle细节：</h3><p>reduce task在执行之前的工作就是不断地拉取当前job里每个map task的最终结果，然后对从不同地方拉取过来的数据不断地做merge，也最终形成一个文件作为reduce task的输入文件。</p>
+<ol>
+<li><p>Copy过程，简单地拉取数据。 </p>
+<p>Reduce进程启动一些数据copy线程(Fetcher)，通过HTTP方式请求map task所在的TaskTracker获取map task的输出文件。因为map task早已结束，这些文件就归TaskTracker管理在本地磁盘中。</p>
+</li>
+<li><p>Merge阶段。 </p>
+<p>这里的merge如map端的merge动作，只是数组中存放的是不同map端copy来的数值。Copy过来的数据会先放入内存缓冲区中，这里的缓冲区大小要比map端的更为灵活，它基于JVM的heap size设置，因为Shuffle阶段Reducer不运行，所以应该把绝大部分的内存都给Shuffle用。merge有三种形式：1)内存到内存 2)内存到磁盘 3)磁盘到磁盘。默认情况下第一种形式不启用。当内存中的数据量到达阈值，就启动内存到磁盘的merge。<br>与map 端类似，这也是溢写的过程，然后在磁盘中生成了众多的溢写文件。第二种merge方式一直在运行，直到没有map端的数据时才结束，然后启动第三种磁盘到磁盘的merge方式生成最终的那个文件。</p>
+</li>
+<li><p>Reducer的输入文件。 </p>
+<p>不断地merge后，最后会生成一个“最终文件”。为什么加引号？因为这个文件可能存在于磁盘上，也可能存在于内存中。对我们来说，当然希望它存放于内存中，直接作为Reducer的输入，但默认情况下，hadoop是把这个文件是存放于磁盘中的。当Reducer的输入文件已定，整个Shuffle才最终结束。然后就是Reducer执行，把结果放到HDFS上。</p>
+</li>
+</ol>
+<h3 id="Hadoop的MapReduce-Shuffle数据流动过程"><a href="#Hadoop的MapReduce-Shuffle数据流动过程" class="headerlink" title="Hadoop的MapReduce Shuffle数据流动过程"></a>Hadoop的MapReduce Shuffle数据流动过程</h3><p><img src="https://img-blog.csdn.net/20160916121058297" alt="这里写图片描述"> </p>
+<p>图上map阶段，有4个map；Reduce端，有3个reduce。<br>4个map 也就是4个JVM，每个JVM处理一个数据分片（split1~split4），每个map产生一个map输出文件，但是每个map都为后面的reduce产生了3部分数据（分别用红1、绿2、蓝3标识），也就是说每个输出的map文件都包含了3部分数据。正如前面第二节所述：<br>mapper运行后，通过Partitioner接口，根据key或value及reduce的数量来决定当前map的输出数据最终应该交由哪个reduce task处理<br>Reduce端一共有3个reduce，去前面的4个map的输出结果中抓取属于自己的数据。</p>
+<h2 id="Spark-Shuffle"><a href="#Spark-Shuffle" class="headerlink" title="Spark Shuffle"></a>Spark Shuffle</h2><p><img src="https://img-blog.csdn.net/20160914195030665" alt="这里写图片描述"> </p>
+<p>该图描述了最简单的Spark 0.X版本的Spark Shuffle过程。<br>与Hadoop Map Reduce的区别在于输出文件个数的变化。</p>
+<p>每个ShuffleMapTask产生与Ruducer个数相同的Shuffle blockFile文件，图中有3个reducer，那么每个ShuffleMapTask就产生3个Shuffle blockFile文件，4个ShuffleMapTask，那么一共产生12个Shuffle blockFile文件。 </p>
+<p>在内存中每个Shuffle blockFile文件都会存在一个句柄从而消耗一定内存，又因为物理内存的限制，就不能有很多并发，这样就限制了Spark集群的规模。<br>该图描绘的只是Spark 0.X版本而已，让人误以为Spark不支持大规模的集群计算，当时这只是<strong>Hash Based Shuffle</strong>。Spark后来做了改进，引入了<strong>Sort Based Shuffle</strong>之后，就再也没有人说Spark只支持小规模的集群运算了。</p>
+<p>Shuffle Read在几种模式中都差不多</p>
+<h3 id="Shuffle-Read"><a href="#Shuffle-Read" class="headerlink" title="Shuffle Read"></a>Shuffle Read</h3><p>回忆一下，每个Stage的上边界，要么需要从外部存储读取数据，要么需要读取上一个Stage的输出；而下边界，要么是需要写入本地文件系统（需要Shuffle），以供childStage读取，要么是最后一个Stage，需要输出结果。这里的Stage，在运行时的时候就是可以以pipeline的方式运行的一组Task，除了最后一个Stage对应的是ResultTask，其余的Stage对应的都是ShuffleMap Task。</p>
+<p>而除了需要从外部存储读取数据和RDD已经做过cache或者checkpoint的Task，一般Task的开始都是从ShuffledRDD的ShuffleRead开始的。</p>
+<p>如果在本地有，那么可以直接从BlockManager中获取数据；如果需要从其他的节点上获取，那么需要走网络。</p>
+<p>读取数据的主要流程：</p>
+<ol>
+<li>获取待拉取数据的iterator；</li>
+<li>使用AppendOnlyMap/ExternalAppendOnlyMap 做combine，这个过程和shuffle write一样；</li>
+<li>如果需要对key排序，则使用ExternalSorter。</li>
+</ol>
+<h3 id="Hash-based-shuffle"><a href="#Hash-based-shuffle" class="headerlink" title="Hash based shuffle"></a>Hash based shuffle</h3><p>Hash based shuffle的==每个mapper都需要为每个reducer写一个文件，供reducer读取，即需要产生M*R个数量的文件==，如果mapper和reducer的数量比较大，产生的文件数会非常多。<br>Hadoop Map Reduce被人诟病的地方，很多不需要sort的地方的sort导致了不必要的开销，于是Spark的==Hash based shuffle设计的目标之一就是避免不需要的排序，但是它在处理超大规模数据集的时候，产生了大量的磁盘IO和内存的消耗，很影响性能。==<br>Hash based shuffle不断优化，Spark 0.8.1引入的file consolidation在一定程度上解决了这个问题。</p>
+<blockquote>
+<ul>
+<li><p><strong>不需要排序的Hash Shuffle是否一定比需要排序的Sorted Shuffle速度更快？</strong></p>
+<p>​    不一定！如果数据规模比较小的情形下，Hash Shuffle会比Sorted Shuffle速度快（很多）！但是如果数据量大，此时Sorted Shuffle一般都会比Hash Shuffle快（很多），因为如果数据规模比较大，Hash Shuffle甚至无法处理，因为Hash Shuffle会产生很多的句柄，小文件，这时候磁盘和内存会变成瓶颈，而Sorted Shuffle就会极大的节省内存和磁盘的访问，所以更有利于更大规模的计算。Hash Shuffle适合中小型规模的数据计算。 </p>
+</li>
+</ul>
+</blockquote>
+<p>每个ShuffleMapTask会根据key的哈希值计算出当前的key需要写入的Partition，然后把决定后的结果写入单独的文件，此时会导致==每个Task产生R（指下一个Stage的Task并行度）个文件==，如果当前的Stage中有M个ShuffleMapTask，则会产生M*R个文件！！！此时数据已经分好类了，==下一个Stage就会通过网络根据Driver端的注册信息，因为上一个Stage写过的内容会注册给Driver，然后向Driver获取上一个Stage的输出位置==，就会通过网络去读取数据，数据分成几种类型只跟下一个阶段分成多少个任务有关系，因为下一个阶段的任务数表示数据被分成多少类。跟并行度没有关系，也就是说跟实际并行运行多少任务没有关系。<br>注意：Shuffle操作绝大多数情况下都要通过网络，如果Mapper和Reducer在同一台机器上，此时只需要读取本地磁盘即可。Spark中的Executor是线程池中的线程复用的，这个线程有可能运行上一个Stage的Task，也有可能运行下一个Stage的Task。 </p>
+<h4 id="Hash-Shuffle-Writer实现解析"><a href="#Hash-Shuffle-Writer实现解析" class="headerlink" title="Hash Shuffle Writer实现解析"></a>Hash Shuffle Writer实现解析</h4><p>Shuffle Map Task计算是调用ShuffleMapTask.runTask执行的。 </p>
+<p>核心代码如下： </p>
+<ol>
+<li>获得ShuffleManager为 Hash Shuffle。 </li>
+<li>获得Hash Shuffle的Writer方法：HashShuffleWriter. </li>
+<li>调用HashShuffleWriter的write方法。其中调用RDD的iterator方法计算，然后将结果传入给write。</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> manager = <span class="type">SparkEnv</span>.get.shuffleManager<span class="comment">//获得ShuffleManager</span></span><br><span class="line"><span class="comment">//获得Hash Shuffle的Writer方法</span></span><br><span class="line">writer = manager.getWriter[<span class="type">Any</span>, <span class="type">Any</span>](dep.shuffleHandle, partitionId, context)</span><br><span class="line"><span class="comment">//调用HashShuffleWriter的write方法，</span></span><br><span class="line">writer.write(rdd.iterator(partition, context).asInstanceOf[<span class="type">Iterator</span>[_ &lt;: <span class="type">Product2</span>[<span class="type">Any</span>, <span class="type">Any</span>]]])</span><br></pre></td></tr></table></figure>
+<p>下面具体看write方法。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Write a bunch of records to this task's output */</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">write</span></span>(records: <span class="type">Iterator</span>[<span class="type">Product2</span>[<span class="type">K</span>, <span class="type">V</span>]]): <span class="type">Unit</span> = &#123;</span><br><span class="line"><span class="comment">//判断aggregator是否被定义</span></span><br><span class="line">  <span class="keyword">val</span> iter = <span class="keyword">if</span> (dep.aggregator.isDefined) &#123;</span><br><span class="line"><span class="comment">//判断数据是否需要聚合如果需要，聚合records</span></span><br><span class="line">    <span class="keyword">if</span> (dep.mapSideCombine) &#123;</span><br><span class="line">      dep.aggregator.get.combineValuesByKey(records, context)</span><br><span class="line"><span class="comment">//中间代码省略</span></span><br><span class="line"><span class="comment">//elem是(K,V)形式的，通过K计算出bucketId</span></span><br><span class="line">  <span class="keyword">for</span> (elem &lt;- iter) &#123;</span><br><span class="line">    <span class="keyword">val</span> bucketId = dep.partitioner.getPartition(elem._1)</span><br><span class="line"><span class="comment">//然后再通过bucketId具体写入那个partition</span></span><br><span class="line"><span class="comment">//此时Shuffle是FileShuffleBlockResolver</span></span><br><span class="line">    shuffle.writers(bucketId).write(elem._1, elem._2)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>具体看一下FileShuffleBlockResolver.writers：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> writers: <span class="type">Array</span>[<span class="type">DiskBlockObjectWriter</span>] = &#123;</span><br><span class="line">  <span class="type">Array</span>.tabulate[<span class="type">DiskBlockObjectWriter</span>](numReducers) &#123; bucketId =&gt;</span><br><span class="line">    <span class="keyword">val</span> blockId = <span class="type">ShuffleBlockId</span>(shuffleId, mapId, bucketId)</span><br><span class="line">    <span class="keyword">val</span> blockFile = blockManager.diskBlockManager.getFile(blockId)</span><br><span class="line">    <span class="keyword">val</span> tmp = <span class="type">Utils</span>.tempFileWith(blockFile)</span><br><span class="line"><span class="comment">//tmp也就是blockFile如果已经存在则，在后面追加数据</span></span><br><span class="line">    blockManager.getDiskWriter(blockId, tmp, serializerInstance, bufferSize, writeMetrics)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>blockManager.getDiskWriter就会为每个文件创建一个DiskBlockObjectWriter</p>
+<p>DiskBlockObjectWriter可以直接向一个在磁盘上的文件写数据，并且允许在后面追加数据</p>
+<h4 id="Hash-Shuffle的两大死穴："><a href="#Hash-Shuffle的两大死穴：" class="headerlink" title="Hash Shuffle的两大死穴："></a>Hash Shuffle的两大死穴：</h4><ol>
+<li>Shuffle前会产生海量的小文件于磁盘之上，此时会产生大量耗时低效的IO操作； </li>
+<li>内存不够用！！！由于内存中需要保存海量的文件操作句柄和临时缓存信息，如果数据处理规模比较庞大的话，内存不可承受，出现OOM等问题！ </li>
+</ol>
+<p>进行HashShuffle的时候会根据后面的Task数，生成对应数量的小文件，而每个小文件也就是一种类型，在数据处理的时候，Task就从前面的小文件抓取需要的数据即可，它会导致同时打开过多的文件，这样就会占用过多的内存，写文件通过Write Handler默认是50KB。 </p>
+<h5 id="Consalidate"><a href="#Consalidate" class="headerlink" title="Consalidate"></a>Consalidate</h5><p>为了改善上述的问题（同时打开过多文件导致Writer Handler内存使用过大以及产生过度文件导致大量的随机读写带来的效率极为低下的磁盘IO操作），Spark后来推出了Consalidate机制，来把小文件(指的是每个Map都要为所有的Reducer产生Reducer个数的小文件)合并，此时Shuffle时文件产生的数量为cores*R，对于ShuffleMapTask的数量明显多于同时可用的并行Cores的数量的情况下，Shuffle产生的文件会大幅度减少，会极大降低OOM的可能； </p>
+<p><strong>Consalidate机制</strong>：把同一个Task的输出变成一个文件进行合并，根据CPU的个数来决定具体产生多少文件，对于运行在同一个core的Shuffle Map Task，第一个Shuffle Map Task会创建一个，之后的就会将数据追加到这个文件上而不是新建一个文件。 </p>
+<p>但是在生成环境下，并行度特别大的话，还是会产生原来的问题。<br>为此Spark推出了Shuffle Pluggable开放框架，方便系统升级的时候定制Shuffle功能模块，也方便第三方系统改造人员根据实际的业务场景来开发具体最佳的Shuffle模块；核心接口ShuffleManager，具体默认实现有HashShuffleManager、SortShuffleManager等</p>
+<h3 id="Sort-based-shuffle"><a href="#Sort-based-shuffle" class="headerlink" title="Sort based shuffle"></a>Sort based shuffle</h3><p>为了解决hash based shuffle性能差的问题，Spark 1.1 引入了<strong>Sort based shuffle</strong>，完全借鉴map reduce实现，每个Shuffle Map Task只产生一个文件，不再为每个Reducer生成一个单独的文件，将所有的结果只写到一个Data文件里，同时生成一个index文件，index文件存储了Data中的数据是如何进行分类的。Reducer可以通过这个index文件取得它需要处理的数据。 下一个Stage中的Task就是根据这个Index文件来获取自己所要抓取的上一个Stage中的Shuffle Map Task的输出数据。</p>
+<p>Shuffle Map Task产生的结果只写到一个Data文件里, 避免产生大量的文件，从而节省了内存的使用和顺序Disk IO带来的低延时。节省内存的使用可以减少GC的风险和频率。 而减少文件的数量可以避免同时写多个文件对系统带来的压力。<br>Sort based shuffle在速度和内存使用方面也优于Hash based shuffle。<br>以上逻辑可以使用下图来描述：</p>
+<p><img src="http://ww1.sinaimg.cn/large/0063bT3ggy1fre7raa5w2j305v0c1gmc.jpg" alt=""> </p>
+<p>Sort based Shuffle包含两阶段的任务： </p>
+<ul>
+<li><p><strong>产生Shuffle数据的阶段(Map阶段)</strong> </p>
+<p>Write 对应的是ShuffleMapTask,具体的写操作ExternalSorter来负责，数据可以通过BlockManager写在内存、磁盘以及Tachyon等，例如想非常快的Shuffle，此时考虑可以把数据写在内存中，但是内存不稳定，建议采用内存+磁盘。 </p>
+</li>
+<li><p><strong>使用Shuffle数据的阶段(Reduce阶段)</strong> </p>
+<p>需要实现ShuffleManager的getReader，Reader会向Driver去获取上一个Stage产生的Shuffle数据)。Read 阶段由ShuffleRDD里的HashShuffleReader来完成。如果拉来的数据如果过大，需要落地，则也由ExternalSorter来完成的</p>
+</li>
+</ul>
+<h4 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h4><ol>
+<li>ShuffleMapTask会根据Key，相应的Partition进行Sort，==如果属于同一个Partition本身不会进行Sort。==</li>
+<li>在进行Sort的时候如果内存不够用的话，它会将哪些已经排序的数据写入到外部磁盘，结束的时候再进行归并排序，这时候基本上就不受内存限制了，同时由于在一个文件中，在一个File中，分为File不同的segment，为了高效的读取不同的segment，它就有一个index文件，会记录不同的Partition信息，BlockManager也会对它的寻址算法进行优化。 </li>
+<li>Sort Shuffle Writer对于每个Partition会创建一个数组，存储他所包含的Key,Value.每个需要处理的Key,Value,都会被插入到相应的数组中，如果数组的大小超过了具体规定大小的限定值的时候，就需要将内容写入到外部存储。</li>
+<li>文件开始的部分记录我们这个Partition的ID，以及这个文件具体保存了有哪些数量的数据。</li>
+<li>最后将所有写入到外部文件进行归并排序，归并排序的时候文件不能过多，如果过多的话会消耗很多的内存，可能会有OOM的风险，或者垃圾回收过多的风险，过少性能不好，会有延迟，最优一般同时打开10~100个文件。</li>
+<li>最后生成文件的时候需要生成index索引文件，由于它已经排序好了索引文件，所以Reducer去读取索引文件的时候就会非常方便。</li>
+</ol>
+<h4 id="排序过程详解"><a href="#排序过程详解" class="headerlink" title="排序过程详解"></a>排序过程详解</h4><p>==Spark基于Sorted-Based Shuffle 它产出的结果是有序的。是错误的==</p>
+<p>Sorted-Based Shuffle 的核心是借助于 ExternalSorter 把每个 ShuffleMapTask 的输出，排序到一个文件中 (FileSegmentGroup)，为了区分下一个阶段 Reducer Task 不同的内容，它还需要有一个索引文件 (Index) 来告诉下游 Stage 的并行任务，那一部份是属于你的。</p>
+<p><img src="https://img-blog.csdn.net/20170505064115674?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZHVhbl96aGlodWE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img"> </p>
+<p>Shuffle Map Task 在ExternalSorter 溢出到磁盘的时候，产生一组 File （File Group是hashShuffle中的概念，理解为一个file文件池，这里为区分，使用File的概念，==FileSegment根据PartionID排序）==和 一个索引文件，File 里的 FileSegement 会进行排序，在 Reducer 端有4个Reducer Task，下游的 Task 可以很容易跟据索引 (index) 定位到这个 Fie 中的哪部份 FileSegement 是属于下游的，它相当于一个指针，下游的 Task 要向 Driver 去碓定文件在那里，然后到了这个 File 文件所在的地方，实际上会跟 BlockManager 进行沟通，BlockManager 首先会读一个 Index 文件，根据它的命名则进行解析，比如说下一个阶段的第一个 Task，一般就是抓取第一个 Segment，这是一个指针定位的过程。</p>
+<p><strong>Sort-Based Shuffle 最大的意义是减少临时文件的输出数量，且只会产生两个文件：一个是包含不同内容划分成不同 FileSegment 构成的单一文件 File，另外一个是索引文件 Index。</strong></p>
+<p> Sort-Based Shuffle  Mapper端的 Sort and Spill 的过程 (ApendOnlyMap时不进行排序，Spill 到磁盘的时候再进行排序的)</p>
+<p>ExternalSorter.scala中有2个很重要的数据结构：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@volatile</span> <span class="keyword">private</span> <span class="keyword">var</span> map = <span class="keyword">new</span> <span class="type">PartitionedAppendOnlyMap</span>[<span class="type">K</span>, <span class="type">C</span>]</span><br><span class="line"><span class="meta">@volatile</span> <span class="keyword">private</span> <span class="keyword">var</span> buffer = <span class="keyword">new</span> <span class="type">PartitionedPairBuffer</span>[<span class="type">K</span>, <span class="type">C</span>]</span><br></pre></td></tr></table></figure>
+<ol>
+<li>在map端进行combine：PartitionedAppendOnlyMap 是map类型的数据结构，map是key-value ，在本地进行聚合，在本地key值不变，Value不断进行更新</li>
+<li>在map端没有combine：使用PartitionedPairBuffer</li>
+</ol>
+<p><strong>排序</strong>：以partition ID进行排序，实现快速的写，方便的读操作；关键的一点对KEY进行操作。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span>[spark] <span class="class"><span class="keyword">class</span> <span class="title">PartitionedAppendOnlyMap</span>[<span class="type">K</span>, <span class="type">V</span>]</span></span><br><span class="line"><span class="class">  <span class="keyword">extends</span> <span class="title">SizeTrackingAppendOnlyMap</span>[(<span class="type">Int</span>, <span class="type">K</span>), <span class="type">V</span>] <span class="keyword">with</span> <span class="title">WritablePartitionedPairCollection</span>[<span class="type">K</span>, <span class="type">V</span>] </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">partitionedDestructiveSortedIterator</span></span>(keyComparator: <span class="type">Option</span>[<span class="type">Comparator</span>[<span class="type">K</span>]])</span><br><span class="line">    : <span class="type">Iterator</span>[((<span class="type">Int</span>, <span class="type">K</span>), <span class="type">V</span>)] = &#123;</span><br><span class="line">    <span class="keyword">val</span> comparator = keyComparator.map(partitionKeyComparator).getOrElse(partitionComparator)</span><br><span class="line">    destructiveSortedIterator(comparator)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">insert</span></span>(partition: <span class="type">Int</span>, key: <span class="type">K</span>, value: <span class="type">V</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    update((partition, key), value)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Tungsten-sort-Based-Shuffle"><a href="#Tungsten-sort-Based-Shuffle" class="headerlink" title="Tungsten-sort Based Shuffle"></a>Tungsten-sort Based Shuffle</h3><p>Tungsten-sort 在特定场景下基于现有的Sort Based Shuffle处理流程，对内存/CPU/Cache使用做了非常大的优化。带来高效的同时，也就限定了自己的使用场景，所以Spark 默认开启的还是Sort Based Shuffle。</p>
+<blockquote>
+<p>Tungsten 是钨丝的意思。 Tungsten Project 是 Databricks 公司提出的对Spark优化内存和CPU使用的计划，该计划初期对Spark SQL优化的最多，不过部分RDD API 还有Shuffle也因此受益。</p>
+</blockquote>
+<p>Tungsten-sort是对普通sort的一种优化，排序的不是内容本身，而是内容序列化后字节数组的指针(元数据)，把数据的排序转变为了指针数组的排序，实现了直接对序列化后的二进制数据进行排序。由于直接基于二进制数据进行操作，所以在这里面没有序列化和反序列化的过程。内存的消耗降低，相应的也会减少gc的开销。</p>
+<p>Tungsten-sort优化点主要在三个方面:</p>
+<ol>
+<li>直接在serialized binary data上进行sort而不是java objects，减少了memory的开销和GC的overhead。</li>
+<li>提供cache-efficient sorter，使用一个8 bytes的指针，把排序转化成了一个指针数组的排序。 </li>
+<li>spill的merge过程也无需反序列化即可完成。</li>
+</ol>
+<p>这些优化的实现导致引入了一个新的内存管理模型，类似OS的Page，Page是由MemoryBlock组成的, 支持off-heap(用NIO或者Tachyon管理) 以及 on-heap 两种模式。为了能够对Record 在这些MemoryBlock进行定位，又引入了Pointer的概念。</p>
+<p>Sort Based Shuffle里存储数据的对象是PartitionedAppendOnlyMap,这只是一个放在JVM heap里普通对象。在Tungsten-sort中，它被替换成了类似操作系统内存页的对象。如果无法申请新的Page,这个时候就要执行spill溢写操作，将数据写到磁盘。具体触发条件和Sort Based Shuffle 类似。</p>
+<p><strong>开启条件</strong></p>
+<p>Spark 默认开启的是Sort Based Shuffle,想要打开Tungsten-sort ,请设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spark.shuffle.manager=tungsten-sort</span><br></pre></td></tr></table></figure>
+<p>对应的实现类是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.apache.spark.shuffle.unsafe.UnsafeShuffleManager</span><br></pre></td></tr></table></figure>
+<p>数据一旦进来，就使用shuffle write进行序列化，在序列化的二进制基础上进行排序，这样就可以减少内存的GC。这种优化需要序列化器可以在不反序列化的情况下重新排序。</p>
+<p><strong>当且仅当下面条件都满足时，才能使用Tungsten-sort Shuffle:</strong> </p>
+<ol>
+<li>Shuffle 文件的数量不能大于 16777216</li>
+<li>Shuffle 的序列化器需要是 KryoSerializer 或者 Spark SQL’s 自定义的一些序列化方式. 因为整个过程是追求不反序列化的，所以不能做aggregation </li>
+<li>Shuffle dependency 不能带有aggregation 或者输出不需要排序 </li>
+<li>序列化时，单条记录不能大于 128 MB</li>
+</ol>
+<blockquote>
+<p><strong>Tungsten内存模型：</strong></p>
+<p><img src="https://img-blog.csdn.net/20160920161953798" alt="这里写图片描述"> </p>
+<p>这张图其实画的是 on-heap 的内存逻辑图，#Page 部分为13bit, Offset 为51bit,你会发现 2^51 &gt;&gt;128M的。但是在Shuffle的过程中，对51bit 做了压缩，使用了27bit</p>
+<p>具体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;  [24 bit partition number][13 bit memory page number][27 bit offset in page]</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>这里预留出的24bit给了partition number,为了后面的排序用。上面的好几个限制其实都是因为这个指针引起的：</p>
+<ol>
+<li>一个是partition 的限制，前面的数字 <code>16777216</code> 就是来源于partition number 使用24bit 表示的。</li>
+<li>第二个是page number</li>
+<li>第三个是偏移量，最大能表示到2^27=128M。那一个task 能管理到的内存是受限于这个指针的，最多是 2^13 * 128M 也就是1TB左右。</li>
+</ol>
+<p>对于第一个限制，那是因为后续Shuffle Write的sort 部分，只对前面24bit的partiton number 进行排序，key的值没有被编码到这个指针，所以没办法进行ordering</p>
+<p>同时，因为整个过程是追求不反序列化的，所以不能做aggregation。</p>
+</blockquote>
+<h4 id="Shuffle-Write"><a href="#Shuffle-Write" class="headerlink" title="Shuffle Write"></a>Shuffle Write</h4><p>数据会通过 <code>UnsafeShuffleExternalSorter.insertRecordIntoSorter</code> 一条一条写入到 <code>serOutputStream</code> 序列化输出流。</p>
+<p>类似于Sort Based Shuffle 中的<code>ExternalSorter</code>，在Tungsten Sort 对应的为<code>UnsafeShuffleExternalSorter</code>,记录序列化后就通过<code>sorter.insertRecord</code>方法放到sorter里去了。</p>
+<p>这里sorter 负责申请Page,释放Page,判断是否要进行spill都这个类里完成。代码的架子其实和Sort Based 是一样的。 </p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1063603-66198ebd48a0a66e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="图片来源:&lt;a href="> </p>
+<h2 id="算子示例"><a href="#算子示例" class="headerlink" title="算子示例"></a>算子示例</h2><h3 id="combineByKey"><a href="#combineByKey" class="headerlink" title="combineByKey"></a>combineByKey</h3><p>因为combineByKey是Spark中一个比较核心的高级函数，其他一些高阶键值对函数底层都是用它实现的。诸如 groupByKey,reduceByKey等等</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](  </span><br><span class="line">      createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>,  </span><br><span class="line">      mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>,  </span><br><span class="line">      mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>,  </span><br><span class="line">      partitioner: <span class="type">Partitioner</span>,  </span><br><span class="line">      mapSideCombine: <span class="type">Boolean</span> = <span class="literal">true</span>,  </span><br><span class="line">      serializer: <span class="type">Serializer</span> = )</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>createCombiner</strong>: combineByKey() 会遍历分区中的所有元素，因此每个元素的键要么还没有遇到过，要么就 和之前的某个元素的键相同。如果这是一个新的元素， combineByKey() 会使用一个叫作 createCombiner() 的函数来创建 那个键对应的累加器的初始值</li>
+<li><strong>mergeValue:</strong> 如果这是一个在处理当前分区之前已经遇到的键， 它会使用 mergeValue() 方法将该键的累加器对应的当前值与这个新的值进行合并</li>
+<li><strong>mergeCombiners:</strong> 由于每个分区都是独立处理的， 因此对于同一个键可以有多个累加器。如果有两个或者更 多的分区都有对应同一个键的累加器， 就需要使用用户提供的mergeCombiners() 方法将各 个分区的结果进行合并。</li>
+<li><strong>partitioner</strong>：Partitioner（分区器），Shuffle时需要通过Partitioner的分区策略进行分区。</li>
+</ul>
+<h4 id="执行过程"><a href="#执行过程" class="headerlink" title="执行过程"></a>执行过程</h4><ol>
+<li>shuffle write操作中，遇到新&lt;K,V&gt;，通过createCombiner生成累加器，遇到已经出现过的&lt;K,V&gt;，通过mergeValue进行合并，在这个过程中使用AppendOnlyMap/ExternalAppendOnlyMap 做combine，即相同的key合并</li>
+<li>shuffle read操作中，通过mergeCombiners将不同分区mergeValue后的结果进行合并，获取数据后也会使用AppendOnlyMap/ExternalAppendOnlyMap 做combine，即相同的key合并</li>
+</ol>
+<h3 id="sortByKey"><a href="#sortByKey" class="headerlink" title="sortByKey"></a>sortByKey</h3><p>sortByKey函数作用于Key-Value形式的RDD，并对Key进行排序。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortByKey</span></span>(ascending: <span class="type">Boolean</span> = <span class="literal">true</span>, numPartitions: <span class="type">Int</span> = self.partitions.size)</span><br><span class="line">    : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">V</span>)] =</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> part = <span class="keyword">new</span> <span class="type">RangePartitioner</span>(numPartitions, self, ascending)</span><br><span class="line">  <span class="keyword">new</span> <span class="type">ShuffledRDD</span>[<span class="type">K</span>, <span class="type">V</span>, <span class="type">V</span>](self, part)</span><br><span class="line">    .setKeyOrdering(<span class="keyword">if</span> (ascending) ordering <span class="keyword">else</span> ordering.reverse)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该函数返回的RDD一定是ShuffledRDD类型的，因为对源RDD进行排序，必须进行Shuffle操作，而Shuffle操作的结果RDD就是ShuffledRDD。其实这个函数的实现很优雅，里面用到了RangePartitioner，它可以使得相应的范围Key数据分到同一个partition中，然后内部用到了mapPartitions对每个partition中的数据进行排序，而每个partition中数据的排序用到了标准的sort机制，避免了大量数据的shuffle。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spark/" rel="tag"># spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/12/大数据/spark/spark简介/" rel="next" title="spark简介">
+                <i class="fa fa-chevron-left"></i> spark简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/12/大数据/spark/spark运行模式/" rel="prev" title="spark运行模式">
+                spark运行模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">89</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spark-shuffle"><span class="nav-number">1.</span> <span class="nav-text">spark shuffle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是Spark的Shuffle"><span class="nav-number">1.0.1.</span> <span class="nav-text">什么是Spark的Shuffle</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hadoop-MapReduce-Shuffle发展史"><span class="nav-number">1.1.</span> <span class="nav-text">Hadoop MapReduce Shuffle发展史</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#map端的Shuffle细节："><span class="nav-number">1.1.1.</span> <span class="nav-text">map端的Shuffle细节：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reduce-端的Shuffle细节："><span class="nav-number">1.1.2.</span> <span class="nav-text">reduce 端的Shuffle细节：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hadoop的MapReduce-Shuffle数据流动过程"><span class="nav-number">1.1.3.</span> <span class="nav-text">Hadoop的MapReduce Shuffle数据流动过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spark-Shuffle"><span class="nav-number">1.2.</span> <span class="nav-text">Spark Shuffle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Shuffle-Read"><span class="nav-number">1.2.1.</span> <span class="nav-text">Shuffle Read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hash-based-shuffle"><span class="nav-number">1.2.2.</span> <span class="nav-text">Hash based shuffle</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hash-Shuffle-Writer实现解析"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">Hash Shuffle Writer实现解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hash-Shuffle的两大死穴："><span class="nav-number">1.2.2.2.</span> <span class="nav-text">Hash Shuffle的两大死穴：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Consalidate"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">Consalidate</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sort-based-shuffle"><span class="nav-number">1.2.3.</span> <span class="nav-text">Sort based shuffle</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#具体实现"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">具体实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排序过程详解"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">排序过程详解</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tungsten-sort-Based-Shuffle"><span class="nav-number">1.2.4.</span> <span class="nav-text">Tungsten-sort Based Shuffle</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Shuffle-Write"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">Shuffle Write</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算子示例"><span class="nav-number">1.3.</span> <span class="nav-text">算子示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#combineByKey"><span class="nav-number">1.3.1.</span> <span class="nav-text">combineByKey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#执行过程"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">执行过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sortByKey"><span class="nav-number">1.3.2.</span> <span class="nav-text">sortByKey</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1526110225000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
