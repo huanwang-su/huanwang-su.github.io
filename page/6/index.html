@@ -786,7 +786,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java并发/原子操作/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java框架/tomcat/ClassLoader/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -805,7 +805,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java并发/原子操作/" itemprop="url">java多线程原子操作</a></h1>
+                <a class="post-title-link" href="/2018/03/16/java框架/tomcat/ClassLoader/" itemprop="url">tomcat classLoader</a></h1>
         
 
         <div class="post-meta">
@@ -840,8 +840,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/java框架/" itemprop="url" rel="index">
+                    <span itemprop="name">java框架</span>
                   </a>
                 </span>
 
@@ -851,8 +851,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/java框架/tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">tomcat</span>
                   </a>
                 </span>
 
@@ -890,11 +890,13 @@
       
         
           
-          #Atomic#java.util.concurrent 是基于Queue 的并发包，而Queue，很多情况下使用到了Atomic 操作。通常情况下，在Java里面在没有额外资源可以利用的情况下，只能使用加锁才能保证读-改-写这三个操作时“原子”的。则需要使用synchronized和volatil
+          8 ClassLoadertomcat的classLoader是自定义的classLoader。每个容器要载入所需的servlet类。能够
+
+定义访问规则，如果通过jvm的classLoader，则servlet能够访问所有的classpath下的所有class，而servlet只允许访问WEB-I
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java并发/原子操作/#more" rel="contents">
+            <a class="btn" href="/2018/03/16/java框架/tomcat/ClassLoader/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -945,7 +947,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java框架/spring/spring整体框架/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java并发/并发/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -964,7 +966,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java框架/spring/spring整体框架/" itemprop="url">spring整体框架</a></h1>
+                <a class="post-title-link" href="/2018/03/16/java基础/java并发/并发/" itemprop="url">CountDownLatch 和 CyclicBarrier 的区别</a></h1>
         
 
         <div class="post-meta">
@@ -999,8 +1001,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java框架/" itemprop="url" rel="index">
-                    <span itemprop="name">java框架</span>
+                  <a href="/categories/java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">java基础</span>
                   </a>
                 </span>
 
@@ -1010,8 +1012,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java框架/spring/" itemprop="url" rel="index">
-                    <span itemprop="name">spring</span>
+                  <a href="/categories/java基础/java并发/" itemprop="url" rel="index">
+                    <span itemprop="name">java并发</span>
                   </a>
                 </span>
 
@@ -1049,16 +1051,12 @@
       
         
           
-          1 spring的框架介绍spring框架是一个分层架构，它包含一系列的功能要素，并被分为大约20个模块，如下图所示
-
-这些模块被总结为以下几个部分：
-
-Core Container
-Core Container(核心容器)包含有Core、Beans、Context和Expression Langu
+          CountDownLatch 和 CyclicBarrier 的区别？ (1) CountDownLatch 的作用是允许 1 个线程等待其他线程执行完成之后， 它才执行；而 CyclicBarrier 则是允许 N 个线程相互等待到某个公共屏障点，然 后这一组线程再同时执行。
+ (2) Count
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java框架/spring/spring整体框架/#more" rel="contents">
+            <a class="btn" href="/2018/03/16/java基础/java并发/并发/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1950,7 +1948,7 @@ Server元素表示整个Catalina servlet容器。 它的属性代表了整个ser
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">107</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1961,7 +1959,7 @@ Server元素表示整个Catalina servlet容器。 它的属性代表了整个ser
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1972,7 +1970,7 @@ Server元素表示整个Catalina servlet容器。 它的属性代表了整个ser
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

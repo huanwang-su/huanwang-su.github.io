@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="scala," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="set默认情况下，Scala 使用的是不可变集合，如果你想使用可变集合，需要引用 scala.collection.mutable.Set 包。 默认引用 scala.collection.immutable.Set，不可变集合实例如下： 12345val set = Set(1,2,3)println(set.getClass.getName) // println(set.exists(_ %">
+<meta name="keywords" content="scala">
+<meta property="og:type" content="article">
+<meta property="og:title" content="scala集合">
+<meta property="og:url" content="http://hvan.wang/2018/04/04/scala/集合对象/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="set默认情况下，Scala 使用的是不可变集合，如果你想使用可变集合，需要引用 scala.collection.mutable.Set 包。 默认引用 scala.collection.immutable.Set，不可变集合实例如下： 12345val set = Set(1,2,3)println(set.getClass.getName) // println(set.exists(_ %">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-17T08:56:43.500Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="scala集合">
+<meta name="twitter:description" content="set默认情况下，Scala 使用的是不可变集合，如果你想使用可变集合，需要引用 scala.collection.mutable.Set 包。 默认引用 scala.collection.immutable.Set，不可变集合实例如下： 12345val set = Set(1,2,3)println(set.getClass.getName) // println(set.exists(_ %">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/04/04/scala/集合对象/"/>
+
+
+
+
+
+  <title>scala集合 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/04/04/scala/集合对象/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">scala集合</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-04T08:28:25+08:00">
+                2018-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/scala/" itemprop="url" rel="index">
+                    <span itemprop="name">scala</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/04/scala/集合对象/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/04/04/scala/集合对象/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="set"><a href="#set" class="headerlink" title="set"></a>set</h2><p>默认情况下，Scala 使用的是不可变集合，如果你想使用可变集合，需要引用 <strong>scala.collection.mutable.Set</strong> 包。</p>
+<p>默认引用 scala.collection.immutable.Set，不可变集合实例如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> set = <span class="type">Set</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line">println(set.getClass.getName) <span class="comment">// </span></span><br><span class="line"></span><br><span class="line">println(set.exists(_ % <span class="number">2</span> == <span class="number">0</span>)) <span class="comment">//true</span></span><br><span class="line">println(set.drop(<span class="number">1</span>)) <span class="comment">//Set(2,3)</span></span><br></pre></td></tr></table></figure>
+<p>如果需要使用可变集合需要引入 scala.collection.mutable.Set：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.collection.mutable.<span class="type">Set</span> <span class="comment">// 可以在任何地方引入 可变集合</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> mutableSet = <span class="type">Set</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line">println(mutableSet.getClass.getName) <span class="comment">// scala.collection.mutable.HashSet</span></span><br><span class="line"></span><br><span class="line">mutableSet.add(<span class="number">4</span>)</span><br><span class="line">mutableSet.remove(<span class="number">1</span>)</span><br><span class="line">mutableSet += <span class="number">5</span></span><br><span class="line">mutableSet -= <span class="number">2</span></span><br><span class="line"></span><br><span class="line">println(mutableSet) <span class="comment">// Set(5, 3, 4)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> another = mutableSet.toSet</span><br><span class="line">println(another.getClass.getName) <span class="comment">// scala.collection.immutable.Set</span></span><br></pre></td></tr></table></figure>
+<h3 id="Scala-Set-常用方法"><a href="#Scala-Set-常用方法" class="headerlink" title="Scala Set 常用方法"></a>Scala Set 常用方法</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>def +(elem: A): Set[A]</strong>为集合添加新元素，x并创建一个新的集合，除非元素已存在</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>def -(elem: A): Set[A]</strong>移除集合中的元素，并创建一个新的集合</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>def contains(elem: A): Boolean</strong>如果元素在集合中存在，返回 true，否则返回 false。</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>def &amp;(that: Set[A]): Set[A]</strong>返回两个集合的交集</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>def &amp;~(that: Set[A]): Set[A]</strong>返回两个集合的差集</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>def +(elem1: A, elem2: A, elems: A*): Set[A]</strong>通过添加传入指定集合的元素创建一个新的不可变集合</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>def ++(elems: A): Set[A]</strong>合并两个集合</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>def -(elem1: A, elem2: A, elems: A*): Set[A]</strong>通过移除传入指定集合的元素创建一个新的不可变集合</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>def addString(b: StringBuilder): StringBuilder</strong>将不可变集合的所有元素添加到字符串缓冲区</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>def addString(b: StringBuilder, sep: String): StringBuilder</strong>将不可变集合的所有元素添加到字符串缓冲区，并使用指定的分隔符</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>def apply(elem: A)</strong>检测集合中是否包含指定元素</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>def count(p: (A) =&gt; Boolean): Int</strong>计算满足指定条件的集合元素个数</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>def copyToArray(xs: Array[A], start: Int, len: Int): Unit</strong>复制不可变集合元素到数组</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>def diff(that: Set[A]): Set[A]</strong>比较两个集合的差集</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>def drop(n: Int): Set[A]]</strong>返回丢弃前n个元素新集合</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>def dropRight(n: Int): Set[A]</strong>返回丢弃最后n个元素新集合</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>def dropWhile(p: (A) =&gt; Boolean): Set[A]</strong>从左向右丢弃元素，直到条件p不成立</td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>def equals(that: Any): Boolean</strong>equals 方法可用于任意序列。用于比较系列是否相等。</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>def exists(p: (A) =&gt; Boolean): Boolean</strong>判断不可变集合中指定条件的元素是否存在。</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>def filter(p: (A) =&gt; Boolean): Set[A]</strong>输出符合指定条件的所有不可变集合元素。</td>
+</tr>
+<tr>
+<td>21</td>
+<td><strong>def find(p: (A) =&gt; Boolean): Option[A]</strong>查找不可变集合中满足指定条件的第一个元素</td>
+</tr>
+<tr>
+<td>22</td>
+<td><strong>def forall(p: (A) =&gt; Boolean): Boolean</strong>查找不可变集合中满足指定条件的所有元素</td>
+</tr>
+<tr>
+<td>23</td>
+<td><strong>def foreach(f: (A) =&gt; Unit): Unit</strong>将函数应用到不可变集合的所有元素</td>
+</tr>
+<tr>
+<td>24</td>
+<td><strong>def head: A</strong>获取不可变集合的第一个元素</td>
+</tr>
+<tr>
+<td>25</td>
+<td><strong>def init: Set[A]</strong>返回所有元素，除了最后一个</td>
+</tr>
+<tr>
+<td>26</td>
+<td><strong>def intersect(that: Set[A]): Set[A]</strong>计算两个集合的交集</td>
+</tr>
+<tr>
+<td>27</td>
+<td><strong>def isEmpty: Boolean</strong>判断集合是否为空</td>
+</tr>
+<tr>
+<td>28</td>
+<td><strong>def iterator: Iterator[A]</strong>创建一个新的迭代器来迭代元素</td>
+</tr>
+<tr>
+<td>29</td>
+<td><strong>def last: A</strong>返回最后一个元素</td>
+</tr>
+<tr>
+<td>30</td>
+<td><strong>def map<a href="f: (A" target="_blank" rel="noopener">B</a> =&gt; B): immutable.Set[B]</strong>通过给定的方法将所有元素重新计算</td>
+</tr>
+<tr>
+<td>31</td>
+<td><strong>def max: A</strong>查找最大元素</td>
+</tr>
+<tr>
+<td>32</td>
+<td><strong>def min: A</strong>查找最小元素</td>
+</tr>
+<tr>
+<td>33</td>
+<td><strong>def mkString: String</strong>集合所有元素作为字符串显示</td>
+</tr>
+<tr>
+<td>34</td>
+<td><strong>def mkString(sep: String): String</strong>使用分隔符将集合所有元素作为字符串显示</td>
+</tr>
+<tr>
+<td>35</td>
+<td><strong>def product: A</strong>返回不可变集合中数字元素的积。</td>
+</tr>
+<tr>
+<td>36</td>
+<td><strong>def size: Int</strong>返回不可变集合元素的数量</td>
+</tr>
+<tr>
+<td>37</td>
+<td><strong>def splitAt(n: Int): (Set[A], Set[A])</strong>把不可变集合拆分为两个容器，第一个由前 n 个元素组成，第二个由剩下的元素组成</td>
+</tr>
+<tr>
+<td>38</td>
+<td><strong>def subsetOf(that: Set[A]): Boolean</strong>如果集合中含有子集返回 true，否则返回false</td>
+</tr>
+<tr>
+<td>39</td>
+<td><strong>def sum: A</strong>返回不可变集合中所有数字元素之和</td>
+</tr>
+<tr>
+<td>40</td>
+<td><strong>def tail: Set[A]</strong>返回一个不可变集合中除了第一元素之外的其他元素</td>
+</tr>
+<tr>
+<td>41</td>
+<td><strong>def take(n: Int): Set[A]</strong>返回前 n 个元素</td>
+</tr>
+<tr>
+<td>42</td>
+<td><strong>def takeRight(n: Int):Set[A]</strong>返回后 n 个元素</td>
+</tr>
+<tr>
+<td>43</td>
+<td><strong>def toArray: Array[A]</strong>将集合转换为数字</td>
+</tr>
+<tr>
+<td>44</td>
+<td><strong>def toBuffer[B &gt;: A]: Buffer[B]</strong>返回缓冲区，包含了不可变集合的所有元素</td>
+</tr>
+<tr>
+<td>45</td>
+<td><strong>def toList: List[A]</strong>返回 List，包含了不可变集合的所有元素</td>
+</tr>
+<tr>
+<td>46</td>
+<td><strong>def toMap[T, U]: Map[T, U]</strong>返回 Map，包含了不可变集合的所有元素</td>
+</tr>
+<tr>
+<td>47</td>
+<td><strong>def toSeq: Seq[A]</strong>返回 Seq，包含了不可变集合的所有元素</td>
+</tr>
+<tr>
+<td>48</td>
+<td><strong>def toString(): String</strong>返回一个字符串，以对象来表示</td>
+</tr>
+</tbody>
+</table>
+<h2 id="list"><a href="#list" class="headerlink" title="list"></a>list</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 字符串列表</span></span><br><span class="line"><span class="keyword">val</span> site: <span class="type">List</span>[<span class="type">String</span>] = <span class="type">List</span>(<span class="string">"Runoob"</span>, <span class="string">"Google"</span>, <span class="string">"Baidu"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 整型列表</span></span><br><span class="line"><span class="keyword">val</span> nums: <span class="type">List</span>[<span class="type">Int</span>] = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 空列表</span></span><br><span class="line"><span class="keyword">val</span> empty: <span class="type">List</span>[<span class="type">Nothing</span>] = <span class="type">List</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 二维列表</span></span><br><span class="line"><span class="keyword">val</span> dim: <span class="type">List</span>[<span class="type">List</span>[<span class="type">Int</span>]] =</span><br><span class="line">   <span class="type">List</span>(</span><br><span class="line">      <span class="type">List</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">      <span class="type">List</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>),</span><br><span class="line">      <span class="type">List</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">   )</span><br></pre></td></tr></table></figure>
+<h3 id="Scala-List-常用方法"><a href="#Scala-List-常用方法" class="headerlink" title="Scala List 常用方法"></a>Scala List 常用方法</h3><p>下表列出了 Scala List 常用的方法：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>def +:(elem: A): List[A]</strong>为列表预添加元素<code>scala&gt; val x = List(1)x: List[Int] = List(1)scala&gt; val y = 2 +: xy: List[Int] = List(2, 1)scala&gt; println(x)List(1)</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>def ::(x: A): List[A]</strong>在列表开头添加元素</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>def :::(prefix: List[A]): List[A]</strong>在列表开头添加指定列表的元素</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>def :+(elem: A): List[A]</strong>复制添加元素后列表。<code>scala&gt; val a = List(1)a: List[Int] = List(1)scala&gt; val b = a :+ 2b: List[Int] = List(1, 2)scala&gt; println(a)List(1)</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>def addString(b: StringBuilder): StringBuilder</strong>将列表的所有元素添加到 StringBuilder</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>def addString(b: StringBuilder, sep: String): StringBuilder</strong>将列表的所有元素添加到 StringBuilder，并指定分隔符</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>def apply(n: Int): A</strong>通过列表索引获取元素</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>def contains(elem: Any): Boolean</strong>检测列表中是否包含指定的元素</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>def copyToArray(xs: Array[A], start: Int, len: Int): Unit</strong>将列表的元素复制到数组中。</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>def distinct: List[A]</strong>去除列表的重复元素，并返回新列表</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>def drop(n: Int): List[A]</strong>丢弃前n个元素，并返回新列表</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>def dropRight(n: Int): List[A]</strong>丢弃最后n个元素，并返回新列表</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>def dropWhile(p: (A) =&gt; Boolean): List[A]</strong>从左向右丢弃元素，直到条件p不成立</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>def endsWith<a href="that: Seq[B]" target="_blank" rel="noopener">B</a>: Boolean</strong>检测列表是否以指定序列结尾</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>def equals(that: Any): Boolean</strong>判断是否相等</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>def exists(p: (A) =&gt; Boolean): Boolean</strong>判断列表中指定条件的元素是否存在。判断l是否存在某个元素:<code>scala&gt; l.exists(s =&gt; s == &quot;Hah&quot;)res7: Boolean = true</code></td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>def filter(p: (A) =&gt; Boolean): List[A]</strong>输出符号指定条件的所有元素。过滤出长度为3的元素:<code>scala&gt; l.filter(s =&gt; s.length == 3)res8: List[String] = List(Hah, WOW)</code></td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>def forall(p: (A) =&gt; Boolean): Boolean</strong>检测所有元素。例如：判断所有元素是否以”H”开头：scala&gt; l.forall(s =&gt; s.startsWith(“H”)) res10: Boolean = false</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>def foreach(f: (A) =&gt; Unit): Unit</strong>将函数应用到列表的所有元素</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>def head: A</strong>获取列表的第一个元素</td>
+</tr>
+<tr>
+<td>21</td>
+<td><strong>def indexOf(elem: A, from: Int): Int</strong>从指定位置 from 开始查找元素第一次出现的位置</td>
+</tr>
+<tr>
+<td>22</td>
+<td><strong>def init: List[A]</strong>返回所有元素，除了最后一个</td>
+</tr>
+<tr>
+<td>23</td>
+<td><strong>def intersect(that: Seq[A]): List[A]</strong>计算多个集合的交集</td>
+</tr>
+<tr>
+<td>24</td>
+<td><strong>def isEmpty: Boolean</strong>检测列表是否为空</td>
+</tr>
+<tr>
+<td>25</td>
+<td><strong>def iterator: Iterator[A]</strong>创建一个新的迭代器来迭代元素</td>
+</tr>
+<tr>
+<td>26</td>
+<td><strong>def last: A</strong>返回最后一个元素</td>
+</tr>
+<tr>
+<td>27</td>
+<td><strong>def lastIndexOf(elem: A, end: Int): Int</strong>在指定的位置 end 开始查找元素最后出现的位置</td>
+</tr>
+<tr>
+<td>28</td>
+<td><strong>def length: Int</strong>返回列表长度</td>
+</tr>
+<tr>
+<td>29</td>
+<td><strong>def map<a href="f: (A" target="_blank" rel="noopener">B</a> =&gt; B): List[B]</strong>通过给定的方法将所有元素重新计算</td>
+</tr>
+<tr>
+<td>30</td>
+<td><strong>def max: A</strong>查找最大元素</td>
+</tr>
+<tr>
+<td>31</td>
+<td><strong>def min: A</strong>查找最小元素</td>
+</tr>
+<tr>
+<td>32</td>
+<td><strong>def mkString: String</strong>列表所有元素作为字符串显示</td>
+</tr>
+<tr>
+<td>33</td>
+<td><strong>def mkString(sep: String): String</strong>使用分隔符将列表所有元素作为字符串显示</td>
+</tr>
+<tr>
+<td>34</td>
+<td><strong>def reverse: List[A]</strong>列表反转</td>
+</tr>
+<tr>
+<td>35</td>
+<td><strong>def sorted[B &gt;: A]: List[A]</strong>列表排序</td>
+</tr>
+<tr>
+<td>36</td>
+<td><strong>def startsWith<a href="that: Seq[B], offset: Int" target="_blank" rel="noopener">B</a>: Boolean</strong>检测列表在指定位置是否包含指定序列</td>
+</tr>
+<tr>
+<td>37</td>
+<td><strong>def sum: A</strong>计算集合元素之和</td>
+</tr>
+<tr>
+<td>38</td>
+<td><strong>def tail: List[A]</strong>返回所有元素，除了第一个</td>
+</tr>
+<tr>
+<td>39</td>
+<td><strong>def take(n: Int): List[A]</strong>提取列表的前n个元素</td>
+</tr>
+<tr>
+<td>40</td>
+<td><strong>def takeRight(n: Int): List[A]</strong>提取列表的后n个元素</td>
+</tr>
+<tr>
+<td>41</td>
+<td><strong>def toArray: Array[A]</strong>列表转换为数组</td>
+</tr>
+<tr>
+<td>42</td>
+<td><strong>def toBuffer[B &gt;: A]: Buffer[B]</strong>返回缓冲区，包含了列表的所有元素</td>
+</tr>
+<tr>
+<td>43</td>
+<td><strong>def toMap[T, U]: Map[T, U]</strong>List 转换为 Map</td>
+</tr>
+<tr>
+<td>44</td>
+<td><strong>def toSeq: Seq[A]</strong>List 转换为 Seq</td>
+</tr>
+<tr>
+<td>45</td>
+<td><strong>def toSet[B &gt;: A]: Set[B]</strong>List 转换为 Set</td>
+</tr>
+<tr>
+<td>46</td>
+<td><strong>def toString(): String</strong>列表转换为字符串</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 空哈希表，键为字符串，值为整型</span></span><br><span class="line"><span class="keyword">var</span> <span class="type">A</span>:<span class="type">Map</span>[<span class="type">Char</span>,<span class="type">Int</span>] = <span class="type">Map</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Map 键值对演示</span></span><br><span class="line"><span class="keyword">val</span> colors = <span class="type">Map</span>(<span class="string">"red"</span> -&gt; <span class="string">"#FF0000"</span>, <span class="string">"azure"</span> -&gt; <span class="string">"#F0FFFF"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> sites = <span class="type">Map</span>(<span class="string">"runoob"</span> -&gt; <span class="string">"http://www.runoob.com"</span>,</span><br><span class="line">                       <span class="string">"baidu"</span> -&gt; <span class="string">"http://www.baidu.com"</span>,</span><br><span class="line">                       <span class="string">"taobao"</span> -&gt; <span class="string">"http://www.taobao.com"</span>)</span><br><span class="line">sites.keys.foreach&#123; i =&gt;  </span><br><span class="line">                           print( <span class="string">"Key = "</span> + i )</span><br><span class="line">                           println(<span class="string">" Value = "</span> + sites(i) )&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Scala-Map-方法"><a href="#Scala-Map-方法" class="headerlink" title="Scala Map 方法"></a>Scala Map 方法</h3><p>下表列出了 Scala Map 常用的方法：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>def ++(xs: Map[(A, B)]): Map[A, B]</strong>返回一个新的 Map，新的 Map xs 组成</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>def -(elem1: A, elem2: A, elems: A*): Map[A, B]</strong>返回一个新的 Map, 移除 key 为 elem1, elem2 或其他 elems。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>def –(xs: GTO[A]): Map[A, B]</strong>返回一个新的 Map, 移除 xs 对象中对应的 key</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>def get(key: A): Option[B]</strong>返回指定 key 的值</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>def iterator: Iterator[(A, B)]</strong>创建新的迭代器，并输出 key/value 对</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>def addString(b: StringBuilder): StringBuilder</strong>将 Map 中的所有元素附加到StringBuilder，可加入分隔符</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>def addString(b: StringBuilder, sep: String): StringBuilder</strong>将 Map 中的所有元素附加到StringBuilder，可加入分隔符</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>def apply(key: A): B</strong>返回指定键的值，如果不存在返回 Map 的默认方法</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>def clear(): Unit</strong>清空 Map</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>def clone(): Map[A, B]</strong>从一个 Map 复制到另一个 Map</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>def contains(key: A): Boolean</strong>如果 Map 中存在指定 key，返回 true，否则返回 false。</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>def copyToArray(xs: Array[(A, B)]): Unit</strong>复制集合到数组</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>def count(p: ((A, B)) =&gt; Boolean): Int</strong>计算满足指定条件的集合元素数量</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>def default(key: A): B</strong>定义 Map 的默认值，在 key 不存在时返回。</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>def drop(n: Int): Map[A, B]</strong>返回丢弃前n个元素新集合</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>def dropRight(n: Int): Map[A, B]</strong>返回丢弃最后n个元素新集合</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>def dropWhile(p: ((A, B)) =&gt; Boolean): Map[A, B]</strong>从左向右丢弃元素，直到条件p不成立</td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>def empty: Map[A, B]</strong>返回相同类型的空 Map</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>def equals(that: Any): Boolean</strong>如果两个 Map 相等(key/value 均相等)，返回true，否则返回false</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>def exists(p: ((A, B)) =&gt; Boolean): Boolean</strong>判断集合中指定条件的元素是否存在</td>
+</tr>
+<tr>
+<td>21</td>
+<td><strong>def filter(p: ((A, B))=&gt; Boolean): Map[A, B]</strong>返回满足指定条件的所有集合</td>
+</tr>
+<tr>
+<td>22</td>
+<td><strong>def filterKeys(p: (A) =&gt; Boolean): Map[A, B]</strong>返回符合指定条件的的不可变 Map</td>
+</tr>
+<tr>
+<td>23</td>
+<td><strong>def find(p: ((A, B)) =&gt; Boolean): Option[(A, B)]</strong>查找集合中满足指定条件的第一个元素</td>
+</tr>
+<tr>
+<td>24</td>
+<td><strong>def foreach(f: ((A, B)) =&gt; Unit): Unit</strong>将函数应用到集合的所有元素</td>
+</tr>
+<tr>
+<td>25</td>
+<td><strong>def init: Map[A, B]</strong>返回所有元素，除了最后一个</td>
+</tr>
+<tr>
+<td>26</td>
+<td><strong>def isEmpty: Boolean</strong>检测 Map 是否为空</td>
+</tr>
+<tr>
+<td>27</td>
+<td><strong>def keys: Iterable[A]</strong>返回所有的key/p&gt;</td>
+</tr>
+<tr>
+<td>28</td>
+<td><strong>def last: (A, B)</strong>返回最后一个元素</td>
+</tr>
+<tr>
+<td>29</td>
+<td><strong>def max: (A, B)</strong>查找最大元素</td>
+</tr>
+<tr>
+<td>30</td>
+<td><strong>def min: (A, B)</strong>查找最小元素</td>
+</tr>
+<tr>
+<td>31</td>
+<td><strong>def mkString: String</strong>集合所有元素作为字符串显示</td>
+</tr>
+<tr>
+<td>32</td>
+<td><strong>def product: (A, B)</strong>返回集合中数字元素的积。</td>
+</tr>
+<tr>
+<td>33</td>
+<td><strong>def remove(key: A): Option[B]</strong>移除指定 key</td>
+</tr>
+<tr>
+<td>34</td>
+<td><strong>def retain(p: (A, B) =&gt; Boolean): Map.this.type</strong>如果符合满足条件的返回 true</td>
+</tr>
+<tr>
+<td>35</td>
+<td><strong>def size: Int</strong>返回 Map 元素的个数</td>
+</tr>
+<tr>
+<td>36</td>
+<td><strong>def sum: (A, B)</strong>返回集合中所有数字元素之和</td>
+</tr>
+<tr>
+<td>37</td>
+<td><strong>def tail: Map[A, B]</strong>返回一个集合中除了第一元素之外的其他元素</td>
+</tr>
+<tr>
+<td>38</td>
+<td><strong>def take(n: Int): Map[A, B]</strong>返回前 n 个元素</td>
+</tr>
+<tr>
+<td>39</td>
+<td><strong>def takeRight(n: Int): Map[A, B]</strong>返回后 n 个元素</td>
+</tr>
+<tr>
+<td>40</td>
+<td><strong>def takeWhile(p: ((A, B)) =&gt; Boolean): Map[A, B]</strong>返回满足指定条件的元素</td>
+</tr>
+<tr>
+<td>41</td>
+<td><strong>def toArray: Array[(A, B)]</strong>集合转数组</td>
+</tr>
+<tr>
+<td>42</td>
+<td><strong>def toBuffer[B &gt;: A]: Buffer[B]</strong>返回缓冲区，包含了 Map 的所有元素</td>
+</tr>
+<tr>
+<td>43</td>
+<td><strong>def toList: List[A]</strong>返回 List，包含了 Map 的所有元素</td>
+</tr>
+<tr>
+<td>44</td>
+<td><strong>def toSeq: Seq[A]</strong>返回 Seq，包含了 Map 的所有元素</td>
+</tr>
+<tr>
+<td>45</td>
+<td><strong>def toSet: Set[A]</strong>返回 Set，包含了 Map 的所有元素</td>
+</tr>
+<tr>
+<td>46</td>
+<td><strong>def toString(): String</strong>返回字符串对象</td>
+</tr>
+</tbody>
+</table>
+<h2 id="元组"><a href="#元组" class="headerlink" title="元组"></a>元组</h2><p>与列表一样，元组也是不可变的，但与列表不同的是元组可以包含不同类型的元素。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> t = <span class="keyword">new</span> <span class="type">Tuple3</span>(<span class="number">1</span>, <span class="number">3.14</span>, <span class="string">"Fred"</span>)</span><br><span class="line">我们可以使用 t._1 访问第一个元素， t._2 访问第二个元素</span><br><span class="line"></span><br><span class="line">可以使用 <span class="type">Tuple</span>.productIterator() 方法来迭代输出元组的所有元素：</span><br><span class="line">t.productIterator.foreach&#123; i =&gt;println(<span class="string">"Value = "</span> + i )&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Option"><a href="#Option" class="headerlink" title="Option"></a>Option</h1><p>Scala Option(选项)类型用来表示一个值是可选的（有值或无值)。</p>
+<p>Option[T] 是一个类型为 T 的可选值的容器： 如果值存在， Option[T] 就是一个 Some[T] ，如果不存在， Option[T] 就是对象 None 。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 虽然 Scala 可以不定义变量的类型，不过为了清楚些，我还是</span></span><br><span class="line"><span class="comment">// 把他显示的定义上了</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">val</span> myMap: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">String</span>] = <span class="type">Map</span>(<span class="string">"key1"</span> -&gt; <span class="string">"value"</span>)</span><br><span class="line"><span class="keyword">val</span> value1: <span class="type">Option</span>[<span class="type">String</span>] = myMap.get(<span class="string">"key1"</span>)</span><br><span class="line"><span class="keyword">val</span> value2: <span class="type">Option</span>[<span class="type">String</span>] = myMap.get(<span class="string">"key2"</span>)</span><br><span class="line"> </span><br><span class="line">println(value1) <span class="comment">// Some("value1")</span></span><br><span class="line">println(value2) <span class="comment">// None</span></span><br></pre></td></tr></table></figure>
+<p>使用 getOrElse() 方法来获取元组中存在的元素或者使用其默认的值</p>
+<p>可以使用 isEmpty() 方法来检测元组中的元素是否为 None</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) &#123;</span><br><span class="line">      <span class="keyword">val</span> a:<span class="type">Option</span>[<span class="type">Int</span>] = <span class="type">Some</span>(<span class="number">5</span>)</span><br><span class="line">      <span class="keyword">val</span> b:<span class="type">Option</span>[<span class="type">Int</span>] = <span class="type">None</span> </span><br><span class="line">      </span><br><span class="line">      println(<span class="string">"a.getOrElse(0): "</span> + a.getOrElse(<span class="number">0</span>) )</span><br><span class="line">      println(<span class="string">"b.getOrElse(10): "</span> + b.getOrElse(<span class="number">10</span>) )</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Scala-Option-常用方法"><a href="#Scala-Option-常用方法" class="headerlink" title="Scala Option 常用方法"></a>Scala Option 常用方法</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法及描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>def get: A</strong>获取可选值</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>def isEmpty: Boolean</strong>检测可选类型值是否为 None，是的话返回 true，否则返回 false</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>def productArity: Int</strong>返回元素个数， A(x_1, …, x_k), 返回 k</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>def productElement(n: Int): Any</strong>获取指定的可选项，以 0 为起始。即 A(x_1, …, x_k), 返回 x_(n+1) ， 0 &lt; n &lt; k.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>def exists(p: (A) =&gt; Boolean): Boolean</strong>如果可选项中指定条件的元素是否存在且不为 None 返回 true，否则返回 false。</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>def filter(p: (A) =&gt; Boolean): Option[A]</strong>如果选项包含有值，而且传递给 filter 的条件函数返回 true， filter 会返回 Some 实例。 否则，返回值为 None 。</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>def filterNot(p: (A) =&gt; Boolean): Option[A]</strong>如果选项包含有值，而且传递给 filter 的条件函数返回 false， filter 会返回 Some 实例。 否则，返回值为 None 。</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>def flatMap<a href="f: (A" target="_blank" rel="noopener">B</a> =&gt; Option[B]): Option[B]</strong>如果选项包含有值，则传递给函数 f 处理后返回，否则返回 None</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>def foreach<a href="f: (A" target="_blank" rel="noopener">U</a> =&gt; U): Unit</strong>如果选项包含有值，则将每个值传递给函数 f， 否则不处理。</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>def getOrElse<a href="default: =&gt; B" target="_blank" rel="noopener">B &gt;: A</a>: B</strong>如果选项包含有值，返回选项值，否则返回设定的默认值。</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>def isDefined: Boolean</strong>如果可选值是 Some 的实例返回 true，否则返回 false。</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>def iterator: Iterator[A]</strong>如果选项包含有值，迭代出可选值。如果可选值为空则返回空迭代器。</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>def map<a href="f: (A" target="_blank" rel="noopener">B</a> =&gt; B): Option[B]</strong>如果选项包含有值， 返回由函数 f 处理后的 Some，否则返回 None</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>def orElse<a href="alternative: =&gt; Option[B]" target="_blank" rel="noopener">B &gt;: A</a>: Option[B]</strong>如果一个 Option 是 None ， orElse 方法会返回传名参数的值，否则，就直接返回这个 Option。</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>def orNull</strong>如果选项包含有值返回选项值，否则返回 null。</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/29/设计模式/设计模式/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/30/分布式/zookeeper/zookeeper/" rel="prev" title="zookeeper原理">
+                zookeeper原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#set"><span class="nav-number">1.</span> <span class="nav-text">set</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Scala-Set-常用方法"><span class="nav-number">1.1.</span> <span class="nav-text">Scala Set 常用方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#list"><span class="nav-number">2.</span> <span class="nav-text">list</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Scala-List-常用方法"><span class="nav-number">2.1.</span> <span class="nav-text">Scala List 常用方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Map"><span class="nav-number">3.</span> <span class="nav-text">Map</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Scala-Map-方法"><span class="nav-number">3.1.</span> <span class="nav-text">Scala Map 方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元组"><span class="nav-number">4.</span> <span class="nav-text">元组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Option"><span class="nav-number"></span> <span class="nav-text">Option</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Scala-Option-常用方法"><span class="nav-number">0.1.</span> <span class="nav-text">Scala Option 常用方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1522801705000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
