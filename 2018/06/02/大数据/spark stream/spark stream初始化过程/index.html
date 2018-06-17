@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="spark stream," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="spark stream初始化过程Spark Streaming是一种构建在Spark上的实时计算框架。Spark Streaming应用以Spark应用的方式提交到Spark平台，其组件以长期批处理任务的形式在Spark平台运行。这些任务主要负责接收实时数据流及定期产生批作业并提交至Spark集群，  数据接收 Job 生成 流量控制 动态资源伸缩  以WordCount程序为例分析Spark">
+<meta name="keywords" content="spark stream">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark stream初始化过程">
+<meta property="og:url" content="http://hvan.wang/2018/06/02/大数据/spark stream/spark stream初始化过程/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="spark stream初始化过程Spark Streaming是一种构建在Spark上的实时计算框架。Spark Streaming应用以Spark应用的方式提交到Spark平台，其组件以长期批处理任务的形式在Spark平台运行。这些任务主要负责接收实时数据流及定期产生批作业并提交至Spark集群，  数据接收 Job 生成 流量控制 动态资源伸缩  以WordCount程序为例分析Spark">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-04T06:22:12.460Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spark stream初始化过程">
+<meta name="twitter:description" content="spark stream初始化过程Spark Streaming是一种构建在Spark上的实时计算框架。Spark Streaming应用以Spark应用的方式提交到Spark平台，其组件以长期批处理任务的形式在Spark平台运行。这些任务主要负责接收实时数据流及定期产生批作业并提交至Spark集群，  数据接收 Job 生成 流量控制 动态资源伸缩  以WordCount程序为例分析Spark">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/06/02/大数据/spark stream/spark stream初始化过程/"/>
+
+
+
+
+
+  <title>spark stream初始化过程 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/06/02/大数据/spark stream/spark stream初始化过程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">spark stream初始化过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-02T21:07:01+08:00">
+                2018-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/spark-stream/" itemprop="url" rel="index">
+                    <span itemprop="name">spark stream</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/02/大数据/spark stream/spark stream初始化过程/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/06/02/大数据/spark stream/spark stream初始化过程/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="spark-stream初始化过程"><a href="#spark-stream初始化过程" class="headerlink" title="spark stream初始化过程"></a>spark stream初始化过程</h1><p>Spark Streaming是一种构建在Spark上的实时计算框架。Spark Streaming应用以Spark应用的方式提交到Spark平台，其组件以长期批处理任务的形式在Spark平台运行。这些任务主要负责接收实时数据流及定期产生批作业并提交至Spark集群，</p>
+<ul>
+<li>数据接收</li>
+<li>Job 生成</li>
+<li>流量控制</li>
+<li>动态资源伸缩</li>
+</ul>
+<p>以WordCount程序为例分析Spark Streaming运行环境的初始化过程。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">"wordCount"</span>).setMaster(<span class="string">"local[4]"</span>) </span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf) </span><br><span class="line"><span class="keyword">val</span> ssc = <span class="keyword">new</span> <span class="type">StreamingContext</span>(sc, <span class="type">Seconds</span>(<span class="number">10</span>)) </span><br><span class="line"><span class="keyword">val</span> lines = ssc.socketTextStream(<span class="string">"localhost"</span>, <span class="number">8585</span>, <span class="type">StorageLevel</span>.<span class="type">MEMORY_ONLY</span>) </span><br><span class="line"><span class="keyword">val</span> words = lines.flatMap(_.split(<span class="string">" "</span>)).map(w =&gt; (w,<span class="number">1</span>)) </span><br><span class="line"><span class="keyword">val</span> wordCount = words.reduceByKey(_+_) </span><br><span class="line">wordCount.print </span><br><span class="line">ssc.start()</span><br><span class="line">ssc.awaitTermination()</span><br></pre></td></tr></table></figure>
+<h2 id="StreamingContext的初始化过程"><a href="#StreamingContext的初始化过程" class="headerlink" title="StreamingContext的初始化过程"></a>StreamingContext的初始化过程</h2><p>StreamingContext是Spark Streaming应用的执行环境，其定义很多Streaming功能的入口，如：它提供从多种数据源创建DStream的方法等。</p>
+<p>在创建Streaming应用时，首先应创建StreamingContext（WordCount应用可知），伴随StreamingContext的创建将会创建以下主要组件：</p>
+<h3 id="DStreamGraph"><a href="#DStreamGraph" class="headerlink" title="DStreamGraph"></a>DStreamGraph</h3><p>DStreamGraph的主要功能是记录InputDStream及OutputStream及从InputDStream中抽取出ReceiverInputStreams。因为DStream之间的依赖关系类似于RDD，并在任务执行时转换成RDD，因此，可以认为DStream Graph与RDD Graph存在对应关系. 即：DStreamGraph以批处理间隔为周期转换成RDDGraph.</p>
+<ul>
+<li>ReceiverInputStreams: 包含用于接收数据的Receiver信息，并在启动Receiver时提供相关信息</li>
+<li>OutputStream：每个OutputStream会在批作业生成时，生成一个Job.</li>
+</ul>
+<h3 id="JobScheduler"><a href="#JobScheduler" class="headerlink" title="JobScheduler"></a>JobScheduler</h3><p>JobScheduler是Spark Streaming中最核心的组件，其负载Streaming各功作组件的启动。</p>
+<ul>
+<li>数据接收</li>
+<li>Job 生成</li>
+<li>流量控制</li>
+<li>动态资源伸缩<br>以及负责生成的批Job的调度及状态管理工作。</li>
+</ul>
+<h2 id="DStream的创建与转换"><a href="#DStream的创建与转换" class="headerlink" title="DStream的创建与转换"></a>DStream的创建与转换</h2><p>StreamingContext初始化完毕后，通过调用其提供的创建InputDStream的方法创建SocketInputDStream.</p>
+<p>SocketInputDStream的继承关系为：<br><code>SocketInputDStream-&gt;ReceiverInputDStream-&gt;InputDStream-&gt;DStream</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssc.graph.addInputStream(this)</span><br></pre></td></tr></table></figure>
+<p>在创建SocketInputDStream时，会先初始化InputDStream，在InputDStream中实现将自身加入DStreamGraph中，以标识其为输入数据源。</p>
+<p>DStream中算子的转换，类似于RDD中的转换，都是延迟计算，仅形成pipeline链。当上述应用遇到print（Output算子）时，会将DStream转换为ForEachDStream,并调register方法作为OutputStream注册到DStreamGraph的outputStreams列表，以待生成Job。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print</span></span>(num: <span class="type">Int</span>): <span class="type">Unit</span> = ssc.withScope &#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foreachFunc</span></span>: (<span class="type">RDD</span>[<span class="type">T</span>], <span class="type">Time</span>) =&gt; <span class="type">Unit</span> = &#123;</span><br><span class="line">      (rdd: <span class="type">RDD</span>[<span class="type">T</span>], time: <span class="type">Time</span>) =&gt; &#123;</span><br><span class="line">        <span class="keyword">val</span> firstNum = rdd.take(num + <span class="number">1</span>)</span><br><span class="line">        <span class="comment">// scalastyle:off println</span></span><br><span class="line">        println(<span class="string">"-------------------------------------------"</span>)</span><br><span class="line">        println(<span class="string">s"Time: <span class="subst">$time</span>"</span>)</span><br><span class="line">        println(<span class="string">"-------------------------------------------"</span>)</span><br><span class="line">        firstNum.take(num).foreach(println)</span><br><span class="line">        <span class="keyword">if</span> (firstNum.length &gt; num) println(<span class="string">"..."</span>)</span><br><span class="line">        println()</span><br><span class="line">        <span class="comment">// scalastyle:on println</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    foreachRDD(context.sparkContext.clean(foreachFunc), displayInnerRDDOps = <span class="literal">false</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">foreachRDD</span></span>(</span><br><span class="line">      foreachFunc: (<span class="type">RDD</span>[<span class="type">T</span>], <span class="type">Time</span>) =&gt; <span class="type">Unit</span>,</span><br><span class="line">      displayInnerRDDOps: <span class="type">Boolean</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">new</span> <span class="type">ForEachDStream</span>(<span class="keyword">this</span>,</span><br><span class="line">      context.sparkContext.clean(foreachFunc, <span class="literal">false</span>), displayInnerRDDOps).register()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>ForEachDStream 不同于其它DStream的地方为其重写了generateJob方法，以使DStream Graph操作转换成RDD Graph操作，并生成Job.</p>
+<h2 id="SparkContext启动"><a href="#SparkContext启动" class="headerlink" title="SparkContext启动"></a>SparkContext启动</h2><p>以线程的方式启动JobScheduler，从而开启各功能组件。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ThreadUtils</span>.runInNewThread(<span class="string">"streaming-start"</span>) &#123;</span><br><span class="line">	sparkContext.setCallSite(startSite.get)</span><br><span class="line">	sparkContext.clearJobGroup()</span><br><span class="line">	sparkContext.setLocalProperty(<span class="type">SparkContext</span>.<span class="type">SPARK_JOB_INTERRUPT_ON_CANCEL</span>, <span class="string">"false"</span>)</span><br><span class="line">	savedProperties.set(<span class="type">SerializationUtils</span>.clone(sparkContext.localProperties.get()))</span><br><span class="line">	scheduler.start()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="JobScheduler的启动"><a href="#JobScheduler的启动" class="headerlink" title="JobScheduler的启动"></a>JobScheduler的启动</h3><p>JobScheduler主要负责以下几种任务：</p>
+<ul>
+<li>数据接收相关组件的初始化及启动<br>ReceiverTracker的初始化及启动。ReceiverTracker负责管理Receiver，包括Receiver的启停，状态维护 等。</li>
+<li>Job生成相关组件的启动<br>JobGenerator的启动。JobGenerator负责以BatchInterval为周期生成Job.</li>
+<li>Streaming监听的注册与启动</li>
+<li>作业监听</li>
+<li>反压机制<br>BackPressure机制，通过RateController控制数据摄取速率。</li>
+<li>Executor DynamicAllocation 的启动<br>Executor 动态伸缩管理,  动态增加或减少Executor，来达到使用系统稳定运行  或减少资源开销的目的。</li>
+<li>Job的调度及状态维护。</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start</span></span>(): <span class="type">Unit</span> = synchronized &#123;</span><br><span class="line">    <span class="comment">//用以接收和处理事件</span></span><br><span class="line">    eventLoop = <span class="keyword">new</span> <span class="type">EventLoop</span>[<span class="type">JobSchedulerEvent</span>](<span class="string">"JobScheduler"</span>) &#123;</span><br><span class="line">      <span class="keyword">override</span> <span class="keyword">protected</span> <span class="function"><span class="keyword">def</span> <span class="title">onReceive</span></span>(event: <span class="type">JobSchedulerEvent</span>): <span class="type">Unit</span> = processEvent(event)</span><br><span class="line">      <span class="keyword">override</span> <span class="keyword">protected</span> <span class="function"><span class="keyword">def</span> <span class="title">onError</span></span>(e: <span class="type">Throwable</span>): <span class="type">Unit</span> = reportError(<span class="string">"Error in job scheduler"</span>, e)</span><br><span class="line">    &#125;</span><br><span class="line">    eventLoop.start()</span><br><span class="line">	executorAllocationManager.foreach(ssc.addStreamingListener)</span><br><span class="line">    receiverTracker.start()</span><br><span class="line">    jobGenerator.start()</span><br><span class="line">    executorAllocationManager.foreach(_.start())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>EventLoop开始执行时，会开启一deamon线程用于处理队列中的事件。EventLoop是一个抽象类，JobScheduler中初始化EventLoop时实现了其OnReceive方法。该方法中指定接收的事件由processEvent（event）方法处理</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spark-stream/" rel="tag"># spark stream</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/02/大数据/spark stream/spark stream介绍/" rel="next" title="spark stream介绍">
+                <i class="fa fa-chevron-left"></i> spark stream介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/02/大数据/spark stream/SparkStreaming Backpressure分析/" rel="prev" title="SparkStreaming Backpressure分析">
+                SparkStreaming Backpressure分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">104</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spark-stream初始化过程"><span class="nav-number">1.</span> <span class="nav-text">spark stream初始化过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#StreamingContext的初始化过程"><span class="nav-number">1.1.</span> <span class="nav-text">StreamingContext的初始化过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DStreamGraph"><span class="nav-number">1.1.1.</span> <span class="nav-text">DStreamGraph</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JobScheduler"><span class="nav-number">1.1.2.</span> <span class="nav-text">JobScheduler</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DStream的创建与转换"><span class="nav-number">1.2.</span> <span class="nav-text">DStream的创建与转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SparkContext启动"><span class="nav-number">1.3.</span> <span class="nav-text">SparkContext启动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JobScheduler的启动"><span class="nav-number">1.3.1.</span> <span class="nav-text">JobScheduler的启动</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1527944821000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

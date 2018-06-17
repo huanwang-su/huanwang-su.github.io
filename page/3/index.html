@@ -306,7 +306,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/javaNIO/选择器/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/05/11/大数据/mapreduce/hadoop的io/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -325,7 +325,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/javaNIO/选择器/" itemprop="url">java nio 选择器</a></h1>
+                <a class="post-title-link" href="/2018/05/11/大数据/mapreduce/hadoop的io/" itemprop="url">hadoop的io</a></h1>
         
 
         <div class="post-meta">
@@ -337,8 +337,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-11T20:46:25+08:00">
+                2018-05-11
               </time>
             
 
@@ -360,8 +360,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -371,8 +371,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/javaNIO/" itemprop="url" rel="index">
-                    <span itemprop="name">javaNIO</span>
+                  <a href="/categories/大数据/MapReduce/" itemprop="url" rel="index">
+                    <span itemprop="name">MapReduce</span>
                   </a>
                 </span>
 
@@ -410,13 +410,13 @@
       
         
           
-          选择器选择器提供选择执行已经就绪的任务的能力，这使得多元 I/O 成为可能。
-就绪选择和多元执行使得单线程能够有效率地同时管理多个 I/O 通道(channels)。
-选择器基础将之前创建的一个或多个可选择的通道注册到选择器对象中。一个表示通道和选择器的键将会被返回。当您调用一个选择器对象的sele
+          hadoop的IO操作数据完整性检测数据是否损坏的常用措施是：在数据第一次引入系统时计算校验和并在数据通过一个不可靠的同道进行传输时再一次计算校验和，这样就能发现数据是否损坏。
+HDFS的数据完整性　
+数据节点负责在存储数据及其校验和之前验证它们收到的数据。 从客户端和其它数据节点复制过来的数据。客
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/javaNIO/选择器/#more" rel="contents">
+            <a class="btn" href="/2018/05/11/大数据/mapreduce/hadoop的io/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -467,7 +467,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/javaNIO/通道/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/05/10/大数据/yarn/yarn架构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -486,7 +486,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/javaNIO/通道/" itemprop="url">java nio 通道</a></h1>
+                <a class="post-title-link" href="/2018/05/10/大数据/yarn/yarn架构/" itemprop="url">yarn架构</a></h1>
         
 
         <div class="post-meta">
@@ -498,8 +498,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T17:08:48+08:00">
+                2018-05-10
               </time>
             
 
@@ -521,8 +521,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -532,8 +532,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/javaNIO/" itemprop="url" rel="index">
-                    <span itemprop="name">javaNIO</span>
+                  <a href="/categories/大数据/yarn/" itemprop="url" rel="index">
+                    <span itemprop="name">yarn</span>
                   </a>
                 </span>
 
@@ -571,16 +571,11 @@
       
         
           
-          通道Channel用于在字节缓冲区和位于通道另一侧的实体（通常是一个文件或套接字）之间有效地传输数据。
-通道是一种途径，借助该途径，可以用最小的总开销来访问操作系统本身的I/O服务。缓冲区则是通道内部用来发送和接收数据的端点。
-
-channel类层次结构
-
-通道基础public interface 
+          yarn架构YARN（Yet Another Resource Negotiator）是一个通用的资源管理平台，可为各类计算框架提供资源的管理和调度。其核心出发点是为了分离资源管理与作业调度/监控，实现分离的做法是拥有一个全局的资源管理器（ResourceManager，RM），以及每个应用程序对应
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/javaNIO/通道/#more" rel="contents">
+            <a class="btn" href="/2018/05/10/大数据/yarn/yarn架构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -631,7 +626,7 @@ channel类层次结构
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java基础/String/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/05/10/大数据/hdfs/HDFS HA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -650,7 +645,7 @@ channel类层次结构
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java基础/String/" itemprop="url">java String</a></h1>
+                <a class="post-title-link" href="/2018/05/10/大数据/hdfs/HDFS HA/" itemprop="url">HDFS HA</a></h1>
         
 
         <div class="post-meta">
@@ -662,8 +657,8 @@ channel类层次结构
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T17:08:48+08:00">
+                2018-05-10
               </time>
             
 
@@ -685,8 +680,8 @@ channel类层次结构
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -696,8 +691,8 @@ channel类层次结构
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/hdfs/" itemprop="url" rel="index">
+                    <span itemprop="name">hdfs</span>
                   </a>
                 </span>
 
@@ -735,15 +730,18 @@ channel类层次结构
       
         
           
-          String基础不可变StringString对象是不可变的,每一个修改String值的方法,实际上都是创建了一个新的String对象,原初的String不变
-APIString() 
-初始化一个新创建的 String 对象，使其表示一个空字符序列。
-String(byte[] bytes) 
-通过
+          5 Hdfs HA背景：hdfs集群SPOF，主要在两种情况下：
+
+突发事件如断电等
+系统升级
+
+在同一个集群中运行两个(以及两个以上)冗余的NameNodes。这样可以在机器崩溃或者为计划维护的情况下快速转移到新的NameNode
+可通过Quorum Journal Manager或NFS 实现
+
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java基础/String/#more" rel="contents">
+            <a class="btn" href="/2018/05/10/大数据/hdfs/HDFS HA/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -794,7 +792,7 @@ String(byte[] bytes)
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java基础/java引用/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/05/10/大数据/yarn/yarn基础/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -813,7 +811,7 @@ String(byte[] bytes)
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java基础/java引用/" itemprop="url">java 引用类型</a></h1>
+                <a class="post-title-link" href="/2018/05/10/大数据/yarn/yarn基础/" itemprop="url">yarn基础</a></h1>
         
 
         <div class="post-meta">
@@ -825,8 +823,8 @@ String(byte[] bytes)
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T17:08:48+08:00">
+                2018-05-10
               </time>
             
 
@@ -848,8 +846,8 @@ String(byte[] bytes)
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -859,8 +857,8 @@ String(byte[] bytes)
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/yarn/" itemprop="url" rel="index">
+                    <span itemprop="name">yarn</span>
                   </a>
                 </span>
 
@@ -898,11 +896,12 @@ String(byte[] bytes)
       
         
           
-          强引用当我们使用new 这个关键字创建对象时被创建的对象就是强引用，如Object object = new Object() 这个Object()就是一个强引用了，如果一个对象具有强引用。垃圾回收器就不会去回收有强引用的对象。如当jvm内存不足时，具备强引用的对象，虚拟机宁可会报内存空间不足的异常
-          ...
+          yarn基础yarn是hadoop集群资源管理系统。yarn提供请求和使用集群资源的API，但这些api很少直接用于用户代码，用户用的是分布式计算框架更高层的API，这些API建立在YARN上并隐藏了细节。
+
+          
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java基础/java引用/#more" rel="contents">
+            <a class="btn" href="/2018/05/10/大数据/yarn/yarn基础/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -953,7 +952,7 @@ String(byte[] bytes)
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java基础/IO/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/05/10/大数据/yarn/实现一个简单的Application框架/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -972,7 +971,7 @@ String(byte[] bytes)
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java基础/IO/" itemprop="url">java io</a></h1>
+                <a class="post-title-link" href="/2018/05/10/大数据/yarn/实现一个简单的Application框架/" itemprop="url">yarn实现一个简单的Application框架</a></h1>
         
 
         <div class="post-meta">
@@ -984,8 +983,8 @@ String(byte[] bytes)
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T17:08:48+08:00">
+                2018-05-10
               </time>
             
 
@@ -1007,8 +1006,8 @@ String(byte[] bytes)
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -1018,8 +1017,8 @@ String(byte[] bytes)
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/大数据/yarn/" itemprop="url" rel="index">
+                    <span itemprop="name">yarn</span>
                   </a>
                 </span>
 
@@ -1057,17 +1056,14 @@ String(byte[] bytes)
       
         
           
-          IO流所有的输入类都继承自InputStream,输入类都继承自OutputStream
-InputStreamInputStream的作用是标志那些从不同数据起源产生输入的类。这些数据起源包括（每个都有一个相关的InputStream子类）：
+          主要接口涉及到的核心接口如下：
 
-字节数组
-String对象
-文件
-“管道”，它的工作
+ClientRM:YarnClient,封装了ApplicationClientProtocol协议。
+AMRM:AMRMClientAsync,AMRMClientAsync.CallbackHandler，封装了ApplicationMasterProtocol
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java基础/IO/#more" rel="contents">
+            <a class="btn" href="/2018/05/10/大数据/yarn/实现一个简单的Application框架/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1118,7 +1114,7 @@ String对象
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java基础/关键字/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/04/30/分布式/zookeeper/zookeeper/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -1137,7 +1133,7 @@ String对象
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java基础/关键字/" itemprop="url">java 关键字</a></h1>
+                <a class="post-title-link" href="/2018/04/30/分布式/zookeeper/zookeeper/" itemprop="url">zookeeper原理</a></h1>
         
 
         <div class="post-meta">
@@ -1149,8 +1145,8 @@ String对象
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-30T22:21:37+08:00">
+                2018-04-30
               </time>
             
 
@@ -1172,8 +1168,8 @@ String对象
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
                   </a>
                 </span>
 
@@ -1183,8 +1179,8 @@ String对象
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
+                  <a href="/categories/分布式/zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">zookeeper</span>
                   </a>
                 </span>
 
@@ -1222,12 +1218,12 @@ String对象
       
         
           
-          staticstatic表示“全局”或者“静态”的意思，用来修饰成员变量和成员方法，也可以形成静态static代码块被static修饰的成员变量和成员方法独立于该类的任何对象,属于这个类。
-静态变量和实例变量　　对于静态变量在内存中只有一个拷贝（节省内存），JVM只为静态分配一次内存，在加载类的过程
+          概述ZooKeeper是一种分布式协调服务，用于管理大型主机。在分布式环境中协调和管理服务是一个复杂的过程。ZooKeeper通过其简单的架构和API解决了这个问题。ZooKeeper允许开发人员专注于核心应用程序逻辑，而不必担心应用程序的分布式特性。
+分布式应用分布式应用可以在给定时间（同时）在网
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java基础/关键字/#more" rel="contents">
+            <a class="btn" href="/2018/04/30/分布式/zookeeper/zookeeper/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1278,7 +1274,7 @@ String对象
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java基础/jni/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/29/设计模式/设计模式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -1297,7 +1293,7 @@ String对象
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java基础/jni/" itemprop="url">java jni</a></h1>
+                <a class="post-title-link" href="/2018/03/29/设计模式/设计模式/" itemprop="url">未命名</a></h1>
         
 
         <div class="post-meta">
@@ -1309,8 +1305,8 @@ String对象
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T00:50:59+08:00">
+                2018-03-29
               </time>
             
 
@@ -1319,39 +1315,6 @@ String对象
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -1382,11 +1345,15 @@ String对象
       
         
           
-          #JNI调用#JNI是Java Native Interface的缩写，它提供了若干的API实现了Java和其他语言的通信（主要是C&amp;C++）。使用java与本地已编译的代码交互，通常会丧失平台可移植性。但是，有些情况下这样做是可以接受的，甚至是必须的。例如，使用一些旧的库，与硬件、操作系统
+          综述设计模式分为三种类型，共23种。
+
+创建型模式：单例模式、抽象工厂模式、建造者模式、工厂模式、原型模式。
+结构型模式：适配器模式、桥接模式、装饰模式、组合模式、外观模式、享元模式、代理模式。
+行为型模式：模版方法模式、命令模式、迭代器模式、观察者模式、中介者模式、备忘录模式、解释器模式（Inte
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java基础/jni/#more" rel="contents">
+            <a class="btn" href="/2018/03/29/设计模式/设计模式/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1437,7 +1404,7 @@ String对象
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java并发/java并发(think in java)/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/18/数据库/mysql面试题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -1456,7 +1423,7 @@ String对象
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java并发/java并发(think in java)/" itemprop="url">java并发简介</a></h1>
+                <a class="post-title-link" href="/2018/03/18/数据库/mysql面试题/" itemprop="url">mysql面试题</a></h1>
         
 
         <div class="post-meta">
@@ -1468,8 +1435,8 @@ String对象
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
-                2018-03-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-18T11:55:31+08:00">
+                2018-03-18
               </time>
             
 
@@ -1491,19 +1458,8 @@ String对象
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
                   </a>
                 </span>
 
@@ -1541,15 +1497,21 @@ String对象
       
         
           
-          并发的多面性并发通常提高运行在单处理器上的程序的性能,如果没有任务阻塞,单处理器上的并发就没有意义
+          1. 主键 超键 候选键 外键
+超键(super key) ：在关系中能唯一标识元组的属性集称为关系模式的超键
 
-阻塞阻塞调用是指调用结果返回之前，当前线程会被挂起（线程进入非可执行状态，在这个状态下，CPU不会给线程分配时间片，即线程暂停运行）。函数只有在得到结果之后才会返回。
 
-同步，就是调用一个功能，该功
+候选键(candidate key)：不含有多余属性的超键称为候选键
+
+
+主键(primary key)：用户选作元组标识的一个候选键程序主键
+
+
+外键(foreign key)：如果
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java并发/java并发(think in java)/#more" rel="contents">
+            <a class="btn" href="/2018/03/18/数据库/mysql面试题/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1600,7 +1562,7 @@ String对象
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java并发/并发/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/git/git介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -1619,7 +1581,7 @@ String对象
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java并发/并发/" itemprop="url">CountDownLatch 和 CyclicBarrier 的区别</a></h1>
+                <a class="post-title-link" href="/2018/03/16/git/git介绍/" itemprop="url">git介绍</a></h1>
         
 
         <div class="post-meta">
@@ -1631,7 +1593,7 @@ String对象
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T14:55:00+08:00">
                 2018-03-16
               </time>
             
@@ -1654,19 +1616,8 @@ String对象
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/java并发/" itemprop="url" rel="index">
-                    <span itemprop="name">java并发</span>
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
                   </a>
                 </span>
 
@@ -1704,12 +1655,12 @@ String对象
       
         
           
-          CountDownLatch 和 CyclicBarrier 的区别？ (1) CountDownLatch 的作用是允许 1 个线程等待其他线程执行完成之后， 它才执行；而 CyclicBarrier 则是允许 N 个线程相互等待到某个公共屏障点，然 后这一组线程再同时执行。
- (2) Count
+          版本控制版本控制是一种记录一个或若干文件内容变化， 以便将来查阅特定版本修订情况的系统。
+采用版本控制系统（VCS）可以将某个文件回溯到之前的状态，甚至将整个项目都回退到过去某个时间点的状态， 你可以比较文件的变化细节，查出最后是谁修改了哪个地方，从而找出导致怪异问题出现的 原因，又是谁在何时报告了
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java并发/并发/#more" rel="contents">
+            <a class="btn" href="/2018/03/16/git/git介绍/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1760,7 +1711,7 @@ String对象
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/java基础/java并发/常见锁/">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/03/16/git/git分支管理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="王焕">
@@ -1779,7 +1730,7 @@ String对象
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/16/java基础/java并发/常见锁/" itemprop="url">java常见锁</a></h1>
+                <a class="post-title-link" href="/2018/03/16/git/git分支管理/" itemprop="url">git分支管理</a></h1>
         
 
         <div class="post-meta">
@@ -1791,7 +1742,7 @@ String对象
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T08:28:25+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T14:55:00+08:00">
                 2018-03-16
               </time>
             
@@ -1814,19 +1765,8 @@ String对象
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/" itemprop="url" rel="index">
-                    <span itemprop="name">java基础</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java基础/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
                   </a>
                 </span>
 
@@ -1864,12 +1804,14 @@ String对象
       
         
           
-          闭锁（Latch）　　闭锁（Latch）：一种同步方法，可以延迟线程的进度直到线程到达某个终点状态。也就是说闭锁的状态是一次性的，它确保在闭锁打开之前所有特定的活动都需要在闭锁打开之后才能完成。
-　　CountDownLatch是 JDK 5+里面闭锁的一个实现，允许一个或者多个线程等待某个事件的发
+          1.引言git 和 svn 的一个显著区别就是提供更丰富的分支特性，我们今天就要说一下如何管理这些分支。关于 git 的分支管理，Vincent Driessen 有一篇文章说的非常好，地址在参考[1]。我这里主要就是参考他的文章。
+2. 总览git 的分支整体预览图如下。
+
+从上图可以看到主要包含
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/03/16/java基础/java并发/常见锁/#more" rel="contents">
+            <a class="btn" href="/2018/03/16/git/git分支管理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1911,7 +1853,7 @@ String对象
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1961,7 +1903,7 @@ String对象
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1972,7 +1914,7 @@ String对象
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1983,7 +1925,7 @@ String对象
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

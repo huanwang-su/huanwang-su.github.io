@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="maven," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="官方的生命周期解释https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html 构建生命周期基础Maven基于构建生命周期的中心概念。这意味着构建和分发特定工件（项目）的过程被明确定义。 对于构建项目的人员，这意味着只需要学习一小堆命令即可构建任何Maven项目，POM将确保他们获得所需的结果。 有三">
+<meta name="keywords" content="maven">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6 maven生命周期">
+<meta property="og:url" content="http://hvan.wang/2018/06/16/maven/6 maven生命周期/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="官方的生命周期解释https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html 构建生命周期基础Maven基于构建生命周期的中心概念。这意味着构建和分发特定工件（项目）的过程被明确定义。 对于构建项目的人员，这意味着只需要学习一小堆命令即可构建任何Maven项目，POM将确保他们获得所需的结果。 有三">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-17T06:06:20.446Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="6 maven生命周期">
+<meta name="twitter:description" content="官方的生命周期解释https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html 构建生命周期基础Maven基于构建生命周期的中心概念。这意味着构建和分发特定工件（项目）的过程被明确定义。 对于构建项目的人员，这意味着只需要学习一小堆命令即可构建任何Maven项目，POM将确保他们获得所需的结果。 有三">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/06/16/maven/6 maven生命周期/"/>
+
+
+
+
+
+  <title>6 maven生命周期 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/06/16/maven/6 maven生命周期/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">6 maven生命周期</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-16T08:28:25+08:00">
+                2018-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/maven/" itemprop="url" rel="index">
+                    <span itemprop="name">maven</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/16/maven/6 maven生命周期/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/06/16/maven/6 maven生命周期/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>官方的生命周期解释<a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html" target="_blank" rel="noopener">https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html</a></p>
+<h2 id="构建生命周期基础"><a href="#构建生命周期基础" class="headerlink" title="构建生命周期基础"></a>构建生命周期基础</h2><p>Maven基于构建生命周期的中心概念。这意味着构建和分发特定工件（项目）的过程被明确定义。</p>
+<p>对于构建项目的人员，这意味着只需要学习一小堆命令即可构建任何Maven项目，<a href="https://maven.apache.org/guides/introduction/introduction-to-the-pom.html" target="_blank" rel="noopener"><strong>POM</strong></a>将确保他们获得所需的结果。</p>
+<p>有三个内置的生命周期：<strong>默认（default）</strong>，<strong>清洁（clean）</strong>和<strong>站点（site）</strong>。在<strong>默认（default）</strong>的生命周期处理你的项目部署，将<strong>清洁（clean）</strong>的生命周期处理项目的清理，而<strong>网站（site）</strong>的生命周期处理你的项目站点文档的创建。</p>
+<ul>
+<li>Clean Lifecycle在进行真正的构建之前进行一些清理工作。</li>
+<li>Default Lifecycle构建的核心部分，编译，测试，打包，部署等等。</li>
+<li>Site Lifecycle生成项目报告，站点，发布站点。</li>
+</ul>
+<p>每个生命周期包含一些阶段，这些阶段是有顺序的，并且后面的阶段依赖于前面的阶段，用户和Maven最直接的交互方式就是调用这些生命周期阶段。 </p>
+<p>较之于生命周期阶段的前后依赖关系，三套生命周期本身是相互独立的，用户可以仅仅调用clean生命周期的某个阶段，或者仅仅调用default生命周期的某个阶段，而不会对其他生命周期产生任何影响。</p>
+<h2 id="构建生命周期是由阶段组成的"><a href="#构建生命周期是由阶段组成的" class="headerlink" title="构建生命周期是由阶段组成的"></a>构建生命周期是由阶段组成的</h2><p>生命周期由构建阶段的不同列表定义，其中构建阶段表示生命周期中的阶段。</p>
+<p><strong>默认（default）</strong>的生命周期包括以下阶段（注意：这里是简化的阶段，用于生命周期阶段的完整列表，请参阅下方<strong>生命周期参考</strong>）：</p>
+<ul>
+<li><strong>验证（validate）</strong> - 验证项目是否正确，所有必要的信息可用</li>
+<li><strong>编译（compile）</strong> - 编译项目的源代码</li>
+<li><strong>测试（test）</strong> - 使用合适的单元测试框架测试编译的源代码。这些测试不应该要求代码被打包或部署</li>
+<li><strong>打包（package）</strong> - 采用编译的代码，并以其可分配格式（如JAR）进行打包。</li>
+<li><strong>验证（verify）</strong> - 对集成测试的结果执行任何检查，以确保满足质量标准</li>
+<li><strong>安装（install）</strong> - 将软件包安装到本地存储库中，用作本地其他项目的依赖项</li>
+<li><strong>部署（deploy）</strong> - 在构建环境中完成，将最终的包复制到远程存储库以与其他开发人员和项目共享。</li>
+</ul>
+<p>这些生命周期阶段（以及此处未显示的其他生命周期阶段）依次执行，以完成<code>默认</code>生命周期。给定上述生命周期阶段，这意味着当使用默认生命周期时，Maven将首先验证项目，然后尝试编译源代码，运行这些源代码，打包二进制文件（例如jar），运行集成测试软件包，验证集成测试，将验证的软件包安装到本地存储库，然后将安装的软件包部署到远程存储库。</p>
+<p>换句话说，在生命周期里面阶段是连续的，在不出错的前提下，比如执行<strong>打包（package）</strong>时就一定是执行了<strong>测试（test）</strong>之后再执行。</p>
+<h2 id="生命周期参考"><a href="#生命周期参考" class="headerlink" title="生命周期参考"></a>生命周期参考</h2><p>以下列出了<strong>默认（default）</strong>，<strong>清洁（clean）</strong>和<strong>站点（site）</strong>生命周期的所有构建阶段，它们按照指定的顺序执行的顺序执行。</p>
+<h3 id="清洁（clean）生命周期"><a href="#清洁（clean）生命周期" class="headerlink" title="清洁（clean）生命周期"></a>清洁（clean）生命周期</h3><table>
+<thead>
+<tr>
+<th>预清洁（pre-clean）</th>
+<th>执行实际项目清理之前所需的流程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>清洁（clean）</strong></td>
+<td>删除以前构建生成的所有文件</td>
+</tr>
+<tr>
+<td><strong>后清洁（post-clean）</strong></td>
+<td>执行完成项目清理所需的流程</td>
+</tr>
+</tbody>
+</table>
+<h3 id="默认（default）生命周期"><a href="#默认（default）生命周期" class="headerlink" title="默认（default）生命周期"></a>默认（default）生命周期</h3><table>
+<thead>
+<tr>
+<th><strong>验证（validate）</strong></th>
+<th>验证项目是正确的，所有必要的信息可用。</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>初始化（initialize）</strong></td>
+<td>初始化构建状态，例如设置属性或创建目录。</td>
+</tr>
+<tr>
+<td><strong>产生来源（generate-sources）</strong></td>
+<td>生成包含在编译中的任何源代码。</td>
+</tr>
+<tr>
+<td><strong>流程源（process-sources）</strong></td>
+<td>处理源代码，例如过滤任何值。</td>
+</tr>
+<tr>
+<td><strong>生成资源（generate-resources）</strong></td>
+<td>生成包含在包中的资源。</td>
+</tr>
+<tr>
+<td><strong>流程资源（process-resources）</strong></td>
+<td>将资源复制并处理到目标目录中，准备打包。</td>
+</tr>
+<tr>
+<td><strong>编译（compile）</strong></td>
+<td>编译项目的源代码。</td>
+</tr>
+<tr>
+<td><strong>工艺类（process-classes）</strong></td>
+<td>从编译后处理生成的文件，例如对Java类进行字节码增强。</td>
+</tr>
+<tr>
+<td><strong>生成测试来源（generate-test-sources）</strong></td>
+<td>生成包含在编译中的任何测试源代码。</td>
+</tr>
+<tr>
+<td><strong>流程测试来源（process-test-sources）</strong></td>
+<td>处理测试源代码，例如过滤任何值。</td>
+</tr>
+<tr>
+<td><strong>生成测试资源（generate-test-resources）</strong></td>
+<td>创建测试资源。</td>
+</tr>
+<tr>
+<td><strong>流程测试资源（process-test-resources）</strong></td>
+<td>将资源复制并处理到测试目标目录中。</td>
+</tr>
+<tr>
+<td><strong>测试编译（test-compile）</strong></td>
+<td>将测试源代码编译到测试目标目录中</td>
+</tr>
+<tr>
+<td><strong>流程检验类（process-test-classes）</strong></td>
+<td>从测试编译中处理生成的文件，例如对Java类进行字节码增强。对于Maven 2.0.5及以上版本。</td>
+</tr>
+<tr>
+<td><strong>测试（test）</strong></td>
+<td>使用合适的单元测试框架运行测试。这些测试不应该要求代码被打包或部署。</td>
+</tr>
+<tr>
+<td><strong>制备包（prepare-package）</strong></td>
+<td>在实际包装之前，执行必要的准备包装的操作。这通常会导致打包的处理版本的包。（Maven 2.1及以上）</td>
+</tr>
+<tr>
+<td><strong>打包（package）</strong></td>
+<td>采取编译的代码，并以其可分发的格式（如JAR）进行打包。</td>
+</tr>
+<tr>
+<td><strong>预集成测试（pre-integration-test）</strong></td>
+<td>在执行集成测试之前执行所需的操作。这可能涉及诸如设置所需环境等。</td>
+</tr>
+<tr>
+<td><strong>集成测试（integration-test）</strong></td>
+<td>如果需要，可以将该包过程并部署到可以运行集成测试的环境中。</td>
+</tr>
+<tr>
+<td><strong>整合后的测试（post-integration-test）</strong></td>
+<td>执行集成测试后执行所需的操作。这可能包括清理环境。</td>
+</tr>
+<tr>
+<td><strong>校验（verify）</strong></td>
+<td>运行任何检查以验证包装是否有效并符合质量标准。</td>
+</tr>
+<tr>
+<td><strong>安装（install）</strong></td>
+<td>将软件包安装到本地存储库中，以作为本地其他项目的依赖关系。</td>
+</tr>
+<tr>
+<td><strong>部署（deploy）</strong></td>
+<td>在集成或发布环境中完成，将最终软件包复制到远程存储库，以与其他开发人员和项目共享。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="站点（site）生命周期"><a href="#站点（site）生命周期" class="headerlink" title="站点（site）生命周期"></a>站点（site）生命周期</h3><table>
+<thead>
+<tr>
+<th><strong>预网站（pre-site）</strong></th>
+<th>在实际的项目现场生成之前执行所需的进程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>网站（site）</strong></td>
+<td>生成项目的站点文档</td>
+</tr>
+<tr>
+<td><strong>后网站（post-site）</strong></td>
+<td>执行完成站点生成所需的进程，并准备站点部署</td>
+</tr>
+<tr>
+<td><strong>网站部署（site-deploy）</strong></td>
+<td>将生成的站点文档部署到指定的Web服务器</td>
+</tr>
+</tbody>
+</table>
+<h2 id="生命周期阶段在命令行中的调用"><a href="#生命周期阶段在命令行中的调用" class="headerlink" title="生命周期阶段在命令行中的调用"></a>生命周期阶段在命令行中的调用</h2><p>在开发环境中，使用以下调用构建并将工件安装到本地存储库中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn install</span><br></pre></td></tr></table></figure>
+<p>此命令在执行<code>安装</code>之前按顺序（<strong>验证（validate）</strong>，<strong>编译（compile）</strong>，<strong>打包（package）</strong>等）执行每个默认生命周期阶段。在这种情况下，您只需要调用最后一个构建阶段来执行，<strong>安装（install）。</strong></p>
+<p>在构建环境中，使用以下调用将工件清理地构建并部署到共享存储库中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean deploy</span><br></pre></td></tr></table></figure>
+<p>相同的命令可以在多模块场景（即具有一个或多个子项目的项目）中使用。Maven遍历每个子项目并执行<strong>清洁（clean）</strong>，然后执行<strong>部署（deploy）</strong>（包括所有之前的构建阶段步骤）。</p>
+<p>注意：在我们开发阶段，有一些生命周期的阶段，比如<strong>验证（validate）</strong>这些，基本很少用到。只要使用关键的几个基本能满足需求。</p>
+<blockquote>
+<p> <strong>通常情况在命令行只调用某些特定的阶段</strong></p>
+<p>以连字符（<code>pre-</code>，<code>post-</code>或<code>process-</code>）命名的阶段通常不会从命令行直接调用。在生命周期的阶段上，只有特定的几个阶段对于构建有意义。一些无用的阶段只起到了中间阶段的作用，换句话说只是一个过客。</p>
+</blockquote>
+<h2 id="调用由插件目标（Plugin-Goals）组成的构建阶段"><a href="#调用由插件目标（Plugin-Goals）组成的构建阶段" class="headerlink" title="调用由插件目标（Plugin Goals）组成的构建阶段"></a>调用由插件目标（Plugin Goals）组成的构建阶段</h2><p>即使构建阶段负责构建生命周期中的特定步骤，其执行这些职责的方式可能会有所不同。这是通过声明绑定到这些构建阶段的插件目标来完成的。</p>
+<p>插件目标代表一个特定的任务（比构建阶段更精细），有助于项目的构建和管理。它可能被限制在零个或多个构建阶段。不限于任何构建阶段的目标可以通过直接调用在构建生命周期之外执行。执行顺序取决于调用目标和构建阶段的顺序。例如，考虑下面的命令。该<strong>清洁（clean）</strong>和<strong>打包（package）</strong>是构建阶段，而<strong>dependency:copy-dependencies</strong>是一个插件的目标。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean dependency:copy-dependencies package</span><br></pre></td></tr></table></figure>
+<p>如果要执行此操作，则将首先执行<strong>清洁（clean）</strong>阶段，然后执行<strong>dependency:copy-dependencies</strong>目标，然后才能最终执行<strong>打包（package）</strong>阶段（以及默认生命周期的所有之前的构建阶段）。</p>
+<p>而且，如果一个目标被绑定到一个或者多个构建阶段，那么在所有这些阶段都会调用这个目标。</p>
+<p>此外，构建阶段也可以有零个或多个目标。如果构建阶段没有绑定目标，则构建阶段将不会执行。但是，如果它有一个或多个目标，它将执行所有这些目标</p>
+<p>提示：其实简单点理解就是说dependency是一个插件，在我们执行生命周期阶段时，可以调用这个插件做特定的事，其中copy-dependencies就是特定的事，那么上面的命令可以这么理解，在执行clean后就会执行dependecy这个插件，最后再执行package；如果dependecy这个插件执行过程异常，package就不会执行到。一个命令可以有多个插件，也可以一个插件都没有。</p>
+<h2 id="使用构建生命周期来设置项目"><a href="#使用构建生命周期来设置项目" class="headerlink" title="使用构建生命周期来设置项目"></a>使用构建生命周期来设置项目</h2><p>构建生命周期足够简单，但是当您为项目配置Maven构建时，您如何将任务分配到每个构建阶段？</p>
+<h3 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h3><p>第一个也是最常见的方法是通过同样命名的POM元素<packaging>为您的项目设置打包。一些有效的打包值是jar，war，ear和pom。如果没有指定包装值，它将默认为jar。每个不同类型的打包都包含要绑定到特定阶段的目标列表。例如，jar包将绑定以下目标来构建默认生命周期的阶段。</packaging></p>
+<table>
+<thead>
+<tr>
+<th><strong>流程资源（process-resources）</strong></th>
+<th><strong>resources:resources</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>编译（compile）</strong></td>
+<td><strong>compiler:compile</strong></td>
+</tr>
+<tr>
+<td><strong>流程测试资源（process-test-resources）</strong></td>
+<td><strong>resources:testResources</strong></td>
+</tr>
+<tr>
+<td><strong>测试编译（test-compile）</strong></td>
+<td><strong>compiler:testCompile</strong></td>
+</tr>
+<tr>
+<td><strong>测试（test）</strong></td>
+<td><strong>surefire:test</strong></td>
+</tr>
+<tr>
+<td><strong>打包（package）</strong></td>
+<td><strong>jar:jar</strong></td>
+</tr>
+<tr>
+<td><strong>安装（install）</strong></td>
+<td><strong>install:install</strong></td>
+</tr>
+<tr>
+<td><strong>部署（deploy）</strong></td>
+<td><strong>deploy:deploy</strong></td>
+</tr>
+</tbody>
+</table>
+<p>这里简单点可以说不同的包对应不同的生命周期阶段，比如jar包和war包的区别可以参考：<a href="https://maven.apache.org/ref/3.5.0/maven-core/default-bindings.html" target="_blank" rel="noopener">https://maven.apache.org/ref/3.5.0/maven-core/default-bindings.html</a>。上方列表可以这么理解，左边是简化的命令，右侧是详细的插件加目标（命令行参数）的形式；切记，<strong>Maven都是以插件的形式存在的</strong>，包括生命周期的阶段同样也是一个个不同的插件组成，比如上面的编译（compile）就是由compiler插件提供，其中compile为这个插件的目标，也可以说是插件的命令行参数。</p>
+<h3 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h3><p>将目标添加到阶段的第二种方法是在项目中配置插件。插件是为Maven提供目标的工件。此外，插件可以具有一个或多个目标，其中每个目标代表该插件的能力。例如，编译器（compiler）插件有两个目标：compile和testCompile。前者编译主代码的源代码，后者编译测试代码的源代码。</p>
+<p>插件可以包含指示将目标绑定到的生命周期阶段的信息。请注意，自己添加插件是不够的，您还必须指定要作为构建的一部分运行的目标。</p>
+<p>配置的目标将被添加到已经从选定的打包绑定到生命周期的目标。如果将多个目标绑定到特定阶段，则使用的顺序是首先执行来自打包装的顺序，然后执行在POM中配置。请注意，您可以使用<executions>元素来获得对特定目标的顺序更多的控制。</executions></p>
+<p>例如，Modello插件默认将目标modello:java绑定到generate-sources阶段（注意：modello:java目标生成Java源代码）。因此，要使用Modello插件，并从模型生成源代码并将其合并到构建中，您可以在<build>的<plugins>部分中将以下内容添加到POM中：</plugins></build></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"> <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.modello<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>modello-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.8.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">models</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">model</span>&gt;</span>src/main/mdo/maven.mdo<span class="tag">&lt;/<span class="name">model</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">models</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">goal</span>&gt;</span>java<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>Modello插件有默认的生命周期阶段，而无需自己手动配置这些阶段。</p>
+<p><strong><executions></executions></strong>元素作用：可以使用不同的配置多次运行相同的目标。还可以使用单独的执行标识，以便在继承或应用配置文件期间，您可以控制目标配置是合并还是转为额外的执行。</p>
+<p>在<strong>modello:java</strong>的情况下，它只在<strong>generate-sources</strong>阶段才有意义。</p>
+<p>可以自己指定阶段。例如，假设您有一个目标display:time当前时间到命令行的时间，并希望它在process-test-resources阶段运行以指示测试何时开始。这将被配置如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"> <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.mycompany.example<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>display-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">phase</span>&gt;</span>process-test-resources<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">goal</span>&gt;</span>time<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h2 id="内置生命周期的绑定"><a href="#内置生命周期的绑定" class="headerlink" title="内置生命周期的绑定"></a>内置生命周期的绑定</h2><p>根据<a href="https://maven.apache.org/ref/3.5.0/maven-core/default-bindings.html" target="_blank" rel="noopener">https://maven.apache.org/ref/3.5.0/maven-core/default-bindings.html</a>提供的不同类型对应不同的生命周期阶段</p>
+<p>默认情况下，某些阶段的目标与之相关。对于默认生命周期，这些绑定取决于包装值。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/maven/" rel="tag"># maven</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/16/maven/5 maven pom文件/" rel="next" title="5 maven pom文件">
+                <i class="fa fa-chevron-left"></i> 5 maven pom文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">104</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#构建生命周期基础"><span class="nav-number">1.</span> <span class="nav-text">构建生命周期基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建生命周期是由阶段组成的"><span class="nav-number">2.</span> <span class="nav-text">构建生命周期是由阶段组成的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期参考"><span class="nav-number">3.</span> <span class="nav-text">生命周期参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#清洁（clean）生命周期"><span class="nav-number">3.1.</span> <span class="nav-text">清洁（clean）生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#默认（default）生命周期"><span class="nav-number">3.2.</span> <span class="nav-text">默认（default）生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#站点（site）生命周期"><span class="nav-number">3.3.</span> <span class="nav-text">站点（site）生命周期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期阶段在命令行中的调用"><span class="nav-number">4.</span> <span class="nav-text">生命周期阶段在命令行中的调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用由插件目标（Plugin-Goals）组成的构建阶段"><span class="nav-number">5.</span> <span class="nav-text">调用由插件目标（Plugin Goals）组成的构建阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用构建生命周期来设置项目"><span class="nav-number">6.</span> <span class="nav-text">使用构建生命周期来设置项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#打包"><span class="nav-number">6.1.</span> <span class="nav-text">打包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件"><span class="nav-number">6.2.</span> <span class="nav-text">插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内置生命周期的绑定"><span class="nav-number">7.</span> <span class="nav-text">内置生命周期的绑定</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1529108905000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="spark stream," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Spark Streaming Executor DynamicAllocation 机制分析Spark Streaming Executor DynamicAllocation 机制分析在Spark Streaming，作业的执行是以批处理的方式进行的，批处理间隔内(batch interval)要完成对批量作业的执行，这就要求==作业的执行时间（process time）不大于设定的批处理间隔">
+<meta name="keywords" content="spark stream">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark Streaming Executor DynamicAllocation 机制分析">
+<meta property="og:url" content="http://hvan.wang/2018/06/02/大数据/spark stream/Spark Streaming Executor DynamicAllocation 机制分析/index.html">
+<meta property="og:site_name" content="王焕の博客">
+<meta property="og:description" content="Spark Streaming Executor DynamicAllocation 机制分析Spark Streaming Executor DynamicAllocation 机制分析在Spark Streaming，作业的执行是以批处理的方式进行的，批处理间隔内(batch interval)要完成对批量作业的执行，这就要求==作业的执行时间（process time）不大于设定的批处理间隔">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4093076-37a7253f4a01a01a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/457">
+<meta property="og:updated_time" content="2018-06-04T08:43:06.379Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark Streaming Executor DynamicAllocation 机制分析">
+<meta name="twitter:description" content="Spark Streaming Executor DynamicAllocation 机制分析Spark Streaming Executor DynamicAllocation 机制分析在Spark Streaming，作业的执行是以批处理的方式进行的，批处理间隔内(batch interval)要完成对批量作业的执行，这就要求==作业的执行时间（process time）不大于设定的批处理间隔">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/4093076-37a7253f4a01a01a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/457">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://hvan.wang/2018/06/02/大数据/spark stream/Spark Streaming Executor DynamicAllocation 机制分析/"/>
+
+
+
+
+
+  <title>Spark Streaming Executor DynamicAllocation 机制分析 | 王焕の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?fda2ef7e04824cae7d02f2026268a57c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王焕の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hvan.wang/2018/06/02/大数据/spark stream/Spark Streaming Executor DynamicAllocation 机制分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王焕">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王焕の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spark Streaming Executor DynamicAllocation 机制分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-02T21:07:01+08:00">
+                2018-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/spark-stream/" itemprop="url" rel="index">
+                    <span itemprop="name">spark stream</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/02/大数据/spark stream/Spark Streaming Executor DynamicAllocation 机制分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/06/02/大数据/spark stream/Spark Streaming Executor DynamicAllocation 机制分析/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Spark-Streaming-Executor-DynamicAllocation-机制分析"><a href="#Spark-Streaming-Executor-DynamicAllocation-机制分析" class="headerlink" title="Spark Streaming Executor DynamicAllocation 机制分析"></a>Spark Streaming Executor DynamicAllocation 机制分析</h1><h1 id="Spark-Streaming-Executor-DynamicAllocation-机制分析-1"><a href="#Spark-Streaming-Executor-DynamicAllocation-机制分析-1" class="headerlink" title="Spark Streaming Executor DynamicAllocation 机制分析"></a>Spark Streaming Executor DynamicAllocation 机制分析</h1><p>在Spark Streaming，作业的执行是以批处理的方式进行的，批处理间隔内(batch interval)要完成对批量作业的执行，这就要求==作业的执行时间（process time）不大于设定的批处理间隔==。在计算资源一定的情况下，执行时间与待处理的数据规模成正比。在大数据流式计算环境中，数据的产生完全由数据源决定,由于不同的数据源在不同时空范围内的状态不统一且发生动态变化，导致数据流的速率呈现出了突发性的特征。前一时刻数据速率和后一时刻数据速率可能会有巨大的差异， 因此不同批次接收的数据总量存在差异，不同批次的执行时间也就会存在差异。这种差异是由于计算资源与数据规模不匹配造成的。==在Spark 2.0以前， Streaming的资源分配都采取资源预先分配的策略，资源管理器依据应用的申请量予以提前分配，在应用执行期间不能依据应用实际的计算资源需求量进行调整，执行作业时会存在资源过剩或资源不足的情况。==</p>
+<h1 id="Spark-Streaming-的计算特征"><a href="#Spark-Streaming-的计算特征" class="headerlink" title="Spark Streaming 的计算特征"></a>Spark Streaming 的计算特征</h1><p>Spark Streaming应用的执行过程可以分成数据准备和数据计算两个阶段，两个阶段分别由不同的作业进行处理，分别是数据接收作业（提交Receiver时的Job）和数据处理作业(Batch Job)。在大数据流式计算中，数据是实时产生、动态增加的，只要数据源处于活动状态,数据就会一直产生，因此要求数据接收作业不间断的接收数据，并将接收的数据分割成批，供数据处理作业消费。Spark Streaming的计算特征如下图所示（实际处理时间&lt;批处理间隔）:</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4093076-37a7253f4a01a01a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/457" alt="img"></p>
+<h1 id="Streaming-Executor-DynamicAllocation机制的评价指标"><a href="#Streaming-Executor-DynamicAllocation机制的评价指标" class="headerlink" title="Streaming Executor DynamicAllocation机制的评价指标"></a>Streaming Executor DynamicAllocation机制的评价指标</h1><p>作业的实际处理时间与设定的批处理间隔之间存在的关系如下：</p>
+<ul>
+<li>实际处理时间 远小于  批处理间隔<br>此时，计算资源大部分时间处于空闲，造成资源浪费</li>
+<li>作业的实际处理时间 约等于  批处理间隔<br>此时，能满足处理，但数据具有波动性，可能下一个时间不能满足，造成延迟。计算资源初显不足。</li>
+<li>介于以上两者之间<br>系统资源能正常满足计算，又不至于造成过多浪费，此时系统稳定性良好。</li>
+<li>作业的实际处理时间  大于  批处理间隔<br>批处理间隔内不能完成批作业，说明计算资源不足。</li>
+</ul>
+<p>因此，采用 有效处理时间占比【有效处理时间占比 = 实际处理时间 / 批处理间隔】来评价当前计算资源的过剩或不足。</p>
+<h1 id="Streaming-Executor-DynamicAllocation机制的工作流程"><a href="#Streaming-Executor-DynamicAllocation机制的工作流程" class="headerlink" title="Streaming Executor DynamicAllocation机制的工作流程"></a>Streaming Executor DynamicAllocation机制的工作流程</h1><ul>
+<li>通过监控组件，获取已完成批作业的实际执行时间</li>
+<li>计算有效处理时间占比，然后与设置的阈值进行比较，如果小于下限down,则结束一个Executor; 如果大于上限up， 则增加Executor(个数由比率决定).</li>
+</ul>
+<p>参数spark.streaming.dynamicAllocation.enabled参数决定，默认为false不开启。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>与Spark Streaming Backpressure机制相同，Spark Streaming Executor动态伸缩机制也是以事件驱动的形式工作的。其负责动态伸缩的类为ExecutorAllocationManager。其通过分析Streaming作业的监控信息，动态的伸请或释放executor.</p>
+<h2 id="ExecutorAllocationManager-注册与启动"><a href="#ExecutorAllocationManager-注册与启动" class="headerlink" title="ExecutorAllocationManager 注册与启动"></a>ExecutorAllocationManager 注册与启动</h2><p>JobScheduler启动时会创建ExecutorAllocationManager 并向ListenerBus注册并开启监听。</p>
+<p>其将开启定时器，周期性的执行manageAllocation方法，其时间周期由参数 “spark.streaming.dynamicAllocation.scalingInterval”决定，默认为60s.</p>
+<p>即：默认情况下每隔60s 执行一次manageAllocation. managerAllocation会使用历史作业执行信息计算出有效处理时间占比ratio, 并依据占比与预设阈值的关系决定增减资源。预设的阈值信息及增减策略为：</p>
+<ul>
+<li><strong>scalingUpRatio</strong><br>阈值上限，由参数“park.streaming.dynamicAllocation.scalingUpRatio”控制，默认值为0.9。当计算出的ratio大于scalingUpRatio 时，将按如下算式计算出的值，增加若干Executor。</li>
+<li><strong>scalingDownRatio</strong><br>阈值下限， 由参数“spark.streaming.dynamicAllocation.scalingDownRatio”，默认值为0.3。 当计算出的ratio小于scalingDownRatio时，将减少一个Executor.</li>
+</ul>
+<h2 id="事件触发"><a href="#事件触发" class="headerlink" title="事件触发"></a>事件触发</h2><p>Executor dynamicAllocation机制是依据完成的批Job的执行信息进行决策，其在批Job执行完成时会收集作业。<br>其事件触发过程，同SparkStreaming Backpressure分析 BatchCompleted触发过程</p>
+<h1 id="与Spark-Core中Executor-DynamicAllocation-机制的区别"><a href="#与Spark-Core中Executor-DynamicAllocation-机制的区别" class="headerlink" title="与Spark Core中Executor DynamicAllocation 机制的区别"></a>与Spark Core中Executor DynamicAllocation 机制的区别</h1><p>Spark Core 中的DynamicAllocation机制同Spark Streaming中一样，也是周期性调度评估机制确定是否要进行Executor增减。不同的是，Spark Core中应用是批处理应用，执行完成之后，即可以结束，因此其使用idle策略来评估Executor的增减，具体策略为：</p>
+<ul>
+<li>减少Executor<br>应用拥有的Executor数量在处理当前负载时绰绰有余，通过缩减Executor仍然能够一次性执行所有任务（running + pending task）时，会通过一定的策略结束掉部分Executor，达到节省资源的目的。Spark Core中的策略为如果监测到一个Executor空闲了K 秒，这意味着其在未来不再执行任务，则可以将其移除。其中参数K由“spark.dynamicAllocation.executorIdleTimeout ”配制，默认值为60s.</li>
+<li>增加Executor<br>应用拥有的Executor数量不足以及时处理当前负载，存在任务长时间堆集，则要增加Executor。Spark Core中的策略为如果监测到任务调度队列中的任务N秒内没有被调度，则会增加新的Executor，如果再过M秒还未进行调度，则以指数方式继续增加，直到上限。</li>
+</ul>
+<p>由于Spark Streaming应用是长期存在的、微批处理应用。其每隔一个小的时间间隔(batchInterval)就会提交微批处理应用。其会使Spark Core中的Executor DynamicAllocation 机制的idle 策略受阻，因此Spark Streaming 采用有效处理时间占比radio来进行决策。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spark-stream/" rel="tag"># spark stream</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/02/大数据/spark stream/SparkStreaming Backpressure分析/" rel="next" title="SparkStreaming Backpressure分析">
+                <i class="fa fa-chevron-left"></i> SparkStreaming Backpressure分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/02/大数据/spark stream/Spark Streaming Receiver启动过程/" rel="prev" title="Spark Streaming Receiver启动过程">
+                Spark Streaming Receiver启动过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://ww1.sinaimg.cn/large/0063bT3ggy1fpdlwgeh51j305t08q765.jpg"
+                alt="王焕" />
+            
+              <p class="site-author-name" itemprop="name">王焕</p>
+              <p class="site-description motion-element" itemprop="description">小码农一个, 欢迎交流</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">104</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huanwang-su" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1360527082@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spark-Streaming-Executor-DynamicAllocation-机制分析"><span class="nav-number">1.</span> <span class="nav-text">Spark Streaming Executor DynamicAllocation 机制分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spark-Streaming-Executor-DynamicAllocation-机制分析-1"><span class="nav-number">2.</span> <span class="nav-text">Spark Streaming Executor DynamicAllocation 机制分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spark-Streaming-的计算特征"><span class="nav-number">3.</span> <span class="nav-text">Spark Streaming 的计算特征</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Streaming-Executor-DynamicAllocation机制的评价指标"><span class="nav-number">4.</span> <span class="nav-text">Streaming Executor DynamicAllocation机制的评价指标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Streaming-Executor-DynamicAllocation机制的工作流程"><span class="nav-number">5.</span> <span class="nav-text">Streaming Executor DynamicAllocation机制的工作流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分析"><span class="nav-number">6.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ExecutorAllocationManager-注册与启动"><span class="nav-number">6.1.</span> <span class="nav-text">ExecutorAllocationManager 注册与启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件触发"><span class="nav-number">6.2.</span> <span class="nav-text">事件触发</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#与Spark-Core中Executor-DynamicAllocation-机制的区别"><span class="nav-number">7.</span> <span class="nav-text">与Spark Core中Executor DynamicAllocation 机制的区别</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王焕</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '1527944821000',
+            owner: 'huanwang-su',
+            repo: 'huanwang-su.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '34d77e9ce832508aaae056ce90e868f33b776713',
+            
+                client_id: '2b519dfb3eabb513db47'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

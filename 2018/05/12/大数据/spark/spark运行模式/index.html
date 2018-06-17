@@ -525,7 +525,7 @@
 <p><img src="http://www.th7.cn/d/file/p/2017/08/14/99909df840cd7e773dff2f483fe3594b.jpg" alt="clip_image016"></p>
 <h2 id="YARN"><a href="#YARN" class="headerlink" title="YARN"></a>YARN</h2><p>Spark on YARN模式根据Driver在集群中的位置分为两种模式：一种是YARN-Client模式，另一种是YARN-Cluster（或称为YARN-Standalone模式）。</p>
 <p>由于已经有了资源管理器，所以不需要启动Spark的Master、Worker守护进程。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</span><br><span class="line">    --master yarn \ # --deploy-mode client</span><br><span class="line">    --deploy-mode cluster \</span><br><span class="line">    --driver-memory 4g \</span><br><span class="line">    --executor-memory 2g \</span><br><span class="line">    --executor-cores 1 \</span><br><span class="line">    --queue thequeue \</span><br><span class="line">    lib/spark-examples*.jar \</span><br><span class="line">    10</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</span></span><br><span class="line">    --master yarn \ # --deploy-mode client</span><br><span class="line">    --deploy-mode cluster \</span><br><span class="line">    --driver-memory 4g \</span><br><span class="line">    --executor-memory 2g \</span><br><span class="line">    --executor-cores 1 \</span><br><span class="line">    --queue thequeue \</span><br><span class="line">    lib/spark-examples*.jar \</span><br><span class="line">    10</span><br></pre></td></tr></table></figure>
 <h3 id="YARN框架流程"><a href="#YARN框架流程" class="headerlink" title="YARN框架流程"></a>YARN框架流程</h3><p>任何框架与YARN的结合，都必须遵循YARN的开发模式。</p>
 <p>Yarn框架的基本运行流程图为：</p>
 <p><img src="http://www.th7.cn/d/file/p/2017/08/14/ec9386134f075aef2adcdb49b97c4b65.jpg" alt="clip_image018"> </p>
@@ -589,8 +589,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/05/12/大数据/spark/spark shuffle/" rel="next" title="spark shuffle">
-                <i class="fa fa-chevron-left"></i> spark shuffle
+              <a href="/2018/05/12/大数据/spark/spark简介/" rel="next" title="spark简介">
+                <i class="fa fa-chevron-left"></i> spark简介
               </a>
             
           </div>
@@ -599,8 +599,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/05/12/大数据/spark/spark调度和任务分配/" rel="prev" title="spark调度和任务分配">
-                spark调度和任务分配 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/05/12/大数据/spark/rdd/" rel="prev" title="RDD简介和RDD模型">
+                RDD简介和RDD模型 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -689,7 +689,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -700,7 +700,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -711,7 +711,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
